@@ -613,7 +613,8 @@
                     <div id="loginErr" class="hidden text-sm text-red-600 bg-red-50 p-2.5 rounded-lg"></div>
                     <button type="submit" id="loginBtn" class="w-full py-3.5 bg-honey-500 text-white font-display font-700 rounded-xl hover:bg-honey-600 transition-colors">Masuk</button>
                 </form>
-                               <div class="text-center mt-4 text-sm"><a href="#" onclick="navigate('register');return false" class="text-honey-600 font-semibold hover:underline">Belum punya akun? Daftar</a></div>
+                <div class="text-center mt-4 text-sm"><a href="#" onclick="navigate('register');return false" class="text-honey-600 font-semibold hover:underline">Belum punya akun? Daftar</a></div>
+                <div class="text-center mt-4 text-sm"><a href="#" onclick="navigate('landing');return false" class="text-honey-600 font-semibold hover:underline">Kembali ke landing Page</a></div>
             </div>
         </div>`;
     }
@@ -622,7 +623,7 @@
     function rRegister(){
         return `<div class="view-enter min-h-screen flex items-center justify-center px-4 py-8">
             <div class="w-full max-w-md">
-                <div class="text-center mb-8"><h1 class="font-display font-900 text-2xl">Daftar Akun Baru</h1></div>
+                <div class="text-center mb-8"><div class="w-12 h-12 bg-honey-500 rounded-xl flex items-center justify-center mx-auto mb-3 shadow"><i class="fas fa-cubes text-white"></i></div><h1 class="font-display font-900 text-2xl">Daftar Akun Baru</h1></div>
                 <form id="regForm" class="bg-white rounded-2xl shadow-xl p-8 space-y-4 border">
                     <input type="text" id="regN" placeholder="Nama Lengkap" required class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50">
                     <input type="text" id="regU" placeholder="Username" required autocomplete="username" class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50">
@@ -630,7 +631,7 @@
                     <div><div class="relative"><input type="password" id="regP" placeholder="Password" required autocomplete="new-password" class="w-full pl-4 pr-10 py-3 border rounded-xl text-sm bg-gray-50"><button type="button" onclick="togglePassword('regP',this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" aria-label="Tampilkan password"><i class="fas fa-eye"></i></button></div><p class="text-xs text-gray-500 mt-1"><i class="fas fa-info-circle mr-1"></i>Min 8 karakter, huruf besar, kecil, angka, simbol</p></div>
                     
                     <!-- Select Role -->
-                    <select id="regR" required class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50" onchange="handleRegRoleChange(this.value)"><option value="user">Masyarakat</option><option value="admdusun">Kepala Dusun</option><option value="admrom">Admin Romawi</option><option value="admdesa">Pemerintah Desa</option></select>
+                    <select id="regR" required class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50" onchange="handleRegRoleChange(this.value)"><option value="">Daftar sebagai...<option value="user">Masyarakat</option><option value="admdusun">Kepala Dusun</option><option value="admrom">Admin Romawi</option><option value="admdesa">Pemerintah Desa</option></select>
                     
                     <!-- Dusun Dropdown: Visible for User & Kepala Dusun -->
                     <div id="regDW" class="hidden"><select id="regDus" class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50"><option value="">Pilih Dusun...</option>${[...new Set(Object.values(CONFIG.RT_MAP))].map(d=>`<option>${d}</option>`).join('')}</select></div>
@@ -642,7 +643,9 @@
                     <button type="submit" class="w-full py-3.5 bg-honey-500 text-white font-display font-700 rounded-xl hover:bg-honey-600 transition-colors">Daftar</button>
                 </form>
                 <div class="text-center mt-4 text-sm"><a href="#" onclick="navigate('login');return false" class="text-honey-600 font-semibold hover:underline">Sudah punya akun? Masuk</a></div>
-            </div>
+                <div class="text-center mt-4 text-sm"><a href="#" onclick="navigate('landing');return false" class="text-honey-600 font-semibold hover:underline">Kembali ke landing Page</a></div>
+
+                </div>
         </div>`;
     }
 
@@ -992,7 +995,7 @@
         </div>`;
         return `<div class="space-y-4">${statsBar(list)}
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <div><h3 class="font-display font-700 text-xl">Verifikasi & Input Dusun</h3><p class="text-xs text-gray-400 mt-0.5">Usulan dari warga dan hasil musyawarah — beri peringkat lalu submit ke Desa</p></div>
+                <div><h3 class="font-display font-700 text-xl">Verifikasi & Input Dusun</h3><p class="text-xs text-gray-400 mt-0.5">Usulan dari warga dan hasil musyawarah — beri peringkat lalu submit ke Desa. Klik baris untuk detail.</p></div>
                 ${locked?'<span class="px-3 py-1.5 bg-red-100 text-red-700 text-xs font-bold rounded-lg"><i class="fas fa-lock mr-1"></i>Pengimputan Ditutup</span>':`<button onclick="openFormUsulan('musyawarah')" class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-blue-700 transition-colors"><i class="fas fa-plus mr-1"></i> Input Hasil Musyawarah</button>`}
             </div>${list.length&&!locked?btns:''}
             <div class="tbl-wrap"><table class="tbl"><thead><tr>
@@ -1010,7 +1013,8 @@
                 const isDiajukan=i.status==='diajukan';
                 const isDikembalikan=i.status==='dikembalikan_dusun';
                 return `
-                <tr class="main-row">
+                <!-- UPDATE 1: Added onclick to show detail -->
+                <tr class="main-row cursor-pointer" onclick="showDetail('${escapeJs(i.id)}')">
                     <td class="text-center">${locked?'':`<input type="checkbox" class="bulk-check accent-honey-500" data-id="${i.id}" onchange="updateBulkCount()">`}</td>
                     <td class="text-center text-gray-400 text-xs">${n+1}</td>
                     <td class="text-center">${statusLabel(i.status)}</td>
@@ -1042,7 +1046,7 @@
             return(a.judul||'').localeCompare(b.judul||'');
         });
         return `<div class="space-y-4">${statsBar(sorted)}
-            <div><h3 class="font-display font-700 text-xl">Musyawarah & Verifikasi Desa</h3><p class="text-xs text-gray-400 mt-0.5">Usulan dari seluruh dusun diurutkan peringkat dusun — beri peringkat desa, tentukan kewenangan, lalu verifikasi final</p></div>
+            <div><h3 class="font-display font-700 text-xl">Musyawarah & Verifikasi Desa</h3><p class="text-xs text-gray-400 mt-0.5">Usulan dari seluruh dusun diurutkan peringkat dusun — beri peringkat desa, tentukan kewenangan, lalu verifikasi final. Klik baris untuk detail.</p></div>
             <div class="tbl-wrap"><table class="tbl"><thead><tr>
                 <th class="w-10 text-center">No</th>
                 <th class="w-36">Status</th>
@@ -1055,7 +1059,8 @@
                 <th class="w-14 text-center">Rank</th>
             </tr></thead><tbody>
             ${sorted.length?sorted.map((i,n)=>`
-                <tr class="main-row">
+                <!-- UPDATE 1: Added onclick to show detail -->
+                <tr class="main-row cursor-pointer" onclick="showDetail('${escapeJs(i.id)}')">
                     <td class="text-center text-gray-400 text-xs">${n+1}</td>
                     <td class="text-center">${statusLabel(i.status)}</td>
                     <td class="font-semibold text-gray-800">${escapeHtml(i.judul)}</td>
@@ -1270,7 +1275,31 @@
         </div>`);
     }
 
+    // UPDATE 2: Helper for Modal Add User Role Change
+    window.handleAddUserRoleChange = function(role) {
+        const dw = document.getElementById('addDW');
+        const kw = document.getElementById('addKW');
+        const dusInput = document.getElementById('addDus');
+
+        // Reset logic
+        dw.classList.add('hidden');
+        kw.classList.add('hidden');
+
+        if (role === 'user' || role === 'admdusun') {
+            dw.classList.remove('hidden');
+            if(role === 'user') {
+                dusInput.required = true;
+            } else {
+                dusInput.required = true;
+                kw.classList.remove('hidden'); 
+            }
+        } else if (role === 'admdesa' || role === 'admrom') {
+            kw.classList.remove('hidden'); 
+        }
+    }
+
     function openModalAddUser(){
+        // UPDATE 2: Form now matches Registration exactly
         openModal(`
         <div class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this)closeModal()">
             <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl view-enter p-6">
@@ -1280,8 +1309,29 @@
                     <input type="text" id="addU" placeholder="Username" required autocomplete="off" class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-50">
                     <input type="email" id="addE" placeholder="Email" required class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-50">
                     <div class="relative"><input type="password" id="addP" placeholder="Password" required class="w-full pl-4 pr-10 py-2.5 border rounded-xl text-sm bg-gray-50"><button type="button" onclick="togglePassword('addP',this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" aria-label="Tampilkan password"><i class="fas fa-eye"></i></button></div>
-                    <select id="addR" required class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-50"><option value="user">Masyarakat</option><option value="admdusun">Kepala Dusun</option><option value="admrom">Admin Romawi</option><option value="admdesa">Pemerintah Desa</option></select>
-                    <input type="text" id="addD" placeholder="Dusun (Khusus Kepala Dusun)" class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-50">
+                    
+                    <!-- Role Select -->
+                    <select id="addR" required class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-50" onchange="handleAddUserRoleChange(this.value)">
+                        <option value="">Pilih Role...</option>
+                        <option value="user">Masyarakat</option>
+                        <option value="admdusun">Kepala Dusun</option>
+                        <option value="admrom">Admin Romawi</option>
+                        <option value="admdesa">Pemerintah Desa</option>
+                    </select>
+
+                    <!-- Dusun Dropdown: Visible for User & Kepala Dusun -->
+                    <div id="addDW" class="hidden">
+                        <select id="addDus" class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-50">
+                            <option value="">Pilih Dusun...</option>
+                            ${[...new Set(Object.values(CONFIG.RT_MAP))].map(d=>`<option>${d}</option>`).join('')}
+                        </select>
+                    </div>
+                    
+                    <!-- Verification Code: Visible for Kepala Dusun, Pemdes, & AdmRom -->
+                    <div id="addKW" class="hidden">
+                        <input type="text" id="addK" placeholder="Kode Verifikasi Admin" class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-50">
+                    </div>
+
                     <div id="addErr" class="hidden text-sm text-red-600 bg-red-50 p-2.5 rounded-lg"></div>
                     <div class="flex justify-end gap-3 pt-2"><button type="button" onclick="closeModal()" class="px-4 py-2 border rounded-xl text-sm font-semibold hover:bg-gray-50">Batal</button><button type="submit" class="px-4 py-2 btn-primary rounded-xl shadow">Simpan</button></div>
                 </form>
@@ -1552,9 +1602,32 @@
         const errEl=document.getElementById('addErr');errEl.classList.add('hidden');
         const rawPw=form.querySelector('#addP').value;
         if(!CONFIG.PASS_REGEX.test(rawPw)){errEl.textContent='Password tidak memenuhi syarat (min 8 karakter, huruf besar, kecil, angka, simbol).';errEl.classList.remove('hidden');return}
-        const res=await API.post('addUser',{nama:form.querySelector('#addN').value.trim(),username:form.querySelector('#addU').value.trim(),email:form.querySelector('#addE').value.trim(),password:await sha256(rawPw),role:form.querySelector('#addR').value,dusun:form.querySelector('#addD').value.trim()||'-'});
+        
+        // UPDATE 2: Extract new fields
+        const nama = form.querySelector('#addN').value.trim();
+        const username = form.querySelector('#addU').value.trim();
+        const email = form.querySelector('#addE').value.trim();
+        const role = form.querySelector('#addR').value;
+        const dusun = (document.getElementById('addDus')?.value.trim()) || '-';
+        const kode = (document.getElementById('addK')?.value.trim()) || '';
+
+        // UPDATE 2: Validate logic identical to Registration
+        if(role === 'admdusun' && kode !== 'dusun2025'){
+            errEl.textContent='Kode verifikasi Kepala Dusun salah'; errEl.classList.remove('hidden'); return;
+        }
+        if(role === 'admdesa' && kode !== 'desa2025'){
+            errEl.textContent='Kode verifikasi Pemerintah Desa salah'; errEl.classList.remove('hidden'); return;
+        }
+        if(role === 'admrom' && kode !== 'warrom2025'){
+            errEl.textContent='Kode verifikasi Admin Romawi salah'; errEl.classList.remove('hidden'); return;
+        }
+
+        const res=await API.post('addUser',{
+            nama, username, email,
+            password:await sha256(rawPw),
+            role, dusun, kode
+        });
         if(res.success){
-            // Optimistic update local cache
             await fetchUsersData();
             showToast('User ditambahkan','success');closeModal();renderUserTable();
         }
@@ -1603,7 +1676,6 @@
             const st=document.getElementById('dlStatus');
             if(st){st.className='bg-forest-50 border-forest-200 text-forest-700 border rounded-lg p-3 text-xs font-medium';st.innerHTML='<i class="fas fa-lock-open mr-1"></i>Status: TERBUKA — Pengimputan tahun ini masih aktif.'}
             showToast('Batas waktu berhasil disimpan','success');
-            // Refresh cache & render summary
             await fetchDeadlinesData();
             renderDeadlineSummary();
         }catch(e){errEl.textContent='Gagal menyimpan batas waktu.';errEl.classList.remove('hidden')}
@@ -1627,19 +1699,16 @@
         
         const needsDataFetch = cachedUsulan.length === 0 || cachedUsulan[0].tahun != STATE.tahunAktif;
         
-        // Auto update logic: Fetch specific data when entering specific tabs
         let fetchPromises = [];
         if (needsDataFetch) {
             fetchPromises.push(fetchUsulan(true));
             fetchPromises.push(fetchDeadline());
         }
         
-        // Tambahan: Jika masuk tab users, fetch user data terbaru
         if (tab === 'users') {
             fetchPromises.push(fetchUsersData());
         }
         
-        // Tambahan: Jika masuk tab pengaturan, fetch deadline data terbaru
         if (tab === 'pengaturan') {
             fetchPromises.push(fetchDeadlinesData());
         }
@@ -1657,10 +1726,8 @@
                 if(c)c.innerHTML='<div class="text-center py-16 text-red-400"><i class="fas fa-exclamation-circle text-3xl mb-2 block"></i>Gagal memuat data.</div>';
             }
         } else {
-            // Smooth: Render langsung dari cache tanpa spinner
             if(c)c.innerHTML=renderTab();
             if(tab==='beranda') initCharts();
-            // Selalu render ulang tabel user/deadline dari cache saat switch tab agar DOM fresh
             if(tab==='users')renderUserTable();
             if(tab==='pengaturan')renderDeadlineSummary();
         }
@@ -1733,9 +1800,7 @@
                 const kode=(document.getElementById('regK')||{}).value||'';
                 const dusun=(document.getElementById('regDus')||{}).value||'-';
                 
-                // Validasi Khusus Register
                 if((role === 'user' && !dusun) && dusun === '') {
-                    // User harus pilih dusun
                 }
 
                 const rawPw=document.getElementById('regP').value;
@@ -1783,11 +1848,8 @@
     document.addEventListener('visibilitychange', async () => {
         if (document.visibilityState === 'visible' && STATE.currentUser) {
             try {
-                // Refresh data utama
                 await fetchUsulan(true);
                 await fetchDeadline();
-                
-                // Refresh data spesifik agar auto-update benar-benar terasa
                 await fetchUsersData();
                 await fetchDeadlinesData();
 
