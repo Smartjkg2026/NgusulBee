@@ -1,0 +1,1821 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NgusulBee - Usulan Masyarakat Desa Jangkang</title>
+    <link rel="shortcut icon" type="image/png" href="Logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js Library untuk Diagram -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        honey: { 50:'#FFF9ED',100:'#FFF0CC',200:'#FFE199',300:'#FFD266',400:'#FFC333',500:'#E8A317',600:'#C48C0E',700:'#9A6D0A',800:'#704F07',900:'#463203' },
+                        forest: { 50:'#F0F7F2',100:'#D4EAD9',200:'#A8D5B3',300:'#7CBF8E',400:'#50AA68',500:'#2D8B4E',600:'#236E3E',700:'#1A522E',800:'#11361F',900:'#081B0F' }
+                    },
+                    fontFamily: { display:['Outfit','sans-serif'], body:['DM Sans','sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root{--bg:#FFF9ED;--fg:#1C1C1C;--muted:#7A7265;--accent:#E8A317;--card:#FFFFFF;--border:#E8DFD0;--success:#2D8B4E;--danger:#D64545}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);overflow-x:hidden}
+        h1,h2,h3,h4,h5,h6{font-family:'Outfit',sans-serif}
+        .hex-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.04;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100' fill='none' stroke='%23E8A317' stroke-width='1'/%3E%3Cpath d='M28 0L28 34L0 50L0 84L28 100L56 84L56 50L28 34' fill='none' stroke='%23E8A317' stroke-width='1'/%3E%3C/svg%3E")}
+        .view-enter{animation:viewIn .4s ease-out forwards}
+        @keyframes viewIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        .toast-enter{animation:toastIn .35s ease-out forwards}
+        .toast-exit{animation:toastOut .3s ease-in forwards}
+        @keyframes toastIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+        @keyframes toastOut{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:0}}
+        .sidebar-link{transition:all .2s ease;border-left:3px solid transparent}
+        .sidebar-link:hover,.sidebar-link.active{background:rgba(232,163,23,.1);border-left-color:var(--accent);color:var(--accent)}
+        .badge-draft{background:#F3F4F6;color:#4B5563}
+        .badge-diajukan{background:#FEF3C7;color:#92400E}
+        .badge-dikembalikan_user{background:#FEE2E2;color:#B91C1C}
+        .badge-ranked_dusun{background:#DBEAFE;color:#1E40AF}
+        .badge-dikembalikan_dusun{background:#FEF3C7;color:#92400E}
+        .badge-final{background:#D1FAE5;color:#065F46}
+        input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)!important;box-shadow:0 0 0 3px rgba(232,163,23,.15)}
+        ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#D4C5A9;border-radius:3px}
+        .spinner{border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;width:20px;height:20px;animation:spin .7s linear infinite;display:inline-block}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .hero-hex{position:absolute;opacity:.06;pointer-events:none}
+        .hero-hex-1{top:10%;left:5%;width:120px;height:120px;animation:floatHex 8s ease-in-out infinite}
+        .hero-hex-2{top:60%;right:8%;width:80px;height:80px;animation:floatHex 6s ease-in-out infinite 1s}
+        .hero-hex-3{bottom:15%;left:15%;width:60px;height:60px;animation:floatHex 7s ease-in-out infinite 2s}
+        @keyframes floatHex{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-15px) rotate(10deg)}}
+        @media(prefers-reduced-motion:reduce){.view-enter,.toast-enter,.toast-exit{animation:none}.hero-hex-1,.hero-hex-2,.hero-hex-3{animation:none}}
+        .hero-gradient{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 40%,rgba(232,163,23,.08),transparent 60%),radial-gradient(ellipse 60% 50% at 80% 70%,rgba(45,139,78,.06),transparent 60%);pointer-events:none;z-index:0}
+        .stat-card{transition:transform .2s ease,box-shadow .2s ease}.stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 25px -5px rgba(0,0,0,.1)}
+        .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid #E5E7EB;border-radius:.75rem;background:#fff}
+        .tbl{width:100%;border-collapse:collapse;font-size:.8125rem;min-width:720px}
+        .tbl thead{background:#F9FAFB;position:sticky;top:0;z-index:2}
+        .tbl th{padding:.625rem .75rem;text-align:left;font-weight:600;color:#6B7280;font-size:.6875rem;text-transform:uppercase;letter-spacing:.025em;white-space:nowrap;border-bottom:1px solid #E5E7EB;vertical-align:middle}
+        .tbl td{padding:.625rem .75rem;border-bottom:1px solid #F3F4F6;vertical-align:middle;white-space:normal;word-break:break-word;line-height:1.4}
+        .tbl tbody tr{transition:background .15s ease}
+        .tbl tbody tr:hover{background:#FEF9EE}
+        .tbl tbody tr:last-child td{border-bottom:none}
+        .tbl .sub-row td{background:#FFFBF0;border-bottom:1px solid #E5E7EB;padding:.6rem .75rem}
+        .tbl .sub-row:hover{background:#FFFBF0}
+        .tbl .main-row td{cursor:default}
+        .btn-primary{background:var(--accent);color:#fff;font-weight:600;transition:all .15s ease}.btn-primary:hover{filter:brightness(1.08);transform:translateY(-1px);box-shadow:0 4px 12px rgba(232,163,23,.3)}
+        .btn-danger{background:#FEE2E2;color:#DC2626;font-weight:600;transition:all .15s ease}.btn-danger:hover{background:#FECACA}
+        .btn-success{background:var(--success);color:#fff;font-weight:600;transition:all .15s ease}.btn-success:hover{filter:brightness(1.1);transform:translateY(-1px)}
+        .table-loading{position:absolute;inset:0;background:rgba(255,255,255,.7);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:10;border-radius:.75rem}
+        .lock-pulse{animation:lockPulse 2s ease-in-out infinite}
+        @keyframes lockPulse{0%,100%{opacity:1}50%{opacity:.6}}
+        .bulk-count{transition:opacity .2s ease}
+        
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="hex-bg"></div>
+    <div id="app" class="relative z-10 min-h-screen"></div>
+    <div id="toast-container" class="fixed top-4 right-4 z-[999] flex flex-col gap-2 max-w-sm"></div>
+    <div id="modal-container" class="fixed inset-0 z-[998] hidden"></div>
+
+    <script>
+    /* ==========================================
+       KONFIGURASI
+       ========================================== */
+    const CONFIG={
+        API_URL:'https://script.google.com/macros/s/AKfycbxiEBV30Rk1U6SaiKYAC1hEV8CPKoH_OBuJwE3fWKDEZG_dGL24lj7dY4FZX0zilfuyWA/exec',
+        APP_NAME:'NgusulBee',
+        DESA:'Desa Jangkang',
+        KATEGORI:['Infrastruktur','Pendidikan','Kesehatan','Ekonomi','Sosial','Lingkungan'],
+        SATUAN:['Meter','Buah','Unit','Titik','Paket','Meter Persegi','Kg','Lainnya'],
+        TAHUN_LIST:(()=>{const y=new Date().getFullYear();const a=[];for(let i=y-2;i<=y+3;i++)a.push(i);return a})(),
+        RT_MAP:{
+            '001':'Dusun Jangkang','002':'Dusun Jangkang','003':'Dusun Jangkang','004':'Dusun Jangkang',
+            '005':'Dusun Jangkang','006':'Dusun Jangkang','007':'Dusun Jangkang','008':'Dusun Jangkang',
+            '009':'Dusun Jangkang','010':'Dusun Jangkang Barat','011':'Dusun Jangkang Timur',
+            '012':'Dusun Jangkang Timur','013':'Dusun Jangkang Timur','014':'Dusun Jangkang Timur',
+            '015':'Dusun Jangkang Timur','016':'Dusun Jangkang Barat','017':'Dusun Jangkang Barat',
+            '018':'Dusun Jangkang Barat','019':'Dusun Jangkang Barat','020':'Dusun Jangkang Barat',
+            '021':'Dusun Air Asam','022':'Dusun Air Asam','023':'Dusun Air Asam','024':'Dusun Air Asam',
+            '025':'Dusun Air Asam','026':'Dusun Air Asam','027':'Dusun Air Asam'
+        },
+        PASS_REGEX:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.\-_])[A-Za-z\d@$!%*?&.\-_]{8,}/,
+        INACTIVITY_TIMEOUT:30*60*1000
+    };
+
+    const STATE={currentView:'landing',currentUser:null,tahunAktif:new Date().getFullYear(),dashboardTab:'beranda',deadline:null,isLocked:false};
+    let cachedUsulan=[],inactivityTimer,inactivityDebounce=null,deadlineInterval=null,mockReady=false,inactivityWarningShown=false;
+    
+    // --- NEW: Cache for Users and Deadlines ---
+    let cachedUsers = [];
+    let cachedDeadlines = {}; 
+    // -----------------------------------------
+
+    // Chart Instances
+    let chartCategoryInstance = null;
+    let chartStatusInstance = null;
+
+    /* ==========================================
+       UTILITAS
+       ========================================== */
+    async function sha256(m){
+        try{
+            const b=new TextEncoder().encode(m);
+            const h=await crypto.subtle.digest('SHA-256',b);
+            return Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,'0')).join('');
+        }catch(e){
+            let h=0;for(let i=0;i<m.length;i++){h=((h<<5)-h)+m.charCodeAt(i);h|=0}
+            return 'fb_'+Math.abs(h).toString(16).padStart(16,'0')+'_'+m.length.toString(16);
+        }
+    }
+    function escapeHtml(s){if(s==null)return '';const d=document.createElement('div');d.textContent=String(s);return d.innerHTML}
+    function escapeJs(s){return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\n/g,'\\n').replace(/\r/g,'\\r')}
+    function togglePassword(id,btn){const i=document.getElementById(id);const ic=btn.querySelector('i');if(i.type==='password'){i.type='text';ic.classList.replace('fa-eye','fa-eye-slash')}else{i.type='password';ic.classList.replace('fa-eye-slash','fa-eye')}}
+    function showToast(msg,type='info'){
+        const c=document.getElementById('toast-container');
+        const cl={success:'bg-forest-600 text-white',error:'bg-red-600 text-white',info:'bg-honey-500 text-white',warning:'bg-amber-500 text-white'};
+        const ic={success:'fa-check-circle',error:'fa-times-circle',info:'fa-info-circle',warning:'fa-exclamation-triangle'};
+        const el=document.createElement('div');
+        el.className=`toast-enter ${cl[type]} px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 text-sm font-medium`;
+        el.innerHTML=`<i class="fas ${ic[type]}"></i><span>${escapeHtml(msg)}</span>`;
+        c.appendChild(el);
+        setTimeout(()=>{el.classList.replace('toast-enter','toast-exit');setTimeout(()=>el.remove(),300)},3500);
+    }
+    function formatRupiah(n){return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',minimumFractionDigits:0}).format(n||0)}
+    
+    // --- NEW: Rupiah Formatter for Input Field ---
+    function formatRupiahInput(angka) {
+        var number_string = angka.replace(/[^,\d]/g, '').toString(),
+            split = number_string.split(','),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        if (ribuan) {
+            var separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+        return rupiah ? 'Rp ' + rupiah : '';
+    }
+
+    function unformatRupiah(str) {
+        return parseInt(str.replace(/[^0-9]/g, ''), 10) || 0;
+    }
+
+    function setupRupiahInput(inputId) {
+        const el = document.getElementById(inputId);
+        if (!el) return;
+
+        el.addEventListener('keyup', function(e) {
+            // Set value directly to formatted string
+            this.value = formatRupiahInput(this.value);
+        });
+
+        // Optional: clean up on blur if needed, or keep formatted for display
+        // Note: When saving, we must unformat.
+    }
+    // ------------------------------------------------
+
+    function statusLabel(s){
+        const m={
+            draft:{l:'Draft',c:'badge-draft'},
+            diajukan:{l:'Diajukan',c:'badge-diajukan'},
+            dikembalikan_user:{l:'Dikembalikan ke Warga',c:'badge-dikembalikan_user'},
+            ranked_dusun:{l:'Terinput ke Desa',c:'badge-ranked_dusun'},
+            dikembalikan_dusun:{l:'Dikembalikan ke Dusun',c:'badge-dikembalikan_dusun'},
+            final:{l:'Diverifikasi Final',c:'badge-final'}
+        };
+        const x=m[s]||{l:s,c:'badge-draft'};
+        return `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold whitespace-nowrap ${x.c}">${x.l}</span>`;
+    }
+    function statusText(s){return{draft:'Draft',diajukan:'Diajukan',dikembalikan_user:'Dikembalikan ke Warga',ranked_dusun:'Terinput ke Desa',dikembalikan_dusun:'Dikembalikan ke Dusun',final:'Diverifikasi Final'}[s]||s||'-'}
+    function roleLabel(r){return{user:'Masyarakat',admdusun:'Kepala Dusun',admdesa:'Pemerintah Desa', admrom: 'Admin Romawi'}[r]||r}
+    function roleIcon(r){return{user:'fa-users',admdusun:'fa-house-chimney',admdesa:'fa-landmark', admrom: 'fa-user-shield'}[r]||'fa-user'}
+
+    /* Lazy load XLSX library */
+    function loadXlsx(){return new Promise((resolve,reject)=>{if(window.XLSX){resolve();return}const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';s.onload=resolve;s.onerror=reject;document.head.appendChild(s)})}
+
+    /* Focus trap untuk modal (aksesibilitas) */
+    function trapFocus(container){
+        const focusable=container.querySelectorAll('button,input,select,textarea,[tabindex]:not([tabindex="-1"])');
+        if(!focusable.length)return;
+        const first=focusable[0],last=focusable[focusable.length-1];
+        container.addEventListener('keydown',function handler(e){
+            if(e.key!=='Tab'){if(e.key==='Escape')closeModal();return}
+            if(e.shiftKey){if(document.activeElement===first){e.preventDefault();last.focus()}}
+            else{if(document.activeElement===last){e.preventDefault();first.focus()}}
+        });
+        first.focus();
+    }
+
+    /* Buka modal dengan focus trap */
+    function openModal(html){
+        const m=document.getElementById('modal-container');
+        m.classList.remove('hidden');
+        m.innerHTML=html;
+        const inner=m.querySelector('.modal-overlay > div:last-child');
+        if(inner)trapFocus(inner);
+    }
+    function closeModal(){const m=document.getElementById('modal-container');m.classList.add('hidden');m.innerHTML=''}
+
+    /* Filter opsi RT di dropdown */
+    function filterRtOptions(q){
+        q=q.toLowerCase();
+        document.querySelectorAll('.rt-option').forEach(el=>{
+            const rt=el.dataset.rt;
+            const dusun=(el.dataset.dusun||'').toLowerCase();
+            el.style.display=(rt.includes(q)||dusun.includes(q))?'':'none';
+        });
+    }
+
+    /* ==========================================
+       SORTING MONITORING BERDASARKAN RANKING
+       ========================================== */
+    function sortForMonitoring(list,role){
+        return[...list].sort((a,b)=>{
+            if(role==='admdesa'){
+                const ra=parseInt(a.rankingDesa)||999,rb=parseInt(b.rankingDesa)||999;
+                if(ra!==rb)return ra-rb;
+                return(parseInt(a.rankingDusun)||999)-(parseInt(b.rankingDusun)||999);
+            }else{
+                const ra=parseInt(a.rankingDusun)||999,rb=parseInt(b.rankingDusun)||999;
+                if(ra!==rb)return ra-rb;
+                return(parseInt(a.rankingDesa)||999)-(parseInt(b.rankingDesa)||999);
+            }
+        });
+    }
+
+    /* ==========================================
+       EXPORT EXCEL
+       ========================================== */
+    async function doExportExcel(){
+        try{await loadXlsx()}catch(e){showToast('Gagal memuat library Excel','error');return}
+        const u=STATE.currentUser;if(!u)return;
+        const role=u.role;
+        let list;
+        if(role==='user')list=cachedUsulan.filter(x=>x.username===u.username&&x.status!=='draft'&&x.status!=='dikembalikan_user');
+        else if(role==='admdusun')list=cachedUsulan.filter(x=>x.dusun===u.dusun&&(x.status==='ranked_dusun'||x.status==='final'));
+        else if(role==='admrom')list=cachedUsulan.filter(x=>(x.status==='ranked_dusun'||x.status==='final')); // AdmRom export
+        else list=cachedUsulan.filter(x=>x.status==='final');
+        list=sortForMonitoring(list,role);
+        if(!list.length){showToast('Tidak ada data untuk diekspor','warning');return}
+        const cols={
+            user:[
+                {h:'No',get:(_,i)=>i+1},{h:'Status',get:v=>statusText(v.status)},
+                {h:'Judul Usulan',get:v=>v.judul},{h:'Sumber',get:v=>v.username},
+                {h:'Kategori',get:v=>v.kategori},
+                {h:'RT',get:v=>Array.isArray(v.rt)?v.rt.join(', '):v.rt},
+                {h:'Volume',get:v=>v.volume+' '+v.satuan},
+                {h:'Estimasi Biaya (Rp)',get:v=>v.estimasiBiaya||0},
+                {h:'Ranking Dusun',get:v=>v.rankingDusun||''},{h:'Ranking Desa',get:v=>v.rankingDesa||''},
+                {h:'Rencana Aksi',get:v=>v.rencanaAksi||''},{h:'Catatan',get:v=>v.catatanKembali||''}
+            ],
+            admdusun:[
+                {h:'No',get:(_,i)=>i+1},{h:'Status',get:v=>statusText(v.status)},
+                {h:'Judul Usulan',get:v=>v.judul},{h:'Sumber',get:v=>v.username},
+                {h:'Kategori',get:v=>v.kategori},
+                {h:'RT',get:v=>Array.isArray(v.rt)?v.rt.join(', '):v.rt},
+                {h:'Volume',get:v=>v.volume+' '+v.satuan},
+                {h:'Estimasi Biaya (Rp)',get:v=>v.estimasiBiaya||0},
+                {h:'Ranking Dusun',get:v=>v.rankingDusun||''},{h:'Ranking Desa',get:v=>v.rankingDesa||''},
+                {h:'Rencana Aksi',get:v=>v.rencanaAksi||''},{h:'Catatan',get:v=>v.catatanKembali||''}
+            ],
+            admrom: [ // Specific export for AdmRom
+                {h:'No',get:(_,i)=>i+1},{h:'Status',get:v=>statusText(v.status)},
+                {h:'Judul Usulan',get:v=>v.judul},{h:'Sumber',get:v=>v.username},
+                {h:'Dusun',get:v=>v.dusun},{h:'Kategori',get:v=>v.kategori},
+                {h:'RT',get:v=>Array.isArray(v.rt)?v.rt.join(', '):v.rt},
+                {h:'Volume',get:v=>v.volume+' '+v.satuan},
+                {h:'Estimasi Biaya (Rp)',get:v=>v.estimasiBiaya||0},
+                {h:'Ranking Dusun',get:v=>v.rankingDusun||''},{h:'Ranking Desa',get:v=>v.rankingDesa||''}
+            ],
+            admdesa:[
+                {h:'No',get:(_,i)=>i+1},{h:'Status',get:v=>statusText(v.status)},
+                {h:'Judul Usulan',get:v=>v.judul},{h:'Sumber',get:v=>v.username},
+                {h:'Dusun',get:v=>v.dusun},{h:'Kategori',get:v=>v.kategori},
+                {h:'RT',get:v=>Array.isArray(v.rt)?v.rt.join(', '):v.rt},
+                {h:'Volume',get:v=>v.volume+' '+v.satuan},
+                {h:'Estimasi Biaya (Rp)',get:v=>v.estimasiBiaya||0},
+                {h:'Ranking Dusun',get:v=>v.rankingDusun||''},{h:'Ranking Desa',get:v=>v.rankingDesa||''},
+                {h:'Rencana Aksi',get:v=>v.rencanaAksi||''},{h:'Rujukan',get:v=>v.rujukanUsulan||''},
+                {h:'Catatan',get:v=>v.catatanKembali||''}
+            ]
+        };
+        const def=cols[role]||cols.user;
+        const rows=list.map((item,idx)=>{const row={};def.forEach(c=>{row[c.h]=c.get(item,idx)});return row});
+        const ws=XLSX.utils.json_to_sheet(rows);
+        ws['!cols']=def.map(c=>({wch:Math.max(c.h.length+4,18)}));
+        const wb=XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb,ws,'Monitoring');
+        XLSX.writeFile(wb,`Monitoring_Usulan_${STATE.tahunAktif}_${CONFIG.DESA.replace(/\s+/g,'_')}.xlsx`);
+        showToast('File Excel berhasil diunduh','success');
+    }
+
+    /* ==========================================
+       BATAS WAKTU PENGIMPUTAN
+       ========================================== */
+    function computeLock(){
+        if(!STATE.deadline){STATE.isLocked=false;return}
+        STATE.isLocked=new Date(STATE.deadline)<new Date();
+    }
+    async function fetchDeadline(){
+        if(!STATE.currentUser)return;
+        const res=await API.post('getDeadline',{tahun:STATE.tahunAktif});
+        if(res.success){STATE.deadline=res.deadline||null;computeLock();updateLockUI()}
+    }
+    function updateLockUI(){
+        const ind=document.getElementById('lockIndicator');
+        const ban=document.getElementById('lockBanner');
+        if(ind){
+            if(STATE.isLocked){
+                ind.className='text-xs px-2.5 py-1 rounded-full font-bold bg-red-100 text-red-700 lock-pulse flex items-center gap-1';
+                ind.innerHTML='<i class="fas fa-lock text-[10px]"></i>Dikunci';
+            }else if(STATE.deadline){
+                ind.className='text-xs px-2.5 py-1 rounded-full font-bold bg-forest-100 text-forest-700 flex items-center gap-1';
+                ind.innerHTML='<i class="fas fa-lock-open text-[10px]"></i>Dibuka';
+            }else{
+                ind.className='text-xs px-2.5 py-1 rounded-full font-bold bg-gray-100 text-gray-500 flex items-center gap-1';
+                ind.innerHTML='<i class="fas fa-infinity text-[10px]"></i>Tanpa Batas';
+            }
+        }
+        if(ban){
+            if(STATE.isLocked){
+                const dl=new Date(STATE.deadline);
+                const fmt=dl.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+                ban.innerHTML=`<div class="flex items-center gap-3"><div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0"><i class="fas fa-lock text-red-500"></i></div><div><p class="font-display font-bold text-red-800 text-sm">Pengimputan Ditutup</p><p class="text-xs text-red-600 mt-0.5">Batas waktu pengimputan usulan tahun ${STATE.tahunAktif} telah berakhir pada ${fmt}. Tidak dapat menambah, mengubah, atau mengajukan usulan baru.</p></div></div>`;
+                ban.className='bg-red-50 border border-red-200 rounded-xl p-4 mb-4';
+            }else{ban.className='hidden';ban.innerHTML=''}
+        }
+    }
+    function startDeadlineCheck(){clearInterval(deadlineInterval);deadlineInterval=setInterval(()=>{computeLock();updateLockUI()},60000)}
+
+    /* ==========================================
+       SESSION & INACTIVITY
+       ========================================== */
+    function saveSession(){if(STATE.currentUser)localStorage.setItem('ngusulbee_session',JSON.stringify({user:STATE.currentUser,tahun:STATE.tahunAktif}))}
+    function clearSession(){localStorage.removeItem('ngusulbee_session');STATE.currentUser=null;STATE.dashboardTab='beranda';cachedUsulan=[];clearInterval(deadlineInterval)}
+    function setupInactivityTimer(){
+        clearTimeout(inactivityTimer);inactivityWarningShown=false;
+        inactivityTimer=setTimeout(()=>{
+            if(!STATE.currentUser)return;
+            inactivityWarningShown=true;
+            showToast('Sesi akan berakhir dalam 2 menit karena tidak ada aktivitas.','warning');
+            inactivityTimer=setTimeout(()=>{
+                if(STATE.currentUser){showToast('Sesi berakhir karena tidak ada aktivitas.','warning');handleLogout()}
+            },120000);
+        },28*60*1000);
+    }
+    function resetInactivityTimer(){if(!STATE.currentUser)return;clearTimeout(inactivityDebounce);inactivityDebounce=setTimeout(setupInactivityTimer,5000)}
+    function attachInactivityListeners(){['mousedown','mousemove','keypress','scroll','touchstart'].forEach(e=>{document.removeEventListener(e,resetInactivityTimer);document.addEventListener(e,resetInactivityTimer,{passive:true})})}
+
+    /* ==========================================
+       DATA MOCK
+       ========================================== */
+    const MOCK_USERS=[
+        {username:'budi',password:'',email:'budi@email.com',role:'user',dusun:'Dusun Jangkang',nama:'Budi Santoso'},
+        {username:'pakdusun',password:'',email:'pakdusun@email.com',role:'admdusun',dusun:'Dusun Jangkang',nama:'Hartono'},
+        {username:'pakedes',password:'',email:'pakedes@email.com',role:'admdesa',dusun:'-',nama:'Kepala Desa'},
+        {username:'adminrom',password:'',email:'adminrom@email.com',role:'admrom',dusun:'-',nama:'Admin Romawi'}
+    ];
+    const MOCK_USULAN=[
+        {id:'USL-1',username:'budi',tahun:2025,judul:'Pembangunan Jalan RT 003',kategori:'Infrastruktur',deskripsi:'Jalan berlubang parah, perlu perbaikan segera untuk akses warga.',rt:['003','004'],dusun:'Dusun Jangkang',desa:'Desa Jangkang',volume:500,satuan:'Meter',estimasiBiaya:50000000,linkProposal:'',status:'draft',rankingDusun:'',rankingDesa:'',rencanaAksi:'',rujukanUsulan:'',catatanKembali:''},
+        {id:'USL-2',username:'budi',tahun:2025,judul:'Perbaikan Saluran Irigasi RT 005',kategori:'Infrastruktur',deskripsi:'Saluran air tersumbat menyebabkan banjir saat hujan deras.',rt:['005'],dusun:'Dusun Jangkang',desa:'Desa Jangkang',volume:200,satuan:'Meter',estimasiBiaya:15000000,linkProposal:'',status:'diajukan',rankingDusun:'',rankingDesa:'',rencanaAksi:'',rujukanUsulan:'',catatanKembali:''},
+        {id:'USL-3',username:'budi',tahun:2025,judul:'Pengadaan Alat Posyandu RT 001',kategori:'Kesehatan',deskripsi:'Posyandu membutuhkan timbangan bayi dan alat ukur lingkar kepala.',rt:['001'],dusun:'Dusun Jangkang',desa:'Desa Jangkang',volume:1,satuan:'Unit',estimasiBiaya:5000000,linkProposal:'',status:'dikembalikan_user',rankingDusun:'',rankingDesa:'',rencanaAksi:'',rujukanUsulan:'',catatanKembali:'Mohon lengkapi volume pengadaan dan sertakan link proposal yang menjelaskan spesifikasi alat.'},
+        {id:'USL-4',username:'pakdusun',tahun:2025,judul:'Musyawarah: Pembangunan Jembatan Penghubung RT 007-008',kategori:'Infrastruktur',deskripsi:'Hasil musyawarah dusun tanggal 15 Januari: prioritas pembangunan jembatan penghubung antar RT.',rt:['007','008'],dusun:'Dusun Jangkang',desa:'Desa Jangkang',volume:1,satuan:'Unit',estimasiBiaya:100000000,linkProposal:'',status:'ranked_dusun',rankingDusun:'1',rankingDesa:'',rencanaAksi:'',rujukanUsulan:'',catatanKembali:''},
+        {id:'USL-5',username:'budi',tahun:2025,judul:'Renovasi Balai RT 002',kategori:'Sosial',deskripsi:'Balai pertemuan RT 002 sudah tidak layak pakai, atap bocor.',rt:['002'],dusun:'Dusun Jangkang',desa:'Desa Jangkang',volume:1,satuan:'Unit',estimasiBiaya:75000000,linkProposal:'',status:'ranked_dusun',rankingDusun:'2',rankingDesa:'',rencanaAksi:'',rujukanUsulan:'',catatanKembali:''},
+        {id:'USL-6',username:'budi',tahun:2025,judul:'Pengadaan Buku Perpustakaan Desa',kategori:'Pendidikan',deskripsi:'Perpustakaan desa membutuhkan tambahan koleksi buku pelajaran dan cerita anak.',rt:['001','002','003'],dusun:'Dusun Jangkang',desa:'Desa Jangkang',volume:200,satuan:'Buah',estimasiBiaya:25000000,linkProposal:'',status:'ranked_dusun',rankingDusun:'3',rankingDesa:'1',rencanaAksi:'Kewenangan Desa',rujukanUsulan:'',catatanKembali:''}
+    ];
+    const MOCK_DEADLINE={'2025':''};
+    (async()=>{
+        const[h1,h2,h3,h4]=await Promise.all([sha256("Budi123!"),sha256("Admin123!"),sha256("Desa123!"),sha256("Romawi123!")]);
+        MOCK_USERS[0].password=h1;MOCK_USERS[1].password=h2;MOCK_USERS[2].password=h3;MOCK_USERS[3].password=h4;
+        mockReady=true;
+    })();
+
+    /* ==========================================
+       API LAYER
+       ========================================== */
+    const API={
+        async post(action,data={}){
+            if(STATE.currentUser&&action!=='login'&&action!=='register'){
+                data._reqUser=STATE.currentUser.username;
+                data._reqRole=STATE.currentUser.role;
+                data._reqTahun=STATE.tahunAktif;
+            }
+            const useMock=!CONFIG.API_URL||CONFIG.API_URL.includes('PASTE_YOUR')||location.protocol==='file:';
+            if(useMock){
+                if(!mockReady)await new Promise(r=>{const ck=setInterval(()=>{if(mockReady){clearInterval(ck);r()}},50)});
+                return this.mock(action,data);
+            }
+            try{
+                const r=await fetch(CONFIG.API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action,...data})});
+                return await r.json();
+            }catch(e){showToast('Koneksi ke server gagal.','error');return{success:false,message:'Koneksi gagal'}}
+        },
+        async mock(action,data){
+            await new Promise(r=>setTimeout(r,120)); 
+            if(action==='login'){const u=MOCK_USERS.find(x=>x.username===data.username&&x.password===data.password);return u?{success:true,user:{...u,password:undefined}}:{success:false,message:'Username atau password salah'}}
+            if(action==='register'){
+                if(MOCK_USERS.find(x=>x.username===data.username))return{success:false,message:'Username sudah dipakai'};
+                if(MOCK_USERS.find(x=>x.email===data.email))return{success:false,message:'Email sudah terdaftar'};
+                
+                // Updated logic for Registration codes
+                if(data.role==='admdusun'&&data.kode!=='dusun2025')return{success:false,message:'Kode verifikasi Kepala Dusun salah'};
+                if(data.role==='admdesa'&&data.kode!=='desa2025')return{success:false,message:'Kode verifikasi Pemerintah Desa salah'};
+                if(data.role==='admrom'&&data.kode!=='warrom2025')return{success:false,message:'Kode verifikasi Admin Romawi salah'};
+
+                MOCK_USERS.push(data);return{success:true};
+            }
+            if(action==='changePassword'){const u=MOCK_USERS.find(x=>x.username===data.username);if(u&&u.password===data.oldHash){u.password=data.newHash;return{success:true}}return{success:false,message:'Password lama salah'}}
+            if(action==='getUsers'){return{success:true,data:MOCK_USERS.map(u=>({...u,password:undefined}))}}
+            if(action==='addUser'){if(MOCK_USERS.find(x=>x.username===data.username))return{success:false,message:'Username sudah dipakai'};if(MOCK_USERS.find(x=>x.email===data.email))return{success:false,message:'Email sudah terdaftar'};MOCK_USERS.push(data);return{success:true}}
+            if(action==='resetPassword'){const u=MOCK_USERS.find(x=>x.username===data.username);if(u){u.password=data.newHash;return{success:true}}return{success:false,message:'User tidak ditemukan'}}
+            if(action==='getUsulan'){
+                let list=MOCK_USULAN.filter(u=>u.tahun===data.tahun);
+                if(data.role==='user')list=list.filter(u=>u.username===data.username);
+                if(data.role==='admdusun')list=list.filter(u=>u.dusun===data.dusun);
+                // NEW: AdmRom Logic (Only show submitted/verified)
+                if(data.role==='admrom') list=list.filter(u=>u.status==='diajukan' || u.status==='ranked_dusun' || u.status==='final');
+                return{success:true,data:list}
+            }
+            if(action==='getDeadline'){const d=MOCK_DEADLINE[data.tahun]||'';return{success:true,deadline:d}}
+            if(action==='setDeadline'){MOCK_DEADLINE[data.tahun]=data.deadline||'';return{success:true,deadline:data.deadline||''}}
+            const mockLock=(tahun)=>{const d=MOCK_DEADLINE[tahun];if(!d)return false;return new Date(d)<new Date()};
+            if(action==='saveUsulan'){
+                if(mockLock(data.tahun))return{success:false,message:'Batas waktu pengimputan untuk tahun ini telah berakhir'};
+                if(data.id){const idx=MOCK_USULAN.findIndex(u=>u.id===data.id);if(idx>-1){const ex={...MOCK_USULAN[idx]};Object.keys(data).forEach(k=>{if(data[k]!==undefined)ex[k]=data[k]});MOCK_USULAN[idx]=ex}}else{data.id='USL-'+Date.now();MOCK_USULAN.unshift(data)}return{success:true,data:data}}
+            if(action==='deleteUsulan'){const ids=data.ids||(data.id?[data.id]:[]);for(let i=MOCK_USULAN.length-1;i>=0;i--)if(ids.indexOf(MOCK_USULAN[i].id)!==-1)MOCK_USULAN.splice(i,1);return{success:true}}
+            if(action==='updateStatus'){
+                if(mockLock(data._reqTahun))return{success:false,message:'Batas waktu pengimputan untuk tahun ini telah berakhir'};
+                (data.ids||[]).forEach(id=>{const u=MOCK_USULAN.find(x=>x.id===id);if(u)u.status=data.status});return{success:true}}
+            if(action==='prosesDusun'){
+                const ids=data.ids||(data.id?[data.id]:[]);let processed=0;
+                ids.forEach(id=>{const u=MOCK_USULAN.find(x=>x.id===id);if(!u)return;if(mockLock(u.tahun))return;if(data.status!==undefined)u.status=data.status;if(data.rankingDusun!==undefined)u.rankingDusun=data.rankingDusun;if(data.catatanKembali!==undefined)u.catatanKembali=data.catatanKembali;processed++});
+                return processed?{success:true}:{success:false,message:'Tidak ada usulan yang diproses'};
+            }
+            if(action==='prosesDesa'){(data.ids||(data.id?[data.id]:[])).forEach(id=>{const u=MOCK_USULAN.find(x=>x.id===id);if(u){if(data.status!==undefined)u.status=data.status;if(data.rankingDesa!==undefined)u.rankingDesa=data.rankingDesa;if(data.rencanaAksi!==undefined)u.rencanaAksi=data.rencanaAksi;if(data.rujukanUsulan!==undefined)u.rujukanUsulan=data.rujukanUsulan;if(data.catatanKembali!==undefined)u.catatanKembali=data.catatanKembali}});return{success:true}}
+            return{success:false,message:'Aksi tidak dikenali'};
+        }
+    };
+
+    // Fungsi Fetch dengan Logika Caching yang lebih cerdas
+    async function fetchUsulan(forceReload = false) {
+        const u = STATE.currentUser;
+        if (!u) { cachedUsulan = []; return; }
+        
+        const hasCache = cachedUsulan.length > 0 && cachedUsulan[0].tahun === STATE.tahunAktif;
+        
+        if (hasCache && !forceReload) return; 
+
+        const res = await API.post('getUsulan', { tahun: STATE.tahunAktif, role: u.role, username: u.username, dusun: u.dusun });
+        if (res.success && Array.isArray(res.data)) {
+            cachedUsulan = res.data;
+        }
+    }
+
+    /* ==========================================
+       NEW: DATA FETCHING HELPERS (Users & Deadlines)
+       ========================================== */
+
+    // Fetch Users & simpan ke cachedUsers
+    async function fetchUsersData() {
+        try {
+            const res = await API.post('getUsers', {});
+            if (res.success && Array.isArray(res.data)) {
+                cachedUsers = res.data;
+            }
+        } catch (e) {
+            console.error("Error fetching users", e);
+        }
+    }
+
+    // Fetch Deadlines untuk SEMUA tahun & simpan ke cachedDeadlines
+    async function fetchDeadlinesData() {
+        try {
+            const promises = CONFIG.TAHUN_LIST.map(t => API.post('getDeadline', { tahun: t }));
+            const results = await Promise.all(promises);
+            
+            CONFIG.TAHUN_LIST.forEach((t, i) => {
+                if (results[i] && results[i].success) {
+                    cachedDeadlines[t] = results[i].deadline;
+                } else {
+                    cachedDeadlines[t] = null; // Fallback jika error
+                }
+            });
+        } catch (e) {
+            console.error("Error fetching deadlines", e);
+        }
+    }
+
+    /* ==========================================
+       END NEW DATA FETCHING
+       ========================================== */
+
+    function setTableLoading(show){
+        const c=document.getElementById('tabContent');if(!c)return;
+        const ex=c.querySelector('.table-loading');
+        if(show&&!ex){const ov=document.createElement('div');ov.className='table-loading';ov.innerHTML='<span class="spinner" style="width:28px;height:28px;border-width:4px"></span>';c.style.position='relative';c.appendChild(ov)}
+        else if(!show&&ex)ex.remove();
+    }
+
+    function updateBulkCount(){
+        const count=document.querySelectorAll('.bulk-check:checked').length;
+        const el=document.getElementById('bulkCount');
+        if(el){el.classList.toggle('hidden',!count);const num=document.getElementById('bulkNum');if(num)num.textContent=count}
+    }
+
+    /* ==========================================
+       RENDERING UTAMA
+       ========================================== */
+    function render(){
+        const app=document.getElementById('app');
+        switch(STATE.currentView){
+            case'landing':app.innerHTML=rLanding();break;
+            case'login':app.innerHTML=rLogin();break;
+            case'register':app.innerHTML=rRegister();break;
+            case'dashboard':app.innerHTML=rDashboard();break;
+        }
+        attachMainEvents();
+        if(STATE.currentView==='dashboard'&&STATE.currentUser){
+            // Load data sekali saat masuk dashboard (usulan, deadline aktif, users, deadline summary)
+            Promise.all([
+                fetchUsulan(true), 
+                fetchDeadline(),
+                fetchUsersData(),      // Load users di background
+                fetchDeadlinesData()   // Load semua deadline di background
+            ]).then(()=>{
+                const c=document.getElementById('tabContent');
+                if(c)c.innerHTML=renderTab();
+                if(STATE.dashboardTab==='users')renderUserTable(); // Render tabel user
+                if(STATE.dashboardTab==='pengaturan')renderDeadlineSummary(); // Render summary deadline
+                if(STATE.dashboardTab==='beranda') initCharts(); // Init chart di awal
+            });
+        }
+    }
+
+    /* ── HALAMAN LANDING ── */
+    function rLanding(){
+        return `<div class="view-enter min-h-screen flex flex-col">
+            <nav class="relative z-10 flex items-center justify-between px-5 md:px-8 py-4 max-w-6xl mx-auto w-full">
+                <div class="flex items-center gap-3"><div class="w-10 h-10 bg-honey-500 rounded-xl flex items-center justify-center shadow-md"><i class="fas fa-cubes text-white text-sm"></i></div><span class="font-display font-800 text-xl text-honey-700 tracking-tight">NgusulBee</span></div>
+                <div class="flex gap-2 sm:gap-3"><button onclick="navigate('register')" class="px-4 sm:px-5 py-2 text-sm font-semibold text-honey-700 hover:bg-honey-50 rounded-lg transition-colors">Daftar</button><button onclick="navigate('login')" class="px-4 sm:px-5 py-2 text-sm font-semibold text-white bg-honey-500 hover:bg-honey-600 rounded-lg shadow transition-colors">Masuk</button></div>
+            </nav>
+            <main class="flex-1 flex items-center px-5 md:px-8 py-12 md:py-16 relative">
+                <div class="hero-gradient"></div>
+                <svg class="hero-hex hero-hex-1" viewBox="0 0 100 100"><polygon points="50,3 95,27 95,72 50,97 5,72 5,27" fill="none" stroke="#E8A317" stroke-width="2"/></svg>
+                <svg class="hero-hex hero-hex-2" viewBox="0 0 100 100"><polygon points="50,3 95,27 95,72 50,97 5,72 5,27" fill="none" stroke="#E8A317" stroke-width="2"/></svg>
+                <svg class="hero-hex hero-hex-3" viewBox="0 0 100 100"><polygon points="50,3 95,27 95,72 50,97 5,72 5,27" fill="none" stroke="#E8A317" stroke-width="2"/></svg>
+                <div class="max-w-6xl mx-auto w-full grid md:grid-cols-2 gap-10 md:gap-12 items-center relative z-10">
+                    <div class="space-y-7">
+                        <div><span class="inline-block px-3 py-1 bg-honey-100 text-honey-700 text-xs font-bold rounded-full mb-4">${CONFIG.DESA}</span><h1 class="font-display font-900 text-4xl md:text-5xl leading-[1.1] tracking-tight">Suara Warga,<br><span class="text-honey-500">Pembangunan Nyata</span></h1></div>
+                        <p class="text-base md:text-lg text-gray-600 leading-relaxed max-w-md">Platform musyawarah perencanaan pembangunan desa yang transparan dan akuntabel.</p>
+                        <div class="flex flex-wrap gap-3"><button onclick="navigate('login')" class="px-7 py-3.5 bg-honey-500 text-white font-display font-700 rounded-xl shadow-lg hover:bg-honey-600 hover:shadow-xl transition-all">Mulai Sekarang <i class="fas fa-arrow-right ml-2"></i></button></div>
+                        <a href="SlideNgusulbee.html" class="px-7 py-3.5 bg-transparent border-2 border-cyan-600 text-cyan-600 font-display font-700 rounded-xl shadow-lg hover:bg-cyan-50 hover:shadow-xl transition-all inline-flex items-center gap-2"><i class="fas fa-desktop"></i> Lihat Slide Presentasi</a>
+                        <div class="flex gap-6 pt-2 text-sm text-gray-500"><div><span class="block font-display font-800 text-2xl text-honey-600">27</span>RT Terlayani</div><div><span class="block font-display font-800 text-2xl text-forest-600">4</span>Dusun Aktif</div><div><span class="block font-display font-800 text-2xl text-gray-700">100%</span>Transparan</div></div>
+                    </div>
+                    <div class="hidden md:grid grid-cols-2 gap-4">
+                        <div class="space-y-4">
+                            <div class="bg-white rounded-2xl p-5 shadow-lg border border-honey-100 stat-card"><div class="w-10 h-10 bg-honey-100 rounded-lg flex items-center justify-center mb-3"><i class="fas fa-file-pen text-honey-600"></i></div><h4 class="font-display font-700 text-sm">Ajukan Usulan</h4><p class="text-xs text-gray-500 mt-1">Sampaikan kebutuhan pembangunan</p></div>
+                            <div class="bg-white rounded-2xl p-5 shadow-lg border border-forest-100 stat-card"><div class="w-10 h-10 bg-forest-100 rounded-lg flex items-center justify-center mb-3"><i class="fas fa-clipboard-check text-forest-600"></i></div><h4 class="font-display font-700 text-sm">Verifikasi Dusun</h4><p class="text-xs text-gray-500 mt-1">Kepala dusun menilai & merangking</p></div>
+                        </div>
+                        <div class="space-y-4 mt-8">
+                            <div class="bg-white rounded-2xl p-5 shadow-lg border border-blue-100 stat-card"><div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-3"><i class="fas fa-gavel text-blue-600"></i></div><h4 class="font-display font-700 text-sm">Musyawarah Desa</h4><p class="text-xs text-gray-500 mt-1">Pemerintah desa menetapkan prioritas</p></div>
+                            <div class="bg-white rounded-2xl p-5 shadow-lg border border-rose-100 stat-card"><div class="w-10 h-10 bg-rose-100 rounded-lg flex items-center justify-center mb-3"><i class="fas fa-chart-line text-rose-600"></i></div><h4 class="font-display font-700 text-sm">Monitoring</h4><p class="text-xs text-gray-500 mt-1">Pantau status usulan real-time</p></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <footer class="text-center py-5 text-xs text-gray-400 border-t border-gray-200/60">${CONFIG.APP_NAME} &copy; ${new Date().getFullYear()} — ${CONFIG.DESA}</footer>
+        </div>`;
+    }
+
+    /* ── HALAMAN LOGIN ── */
+    function rLogin(){
+        return `<div class="view-enter min-h-screen flex items-center justify-center px-4 py-8">
+            <div class="w-full max-w-md">
+                <div class="text-center mb-8"><div class="w-12 h-12 bg-honey-500 rounded-xl flex items-center justify-center mx-auto mb-3 shadow"><i class="fas fa-cubes text-white"></i></div><h1 class="font-display font-900 text-2xl">Masuk ke NgusulBee</h1></div>
+                <form id="loginForm" class="bg-white rounded-2xl shadow-xl p-8 space-y-5 border">
+                    <div><label class="block text-sm font-semibold mb-1.5">Username</label><input type="text" id="loginU" required autocomplete="username" class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50"></div>
+                    <div><label class="block text-sm font-semibold mb-1.5">Password</label><div class="relative"><input type="password" id="loginP" required autocomplete="current-password" class="w-full pl-4 pr-10 py-3 border rounded-xl text-sm bg-gray-50"><button type="button" onclick="togglePassword('loginP',this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" aria-label="Tampilkan password"><i class="fas fa-eye"></i></button></div></div>
+                    <div><label class="block text-sm font-semibold mb-1.5">Tahun Usulan</label><select id="loginT" required class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50">${CONFIG.TAHUN_LIST.map(t=>`<option value="${t}" ${t===STATE.tahunAktif?'selected':''}>${t}</option>`).join('')}</select></div>
+                    <div id="loginErr" class="hidden text-sm text-red-600 bg-red-50 p-2.5 rounded-lg"></div>
+                    <button type="submit" id="loginBtn" class="w-full py-3.5 bg-honey-500 text-white font-display font-700 rounded-xl hover:bg-honey-600 transition-colors">Masuk</button>
+                </form>
+                               <div class="text-center mt-4 text-sm"><a href="#" onclick="navigate('register');return false" class="text-honey-600 font-semibold hover:underline">Belum punya akun? Daftar</a></div>
+            </div>
+        </div>`;
+    }
+
+    /* ── HALAMAN REGISTER (UPDATED) ── */
+    function rRegister(){
+        return `<div class="view-enter min-h-screen flex items-center justify-center px-4 py-8">
+            <div class="w-full max-w-md">
+                <div class="text-center mb-8"><h1 class="font-display font-900 text-2xl">Daftar Akun Baru</h1></div>
+                <form id="regForm" class="bg-white rounded-2xl shadow-xl p-8 space-y-4 border">
+                    <input type="text" id="regN" placeholder="Nama Lengkap" required class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50">
+                    <input type="text" id="regU" placeholder="Username" required autocomplete="username" class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50">
+                    <input type="email" id="regE" placeholder="Email" required class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50">
+                    <div><div class="relative"><input type="password" id="regP" placeholder="Password" required autocomplete="new-password" class="w-full pl-4 pr-10 py-3 border rounded-xl text-sm bg-gray-50"><button type="button" onclick="togglePassword('regP',this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" aria-label="Tampilkan password"><i class="fas fa-eye"></i></button></div><p class="text-xs text-gray-500 mt-1"><i class="fas fa-info-circle mr-1"></i>Min 8 karakter, huruf besar, kecil, angka, simbol</p></div>
+                    
+                    <!-- Select Role -->
+                    <select id="regR" required class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50" onchange="handleRegRoleChange(this.value)"><option value="user">Masyarakat</option><option value="admdusun">Kepala Dusun</option><option value="admrom">Admin Romawi</option><option value="admdesa">Pemerintah Desa</option></select>
+                    
+                    <!-- Dusun Dropdown: Visible for User & Kepala Dusun -->
+                    <div id="regDW" class="hidden"><select id="regDus" class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50"><option value="">Pilih Dusun...</option>${[...new Set(Object.values(CONFIG.RT_MAP))].map(d=>`<option>${d}</option>`).join('')}</select></div>
+                    
+                    <!-- Verification Code: Visible for Kepala Dusun, Pemdes, & AdmRom -->
+                    <div id="regKW" class="hidden"><input type="text" id="regK" placeholder="Kode Verifikasi Admin" class="w-full px-4 py-3 border rounded-xl text-sm bg-gray-50"></div>
+                    
+                    <div id="regErr" class="hidden text-sm text-red-600 bg-red-50 p-2.5 rounded-lg"></div>
+                    <button type="submit" class="w-full py-3.5 bg-honey-500 text-white font-display font-700 rounded-xl hover:bg-honey-600 transition-colors">Daftar</button>
+                </form>
+                <div class="text-center mt-4 text-sm"><a href="#" onclick="navigate('login');return false" class="text-honey-600 font-semibold hover:underline">Sudah punya akun? Masuk</a></div>
+            </div>
+        </div>`;
+    }
+
+    // Helper untuk toggle form register
+    window.handleRegRoleChange = function(role) {
+        const dw = document.getElementById('regDW');
+        const kw = document.getElementById('regKW');
+        const dusInput = document.getElementById('regDus');
+
+        // Reset logic
+        dw.classList.add('hidden');
+        kw.classList.add('hidden');
+
+        if (role === 'user' || role === 'admdusun') {
+            dw.classList.remove('hidden');
+            if(role === 'user') {
+                // Masyarakat wajib pilih dusun
+                dusInput.required = true;
+            } else {
+                dusInput.required = true;
+                kw.classList.remove('hidden'); // Kepala Dusun butuh kode
+            }
+        } else if (role === 'admdesa' || role === 'admrom') {
+            kw.classList.remove('hidden'); // Pemdes & AdmRom butuh kode
+        }
+    }
+
+    /* ── DASHBOARD (SHELL) ── */
+    function rDashboard(){
+        const u=STATE.currentUser;if(!u){navigate('login');return ''}
+        const tabs=getTabs(u.role);
+        if(STATE.dashboardTab==='beranda')STATE.dashboardTab=tabs[0].key;
+        const showLock=(u.role==='user'||u.role==='admdusun');
+        return `<div class="view-enter min-h-screen flex relative">
+            <aside id="sidebar" class="sidebar w-64 bg-white border-r flex-col fixed h-screen z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+                <div class="p-5 border-b flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 bg-honey-500 rounded-lg flex items-center justify-center shadow-sm"><i class="fas fa-cubes text-white text-sm"></i></div>
+                        <span class="font-display font-800 text-lg text-honey-700 tracking-tight">NgusulBee</span>
+                    </div>
+                    <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-gray-600"><i class="fas fa-times text-lg"></i></button>
+                </div>
+                <nav class="flex-1 py-4 space-y-1 px-3 overflow-y-auto">${tabs.map(t=>`<button onclick="switchTab('${t.key}')" class="sidebar-link w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-600 ${STATE.dashboardTab===t.key?'active':''}" data-tab="${t.key}"><i class="fas ${t.icon} w-5 text-center"></i> ${t.label}</button>`).join('')}</nav>
+                <div class="p-4 border-t">
+                    <div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 bg-honey-100 rounded-full flex items-center justify-center flex-shrink-0"><i class="fas ${roleIcon(u.role)} text-honey-600"></i></div><div class="min-w-0"><div class="text-sm font-semibold truncate">${escapeHtml(u.nama)}</div><div class="text-xs text-gray-500">${roleLabel(u.role)}</div></div></div>
+                    <button onclick="handleLogout()" class="w-full py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors"><i class="fas fa-sign-out-alt mr-1"></i>Keluar</button>
+                </div>
+            </aside>
+            <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/30 z-40 hidden md:hidden transition-opacity duration-300"></div>
+            <main class="flex-1 min-h-screen md:ml-64 transition-all duration-300">
+                <header class="bg-white/80 backdrop-blur-md border-b px-4 md:px-6 py-3.5 flex items-center justify-between sticky top-0 z-30">
+                    <div class="flex items-center gap-3">
+                        <button onclick="toggleSidebar()" class="md:hidden w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-600" aria-label="Menu"><i class="fas fa-bars"></i></button>
+                        <h2 class="font-display font-700 text-lg">${tabs.find(t=>t.key===STATE.dashboardTab)?.label||'Dashboard'}</h2>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        ${showLock?`<span id="lockIndicator" class="text-xs px-2.5 py-1 rounded-full font-bold bg-gray-100 text-gray-500 flex items-center gap-1"><i class="fas fa-infinity text-[10px]"></i>Tanpa Batas</span>`:''}
+                        <select onchange="changeTahun(this.value)" class="text-sm border rounded-lg px-3 py-2 bg-white font-medium" aria-label="Pilih tahun">${CONFIG.TAHUN_LIST.map(t=>`<option value="${t}" ${t==STATE.tahunAktif?'selected':''}>${t}</option>`).join('')}</select>
+                    </div>
+                </header>
+                <div class="p-4 md:p-6" id="tabContent"><div class="text-center py-16 text-gray-400"><span class="spinner"></span> Memuat data...</div></div>
+            </main>
+        </div>`;
+    }
+
+    function getTabs(r){
+        const tabs = {
+            user:[
+                {key:'beranda',label:'Beranda',icon:'fa-home'},
+                {key:'draft',label:'Usulan Saya',icon:'fa-file-pen'},
+                {key:'monitoring',label:'Monitoring',icon:'fa-eye'},
+                {key:'ubahpw',label:'Ubah Password',icon:'fa-key'}
+            ],
+            admdusun:[
+                {key:'beranda',label:'Beranda',icon:'fa-home'},
+                {key:'verifikasi_dusun',label:'Verifikasi & Input',icon:'fa-clipboard-check'},
+                {key:'monitoring',label:'Monitoring',icon:'fa-eye'},
+                {key:'ubahpw',label:'Ubah Password',icon:'fa-key'}
+            ],
+            admrom: [
+                {key:'beranda',label:'Beranda',icon:'fa-home'},
+                {key:'monitoring',label:'Monitoring',icon:'fa-eye'},
+                {key:'ubahpw',label:'Ubah Password',icon:'fa-key'}
+            ],
+            admdesa:[
+                {key:'beranda',label:'Beranda',icon:'fa-home'},
+                {key:'verifikasi_desa',label:'Musyawarah Desa',icon:'fa-gavel'},
+                {key:'monitoring',label:'Monitoring',icon:'fa-eye'},
+                {key:'pengaturan',label:'Pengaturan Waktu',icon:'fa-clock'},
+                {key:'users',label:'Manajemen User',icon:'fa-users-cog'},
+                {key:'ubahpw',label:'Ubah Password',icon:'fa-key'}
+            ]
+        };
+        return tabs[r] || tabs.user;
+    }
+
+    /* ==========================================
+       DASHBOARD CHARTS (Diagram)
+       ========================================== */
+    function initCharts() {
+        if(STATE.dashboardTab !== 'beranda') return;
+
+        const ctxCat = document.getElementById('chartCategory');
+        const ctxStat = document.getElementById('chartStatus');
+        
+        if(!ctxCat || !ctxStat) return;
+
+        const catData = {};
+        CONFIG.KATEGORI.forEach(k => catData[k] = 0);
+        let totalBiaya = 0;
+        cachedUsulan.forEach(u => {
+            if(catData[u.kategori] !== undefined) catData[u.kategori]++;
+            totalBiaya += (parseInt(u.estimasiBiaya)||0);
+        });
+
+        const statusMap = {draft:0, diajukan:0, ranked_dusun:0, dikembalikan_user:0, dikembalikan_dusun:0, final:0};
+        cachedUsulan.forEach(u => {
+            if(statusMap[u.status] !== undefined) statusMap[u.status]++;
+        });
+
+        if(chartCategoryInstance) chartCategoryInstance.destroy();
+        if(chartStatusInstance) chartStatusInstance.destroy();
+
+        chartCategoryInstance = new Chart(ctxCat, {
+            type: 'doughnut',
+            data: {
+                labels: CONFIG.KATEGORI,
+                datasets: [{
+                    data: CONFIG.KATEGORI.map(k => catData[k]),
+                    backgroundColor: [
+                        '#E8A317', '#2D8B4E', '#3B82F6', '#EF4444', '#8B5CF6', '#10B981'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { boxWidth: 12, font: { family: 'DM Sans' } } },
+                    title: { display: true, text: 'Sebaran Kategori Usulan', font: { size: 14, family: 'Outfit', weight: 'bold' } }
+                }
+            }
+        });
+
+        chartStatusInstance = new Chart(ctxStat, {
+            type: 'bar',
+            data: {
+                labels: ['Draft', 'Diajukan', 'Ranked Dusun', 'Dikembalikan', 'Final'],
+                datasets: [{
+                    label: 'Jumlah Usulan',
+                    data: [
+                        statusMap.draft, statusMap.diajukan, statusMap.ranked_dusun, 
+                        statusMap.dikembalikan_user + statusMap.dikembalikan_dusun, statusMap.final
+                    ],
+                    backgroundColor: '#2D8B4E',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } },
+                    x: { grid: { display: false } }
+                },
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Status Pergerakan Usulan', font: { size: 14, family: 'Outfit', weight: 'bold' } }
+                }
+            }
+        });
+    }
+
+    /* ── TAB: BERANDA (Dashboard Charts) ── */
+    function rBerandaTab(){
+        const total=cachedUsulan.length;
+        const totalBiaya=cachedUsulan.reduce((s,i)=>s+(i.estimasiBiaya||0),0);
+        
+        return `<div class="space-y-6 animate-fade-in">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-5 rounded-xl border shadow-sm">
+                    <h3 class="font-display font-bold text-gray-800 mb-4 text-sm">Kategori</h3>
+                    <div class="chart-container h-64">
+                        <canvas id="chartCategory"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl border shadow-sm">
+                    <h3 class="font-display font-bold text-gray-800 mb-4 text-sm">Status</h3>
+                    <div class="chart-container h-64">
+                        <canvas id="chartStatus"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                ${statCard(total,'Total Usulan','fa-file-lines','honey')}
+                ${statCard(formatRupiah(totalBiaya),'Total Estimasi','fa-coins','forest')}
+                ${statCard(STATE.tahunAktif,'Tahun Aktif','fa-calendar-alt','blue')}
+            </div>
+        </div>`;
+    }
+
+    /* ── KOMPONEN TAB LAINNYA ── */
+    function renderTab(){
+        const u=STATE.currentUser;if(!u)return '';
+        const list=cachedUsulan;
+        if(STATE.dashboardTab==='ubahpw')return rUbahPw();
+        if(STATE.dashboardTab==='users')return rManajemenUser();
+        if(STATE.dashboardTab==='pengaturan')return rPengaturan();
+        if(STATE.dashboardTab==='beranda')return rBerandaTab();
+        
+        let banner='<div id="lockBanner" class="hidden"></div>';
+        if(u.role==='user'){
+            if(STATE.dashboardTab==='draft')return banner+rDraftTable(u,list.filter(x=>x.username===u.username&&(x.status==='draft'||x.status==='dikembalikan_user')));
+            if(STATE.dashboardTab==='monitoring')return banner+rMonitorTable(list.filter(x=>x.username===u.username&&x.status!=='draft'&&x.status!=='dikembalikan_user'),'user');
+        }
+        if(u.role==='admdusun'){
+            if(STATE.dashboardTab==='verifikasi_dusun')return banner+rVerifDusunTable(u,list.filter(x=>x.dusun===u.dusun&&(x.status==='diajukan'||x.status==='dikembalikan_dusun')));
+            if(STATE.dashboardTab==='monitoring')return banner+rMonitorTable(list.filter(x=>x.dusun===u.dusun&&(x.status==='ranked_dusun'||x.status==='final')),'admdusun');
+        }
+        if(u.role==='admrom'){
+            // AdmRom only sees monitoring of submitted/verified
+            if(STATE.dashboardTab==='monitoring')return banner+rMonitorTable(list,'admrom');
+        }
+        if(u.role==='admdesa'){
+            if(STATE.dashboardTab==='verifikasi_desa')return banner+rVerifDesaTable(u,list.filter(x=>x.status==='ranked_dusun'||x.status==='dikembalikan_dusun'));
+            if(STATE.dashboardTab==='monitoring')return banner+rMonitorTable(list.filter(x=>x.status==='final'),'admdesa');
+        }
+        return '';
+    }
+
+    /* Helpers */
+    function emptyRow(colspan,msg){return `<tr><td colspan="${colspan}" class="text-center py-12 text-gray-400"><i class="fas fa-inbox text-3xl mb-2 block opacity-40"></i>${msg}</td></tr>`}
+    function statCard(val,label,icon,color){
+        const bg={honey:'bg-honey-50 border-honey-200',forest:'bg-forest-50 border-forest-200',blue:'bg-blue-50 border-blue-200'}[color]||'bg-gray-50 border-gray-200';
+        const ic={honey:'text-honey-600',forest:'text-forest-600',blue:'text-blue-600'}[color]||'text-gray-600';
+        return `<div class="${bg} border rounded-xl p-3.5 stat-card"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-white flex items-center justify-center shadow-sm flex-shrink-0"><i class="fas ${icon} ${ic} text-sm"></i></div><div class="min-w-0"><div class="font-display font-800 text-lg leading-tight truncate">${val}</div><div class="text-[11px] text-gray-500 font-medium">${label}</div></div></div></div>`;
+    }
+    function statsBar(items){
+        if(!items.length)return '';
+        const total=items.length;
+        const totalBiaya=items.reduce((s,i)=>s+(i.estimasiBiaya||0),0);
+        return `<div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">${statCard(total,'Usulan','fa-file-lines','honey')}${statCard(formatRupiah(totalBiaya),'Total Estimasi','fa-coins','forest')}</div>`;
+    }
+
+    /* ==========================================
+       TAB: USULAN SAYA
+       ========================================== */
+    function rDraftTable(u,list){
+        const locked=STATE.isLocked;
+        const btns=locked?'':`<div class="flex flex-wrap items-center gap-2 mb-3">
+            <button onclick="bulkSubmitUser()" class="px-3 py-1.5 btn-success text-xs rounded-md"><i class="fas fa-paper-plane mr-1"></i>Submit Terpilih</button>
+            <button onclick="bulkDeleteUsulan()" class="px-3 py-1.5 btn-danger text-xs rounded-md"><i class="fas fa-trash mr-1"></i>Hapus Terpilih</button>
+            <span id="bulkCount" class="bulk-count hidden text-xs text-honey-700 font-semibold ml-1"><span id="bulkNum">0</span> terpilih</span>
+        </div>`;
+        return `<div class="space-y-4">${statsBar(list)}
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div><h3 class="font-display font-700 text-xl">Usulan Saya</h3><p class="text-xs text-gray-400 mt-0.5">Draft dan usulan yang dikembalikan — bisa diedit, dihapus, atau disubmit</p></div>
+                ${locked?'<span class="px-3 py-1.5 bg-red-100 text-red-700 text-xs font-bold rounded-lg"><i class="fas fa-lock mr-1"></i>Pengimputan Ditutup</span>':`<button onclick="openFormUsulan()" class="px-4 py-2 btn-primary text-sm rounded-lg shadow"><i class="fas fa-plus mr-1"></i> Buat Usulan</button>`}
+            </div>${list.length&&!locked?btns:''}
+            <div class="tbl-wrap"><table class="tbl"><thead><tr>
+                <th class="w-8 text-center">${locked?'':`<input type="checkbox" onchange="document.querySelectorAll('.bulk-check').forEach(c=>{c.checked=this.checked});updateBulkCount()" aria-label="Pilih semua">`}</th>
+                <th class="w-10 text-center">No</th>
+                <th class="w-40">Status</th>
+                <th>Judul Usulan</th>
+                <th class="w-28">Kategori</th>
+                <th class="w-20">RT</th>
+                <th class="w-28">Volume</th>
+                <th class="w-32 text-right">Estimasi</th>
+                <th class="w-28 text-center">Aksi</th>
+            </tr></thead><tbody>
+            ${list.length?list.map((i,n)=>`
+                <tr class="main-row">
+                    <td class="text-center">${locked?'':`<input type="checkbox" class="bulk-check accent-honey-500" data-id="${i.id}" onchange="updateBulkCount()" aria-label="Pilih">`}</td>
+                    <td class="text-center text-gray-400 text-xs">${n+1}</td>
+                    <td class="text-center">${statusLabel(i.status)}</td>
+                    <td class="font-semibold text-gray-800">${escapeHtml(i.judul)}</td>
+                    <td><span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded font-medium">${escapeHtml(i.kategori)}</span></td>
+                    <td class="text-xs text-gray-500">${i.rt.join(', ')}</td>
+                    <td class="text-xs text-gray-600">${i.volume} ${escapeHtml(i.satuan)}</td>
+                    <td class="text-right text-xs font-semibold text-gray-700 whitespace-nowrap">${formatRupiah(i.estimasiBiaya)}</td>
+                    <td class="text-center">${locked?'<span class="text-xs text-red-400"><i class="fas fa-lock"></i></span>':`<div class="flex justify-center gap-1">
+                        <button onclick="openFormUsulan('${escapeJs(i.id)}')" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded" title="Edit"><i class="fas fa-edit text-xs"></i></button>
+                        <button onclick="singleDeleteUsulan('${escapeJs(i.id)}')" class="p-1.5 text-red-500 hover:bg-red-50 rounded" title="Hapus"><i class="fas fa-trash text-xs"></i></button>
+                        <button onclick="singleSubmitUsulan('${escapeJs(i.id)}')" class="p-1.5 text-forest-600 hover:bg-forest-50 rounded" title="Submit"><i class="fas fa-paper-plane text-xs"></i></button>
+                    </div>`}</td>
+                </tr>
+                ${i.status==='dikembalikan_user'?`<tr class="sub-row"><td colspan="9"><div class="flex items-start gap-2 text-xs text-red-700 bg-red-50 rounded-lg px-3 py-2.5"><i class="fas fa-comment-dots mt-0.5 flex-shrink-0"></i><div><b class="block mb-0.5">Catatan dari Kepala Dusun:</b>${escapeHtml(i.catatanKembali)}</div></div></td></tr>`:''}
+            `).join(''):emptyRow(9,'Belum ada draf usulan. Klik "Buat Usulan" untuk memulai.')}
+            </tbody></table></div>
+        </div>`;
+    }
+
+    function rMonitorTable(list,role){
+        const sorted=sortForMonitoring(list,role);
+        const colDusun=role!=='user';
+        const colRankDusun=role==='admdusun'||role==='admdesa'||role==='admrom';
+        const colRankDesa=role==='admdesa'||role==='admrom';
+        const colAksi=role==='admdesa';
+        const totalCol=9+(colDusun?1:0)+(colRankDusun?1:0)+(colRankDesa?1:0)+(colAksi?1:0);
+        return `<div class="space-y-4">${statsBar(sorted)}
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div><h3 class="font-display font-700 text-xl">Monitoring Usulan</h3><p class="text-xs text-gray-400 mt-0.5">Diurutkan berdasarkan ranking — klik baris untuk melihat detail</p></div>
+                <button onclick="doExportExcel()" class="px-4 py-2 bg-forest-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-forest-700 transition-colors flex items-center gap-2 flex-shrink-0"><i class="fas fa-file-excel"></i> Unduh Excel</button>
+            </div>
+            <div class="tbl-wrap"><table class="tbl"><thead><tr>
+                <th class="w-10 text-center">No</th>
+                <th class="w-40">Status</th>
+                <th>Judul Usulan</th>
+                <th class="w-28">Sumber</th>
+                ${colDusun?'<th class="w-28">Dusun</th>':''}
+                <th class="w-28">Kategori</th>
+                <th class="w-28">RT</th>
+                <th class="w-28">Volume</th>
+                <th class="w-32 text-right">Estimasi</th>
+                ${colRankDusun?'<th class="w-14 text-center">Rank Dusun</th>':''}
+                ${colRankDesa?'<th class="w-14 text-center">Rank Desa</th>':''}
+                ${colAksi?'<th class="w-36">Rencana Aksi</th>':''}
+                <th class="w-20 text-center">Detail</th>
+            </tr></thead><tbody>
+            ${sorted.length?sorted.map((i,n)=>`
+                <tr class="main-row cursor-pointer" onclick="showDetail('${escapeJs(i.id)}')">
+                    <td class="text-center text-gray-400 text-xs">${n+1}</td>
+                    <td class="text-center">${statusLabel(i.status)}</td>
+                    <td class="font-semibold text-gray-800">${escapeHtml(i.judul)}</td>
+                    <td class="text-xs text-gray-500 whitespace-nowrap">${escapeHtml(i.username)}</td>
+                    ${colDusun?`<td class="text-xs text-gray-500">${escapeHtml(i.dusun)}</td>`:''}
+                    <td><span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded font-medium">${escapeHtml(i.kategori)}</span></td>
+                    <td class="text-xs text-gray-500">${i.rt.join(', ')}</td>
+                    <td class="text-xs text-gray-600">${i.volume} ${escapeHtml(i.satuan)}</td>
+                    <td class="text-right text-xs font-semibold text-gray-700 whitespace-nowrap">${formatRupiah(i.estimasiBiaya)}</td>
+                    ${colRankDusun?`<td class="text-center">${i.rankingDusun?`<span class="font-display font-800 text-blue-600 text-sm">#${i.rankingDusun}</span>`:'<span class="text-gray-300">-</span>'}</td>`:''}
+                    ${colRankDesa?`<td class="text-center">${i.rankingDesa?`<span class="font-display font-800 text-forest-600 text-sm">#${i.rankingDesa}</span>`:'<span class="text-gray-300">-</span>'}</td>`:''}
+                    ${colAksi?`<td class="text-xs">${i.rencanaAksi?`<span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${i.rencanaAksi==='Kewenangan Desa'?'bg-forest-100 text-forest-700':'bg-amber-100 text-amber-700'}">${escapeHtml(i.rencanaAksi)}</span>${i.rujukanUsulan?`<br><span class="text-gray-400">→ ${escapeHtml(i.rujukanUsulan)}</span>`:''}`:'<span class="text-gray-300">-</span>'}</td>`:''}
+                    <td class="text-center"><span class="px-2.5 py-1 bg-honey-100 text-honey-700 text-xs font-semibold rounded hover:bg-honey-200 transition-colors inline-block"><i class="fas fa-eye mr-1"></i>Lihat</span></td>
+                </tr>
+            `).join(''):emptyRow(totalCol,'Belum ada data monitoring')}
+            </tbody></table></div>
+        </div>`;
+    }
+
+    function rVerifDusunTable(u,list){
+        const locked=STATE.isLocked;
+        const btns=locked?'':`<div class="flex flex-wrap items-center gap-2 mb-3">
+            <button onclick="bulkProsesDusun()" class="px-3 py-1.5 btn-success text-xs rounded-md"><i class="fas fa-check-double mr-1"></i>Submit Terpilih ke Desa</button>
+            <span id="bulkCount" class="bulk-count hidden text-xs text-honey-700 font-semibold ml-1"><span id="bulkNum">0</span> terpilih</span>
+        </div>`;
+        return `<div class="space-y-4">${statsBar(list)}
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div><h3 class="font-display font-700 text-xl">Verifikasi & Input Dusun</h3><p class="text-xs text-gray-400 mt-0.5">Usulan dari warga dan hasil musyawarah — beri peringkat lalu submit ke Desa</p></div>
+                ${locked?'<span class="px-3 py-1.5 bg-red-100 text-red-700 text-xs font-bold rounded-lg"><i class="fas fa-lock mr-1"></i>Pengimputan Ditutup</span>':`<button onclick="openFormUsulan('musyawarah')" class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-blue-700 transition-colors"><i class="fas fa-plus mr-1"></i> Input Hasil Musyawarah</button>`}
+            </div>${list.length&&!locked?btns:''}
+            <div class="tbl-wrap"><table class="tbl"><thead><tr>
+                <th class="w-8 text-center">${locked?'':`<input type="checkbox" onchange="document.querySelectorAll('.bulk-check').forEach(c=>{c.checked=this.checked});updateBulkCount()" aria-label="Pilih semua">`}</th>
+                <th class="w-10 text-center">No</th>
+                <th class="w-36">Status</th>
+                <th>Judul Usulan</th>
+                <th class="w-20">RT</th>
+                <th class="w-28">Volume</th>
+                <th class="w-32 text-right">Estimasi</th>
+                <th class="w-28 text-center">Sumber</th>
+            </tr></thead><tbody>
+            ${list.length?list.map((i,n)=>{
+                const isOwnMusyawarah=i.username===u.username;
+                const isDiajukan=i.status==='diajukan';
+                const isDikembalikan=i.status==='dikembalikan_dusun';
+                return `
+                <tr class="main-row">
+                    <td class="text-center">${locked?'':`<input type="checkbox" class="bulk-check accent-honey-500" data-id="${i.id}" onchange="updateBulkCount()">`}</td>
+                    <td class="text-center text-gray-400 text-xs">${n+1}</td>
+                    <td class="text-center">${statusLabel(i.status)}</td>
+                    <td class="font-semibold text-gray-800">${escapeHtml(i.judul)}</td>
+                    <td class="text-xs text-gray-500">${i.rt.join(', ')}</td>
+                    <td class="text-xs text-gray-600">${i.volume} ${escapeHtml(i.satuan)}</td>
+                    <td class="text-right text-xs font-semibold text-gray-700 whitespace-nowrap">${formatRupiah(i.estimasiBiaya)}</td>
+                    <td class="text-center">${isOwnMusyawarah?'<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-honey-50 text-honey-700 rounded-full font-semibold text-xs" title="Hasil Musyawarah Dusun"><i class="fas fa-users text-[10px]"></i>Musyawarah</span>':`<span class="text-xs text-gray-400">${escapeHtml(i.username)}</span>`}</td>
+                </tr>
+                <tr class="sub-row"><td colspan="8"><div class="space-y-2">
+                    ${isDikembalikan?`<div class="flex items-start gap-2 text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2.5"><i class="fas fa-comment-dots mt-0.5 flex-shrink-0"></i><div><b class="block mb-0.5">Catatan dari Pemerintah Desa:</b>${escapeHtml(i.catatanKembali)}</div></div>`:''}
+                    ${locked?'<div class="text-xs text-red-500 font-medium"><i class="fas fa-lock mr-1"></i>Pengimputan ditutup — tidak dapat memproses usulan.</div>':`<div class="flex flex-wrap items-center gap-2">
+                        <label class="text-xs font-semibold text-gray-600">Ranking Dusun:</label>
+                        <input type="number" min="1" placeholder="#" value="${i.rankingDusun}" class="w-20 px-2 py-1.5 border rounded-lg text-sm text-center" id="rank-${i.id}">
+                        <button onclick="prosesDusun('${escapeJs(i.id)}','ranked_dusun')" class="px-3 py-1.5 btn-success text-xs rounded-md"><i class="fas fa-check mr-1"></i>Submit ke Desa</button>
+                        ${isDiajukan?`<button onclick="openModalKembalikan('${escapeJs(i.id)}','dikembalikan_user')" class="px-3 py-1.5 bg-amber-100 text-amber-700 text-xs font-semibold rounded-md hover:bg-amber-200 transition-colors"><i class="fas fa-undo mr-1"></i>Kembalikan ke Warga</button>`:''}
+                        ${isDikembalikan&&isOwnMusyawarah?`<button onclick="openFormUsulan('${escapeJs(i.id)}')" class="px-3 py-1.5 bg-blue-100 text-blue-600 text-xs font-semibold rounded-md hover:bg-blue-200 transition-colors"><i class="fas fa-edit mr-1"></i>Edit Usulan</button>`:''}
+                    </div>`}
+                </div></td></tr>`;
+            }).join(''):emptyRow(8,'Tidak ada usulan yang perlu diproses')}
+            </tbody></table></div>
+        </div>`;
+    }
+
+    function rVerifDesaTable(u,list){
+        const sorted=[...list].sort((a,b)=>{
+            const ra=parseInt(a.rankingDusun)||999,rb=parseInt(b.rankingDusun)||999;
+            if(ra!==rb)return ra-rb;
+            return(a.judul||'').localeCompare(b.judul||'');
+        });
+        return `<div class="space-y-4">${statsBar(sorted)}
+            <div><h3 class="font-display font-700 text-xl">Musyawarah & Verifikasi Desa</h3><p class="text-xs text-gray-400 mt-0.5">Usulan dari seluruh dusun diurutkan peringkat dusun — beri peringkat desa, tentukan kewenangan, lalu verifikasi final</p></div>
+            <div class="tbl-wrap"><table class="tbl"><thead><tr>
+                <th class="w-10 text-center">No</th>
+                <th class="w-36">Status</th>
+                <th>Judul Usulan</th>
+                <th class="w-28">Sumber</th>
+                <th class="w-28">Dusun</th>
+                <th class="w-20">RT</th>
+                <th class="w-28">Volume</th>
+                <th class="w-32 text-right">Estimasi</th>
+                <th class="w-14 text-center">Rank</th>
+            </tr></thead><tbody>
+            ${sorted.length?sorted.map((i,n)=>`
+                <tr class="main-row">
+                    <td class="text-center text-gray-400 text-xs">${n+1}</td>
+                    <td class="text-center">${statusLabel(i.status)}</td>
+                    <td class="font-semibold text-gray-800">${escapeHtml(i.judul)}</td>
+                    <td class="text-xs text-gray-500 whitespace-nowrap">${escapeHtml(i.username)}</td>
+                    <td class="text-xs text-gray-500">${escapeHtml(i.dusun)}</td>
+                    <td class="text-xs text-gray-500">${i.rt.join(', ')}</td>
+                    <td class="text-xs text-gray-600">${i.volume} ${escapeHtml(i.satuan)}</td>
+                    <td class="text-right text-xs font-semibold text-gray-700 whitespace-nowrap">${formatRupiah(i.estimasiBiaya)}</td>
+                    <td class="text-center"><span class="font-display font-800 text-blue-600">#${i.rankingDusun||'-'}</span></td>
+                </tr>
+                <tr class="sub-row"><td colspan="9"><div class="space-y-2">
+                    ${i.status==='dikembalikan_dusun'?`<div class="flex items-start gap-2 text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2"><i class="fas fa-info-circle mt-0.5 flex-shrink-0"></i><span>Usulan ini dikembalikan dari proses sebelumnya.</span></div>`:''}
+                    <div class="flex flex-wrap items-center gap-2">
+                        <label class="text-xs font-semibold text-gray-600">Rank Desa:</label>
+                        <input type="number" min="1" placeholder="#" value="${i.rankingDesa}" class="w-20 px-2 py-1.5 border rounded-lg text-sm text-center" id="rankd-${i.id}">
+                        <label class="text-xs font-semibold text-gray-600">Rencana Aksi:</label>
+                        <select id="aksi-${i.id}" onchange="toggleRujukan('${escapeJs(i.id)}',this.value)" class="px-2 py-1.5 border rounded-lg text-sm bg-white"><option value="">Pilih...</option><option value="Kewenangan Desa" ${i.rencanaAksi==='Kewenangan Desa'?'selected':''}>Kewenangan Desa</option><option value="Non Kewenangan Desa" ${i.rencanaAksi==='Non Kewenangan Desa'?'selected':''}>Non Kewenangan Desa</option></select>
+                        <input type="text" id="rujuk-${i.id}" placeholder="Rujukan ke..." value="${escapeHtml(i.rujukanUsulan||'')}" class="w-36 px-2 py-1.5 border rounded-lg text-sm ${i.rencanaAksi==='Non Kewenangan Desa'?'':'hidden'}">
+                        <button onclick="prosesDesa('${escapeJs(i.id)}','final')" class="px-3 py-1.5 btn-success text-xs rounded-md"><i class="fas fa-check-double mr-1"></i>Verifikasi Final</button>
+                        <button onclick="openModalKembalikan('${escapeJs(i.id)}','dikembalikan_dusun')" class="px-3 py-1.5 bg-amber-100 text-amber-700 text-xs font-semibold rounded-md hover:bg-amber-200 transition-colors"><i class="fas fa-undo mr-1"></i>Kembalikan ke Dusun</button>
+                    </div>
+                </div></td></tr>
+            `).join(''):emptyRow(9,'Semua usulan sudah diverifikasi')}
+            </tbody></table></div>
+        </div>`;
+    }
+
+    /* ==========================================
+       MODIFIED: rPengaturan & Related Functions
+       ========================================== */
+    function rPengaturan(){
+        const dl=STATE.deadline||'';
+        const now=new Date();
+        const minDate=now.toISOString().slice(0,16);
+        return `<div class="max-w-2xl mx-auto space-y-6">
+            <div class="bg-white rounded-xl border p-6 space-y-5">
+                <div><h3 class="font-display font-700 text-xl">Batas Waktu Pengimputan</h3><p class="text-xs text-gray-400 mt-1">Atur batas waktu pengimputan usulan per tahun. Setelah batas waktu berakhir, semua role (User & Kepala Dusun) tidak dapat menambah, mengubah, atau mengajukan usulan baru untuk tahun tersebut.</p></div>
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 text-xs text-amber-800 space-y-1">
+                    <p><i class="fas fa-info-circle mr-1"></i><b>Pengaruh batas waktu:</b></p>
+                    <ul class="list-disc list-inside ml-4 space-y-0.5">
+                        <li>User tidak dapat membuat, mengedit, menghapus, atau submit usulan</li>
+                        <li>Kepala Dusun tidak dapat menginput musyawarah, memberi ranking, atau submit ke Desa</li>
+                        <li>Pemerintah Desa tetap dapat memverifikasi dan mengembalikan usulan</li>
+                    </ul>
+                </div>
+                <form id="formDeadline" class="space-y-4">
+                    <div><label class="block text-sm font-semibold mb-1.5">Tahun</label><select id="dlTahun" class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-50" onchange="loadDeadlineForYear(this.value)">${CONFIG.TAHUN_LIST.map(t=>`<option value="${t}" ${t==STATE.tahunAktif?'selected':''}>${t}</option>`).join('')}</select></div>
+                    <div><label class="block text-sm font-semibold mb-1.5">Batas Waktu (WIB)</label><input type="datetime-local" id="dlDate" value="${dl?dl.slice(0,16):''}" min="${minDate}" class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-50"><p class="text-xs text-gray-400 mt-1">Kosongkan untuk membuka pengimputan tanpa batas waktu.</p></div>
+                    <div id="dlStatus" class="${STATE.isLocked?'bg-red-50 border-red-200 text-red-700':'bg-forest-50 border-forest-200 text-forest-700'} border rounded-lg p-3 text-xs font-medium">
+                        ${STATE.isLocked?'<i class="fas fa-lock mr-1"></i>Status: DIKUNCULU — Pengimputan tahun ini telah ditutup.':'<i class="fas fa-lock-open mr-1"></i>Status: TERBUKA — Pengimputan tahun ini masih aktif.'}
+                    </div>
+                    <div id="dlErr" class="hidden text-sm text-red-600 bg-red-50 p-2.5 rounded-lg"></div>
+                    <div class="flex gap-3 pt-2">
+                        <button type="submit" class="px-5 py-2.5 btn-primary rounded-xl shadow"><i class="fas fa-save mr-1"></i>Simpan Batas Waktu</button>
+                        <button type="button" onclick="clearDeadline()" class="px-5 py-2.5 border rounded-xl text-sm font-semibold hover:bg-gray-50 transition-colors"><i class="fas fa-infinity mr-1"></i>Buka Tanpa Batas</button>
+                    </div>
+                </form>
+            </div>
+            <div class="bg-white rounded-xl border p-6">
+                <h4 class="font-display font-700 text-sm mb-3">Ringkasan Status Per Tahun</h4>
+                <div id="deadlineSummary" class="space-y-2"><div class="text-center py-6 text-gray-400 text-xs"><span class="spinner"></span> Memuat...</div></div>
+            </div>
+        </div>`;
+    }
+
+    // Render deadline summary dari cachedDeadlines
+    function renderDeadlineSummary(){
+        const c=document.getElementById('deadlineSummary');if(!c)return;
+        let html='';
+        CONFIG.TAHUN_LIST.forEach(t=>{
+            const dl=cachedDeadlines[t]||null;
+            const locked=dl?new Date(dl)<new Date():false;
+            const bg=locked?'bg-red-50 border-red-200':'bg-forest-50 border-forest-200';
+            const icon=locked?'fa-lock text-red-500':'fa-lock-open text-forest-500';
+            const txt=locked?'Dikunci':'Terbuka';
+            const txtCls=locked?'text-red-700':'text-forest-700';
+            const dlTxt=dl?new Date(dl).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}):'Tanpa batas waktu';
+            html+=`<div class="flex items-center justify-between ${bg} border rounded-lg p-3"><div class="flex items-center gap-3"><i class="fas ${icon}"></i><span class="font-display font-700">${t}</span></div><div class="flex items-center gap-3"><span class="text-xs text-gray-500">${dlTxt}</span><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${txtCls}">${txt}</span></div></div>`;
+        });
+        c.innerHTML=html||'<p class="text-center text-gray-400 text-xs py-4">Tidak ada data</p>';
+    }
+
+    function rUbahPw(){
+        return `<div class="max-w-lg mx-auto bg-white rounded-xl border p-6 space-y-4">
+            <h3 class="font-display font-700 text-xl">Ubah Password</h3>
+            <form id="formUbahPw" class="space-y-4">
+                <div><label class="block text-sm font-semibold mb-1">Password Lama</label><div class="relative"><input type="password" id="pwOld" required class="w-full pl-4 pr-10 py-2.5 border rounded-xl text-sm"><button type="button" onclick="togglePassword('pwOld',this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" aria-label="Tampilkan password"><i class="fas fa-eye"></i></button></div></div>
+                <div><label class="block text-sm font-semibold mb-1">Password Baru</label><div class="relative"><input type="password" id="pwNew" required class="w-full pl-4 pr-10 py-2.5 border rounded-xl text-sm"><button type="button" onclick="togglePassword('pwNew',this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" aria-label="Tampilkan password"><i class="fas fa-eye"></i></button></div></div>
+                <div><label class="block text-sm font-semibold mb-1">Konfirmasi</label><div class="relative"><input type="password" id="pwNewC" required class="w-full pl-4 pr-10 py-2.5 border rounded-xl text-sm"><button type="button" onclick="togglePassword('pwNewC',this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" aria-label="Tampilkan password"><i class="fas fa-eye"></i></button></div></div>
+                <div id="errPw" class="hidden text-sm text-red-600 bg-red-50 p-2.5 rounded-lg"></div>
+                <button type="submit" class="w-full py-3 btn-primary rounded-xl">Simpan Password</button>
+            </form>
+        </div>`;
+    }
+
+    /* ==========================================
+       MODIFIED: rManajemenUser & Related Functions
+       ========================================== */
+    function rManajemenUser(){
+        return `<div class="space-y-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <h3 class="font-display font-700 text-xl">Daftar Pengguna</h3>
+                <button onclick="openModalAddUser()" class="px-4 py-2 btn-primary text-sm rounded-lg shadow"><i class="fas fa-plus mr-1"></i> Tambah User</button>
+            </div>
+            <div id="userTableContainer" class="tbl-wrap"><div class="p-8 text-center text-gray-400"><span class="spinner"></span></div></div>
+        </div>`;
+    }
+
+    // Render tabel user dari cachedUsers
+    function renderUserTable(){
+        const c=document.getElementById('userTableContainer');if(!c)return;
+        if(!cachedUsers.length){c.innerHTML='<div class="p-8 text-center text-gray-400"><i class="fas fa-users text-3xl mb-2 block opacity-40"></i>Tidak ada data pengguna</div>';return}
+        c.innerHTML=`<table class="tbl"><thead><tr><th>Nama</th><th>Username</th><th>Role</th><th>Dusun</th><th class="text-center">Aksi</th></tr></thead><tbody>${cachedUsers.map(u=>`<tr class="hover:bg-gray-50"><td class="font-medium">${escapeHtml(u.nama)}</td><td class="text-gray-600">${escapeHtml(u.username)}</td><td><span class="px-2 py-0.5 bg-honey-100 text-honey-700 text-xs font-bold rounded-full">${roleLabel(u.role)}</span></td><td class="text-gray-600">${escapeHtml(u.dusun)}</td><td class="text-center"><button onclick="openModalResetPw('${escapeJs(u.username)}')" class="px-3 py-1.5 bg-blue-50 text-blue-600 text-xs font-semibold rounded-lg hover:bg-blue-100 transition-colors"><i class="fas fa-key mr-1"></i>Reset</button></td></tr>`).join('')}</tbody></table>`;
+    }
+
+    /* ==========================================
+       MODAL HANDLERS
+       ========================================== */
+    function openFormUsulan(id){
+        const u=STATE.currentUser;if(STATE.isLocked&&u.role!=='admdesa'){showToast('Pengimputan ditutup untuk tahun ini','error');return}
+        const isMusyawarah=(id==='musyawarah');
+        const existData=isMusyawarah?null:(id?cachedUsulan.find(x=>x.id===id):null);
+        
+        // Format initial value for editing
+        const initVal = existData?.estimasiBiaya ? formatRupiah(existData.estimasiBiaya) : '';
+
+        const rtOptions=Object.keys(CONFIG.RT_MAP).map(rt=>`<label class="rt-option flex items-center gap-2 py-1.5 px-2 hover:bg-honey-50 rounded cursor-pointer text-sm" data-rt="${rt}" data-dusun="${CONFIG.RT_MAP[rt]}"><input type="checkbox" class="rt-checkbox accent-honey-500" value="${rt}" ${existData?.rt?.includes(rt)?'checked':''} onchange="updateRtLabel()"> RT ${rt} <span class="text-gray-400 text-xs ml-auto">(${CONFIG.RT_MAP[rt]})</span></label>`).join('');
+        
+        openModal(`
+        <div class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this)closeModal()">
+            <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl view-enter p-6">
+                <div class="flex justify-between items-center mb-5">
+                    <h3 class="font-display font-700 text-xl">${existData?'Edit':'Buat'} Usulan ${isMusyawarah?'(Hasil Musyawarah)':''}</h3>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-1" aria-label="Tutup"><i class="fas fa-times text-lg"></i></button>
+                </div>
+                <form id="formUsulan" class="space-y-4">
+                    <div><label class="block text-sm font-semibold mb-1">Judul Usulan <span class="text-red-500">*</span></label><input type="text" id="fJudul" value="${escapeHtml(existData?.judul||'')}" required class="w-full px-4 py-2.5 border rounded-xl text-sm"></div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div><label class="block text-sm font-semibold mb-1">Kategori <span class="text-red-500">*</span></label><select id="fKategori" required class="w-full px-4 py-2.5 border rounded-xl text-sm bg-white">${CONFIG.KATEGORI.map(k=>`<option ${existData?.kategori===k?'selected':''}>${k}</option>`).join('')}</select></div>
+                        <div><label class="block text-sm font-semibold mb-1">RT <span class="text-red-500">*</span></label>
+                            <div class="relative" id="rtSelectWrapper">
+                                <button type="button" onclick="toggleRtDropdown()" class="w-full px-4 py-2.5 border rounded-xl text-sm text-left bg-white flex justify-between items-center"><span id="rtLabel" class="${existData?.rt?.length?'':'text-gray-400'}">${existData?.rt?.length?existData.rt.join(', '):'Pilih RT...'}</span><i class="fas fa-chevron-down text-xs text-gray-400"></i></button>
+                                <div id="rtDropdown" class="hidden absolute z-20 w-full mt-1 bg-white border rounded-xl shadow-lg max-h-56 overflow-hidden flex flex-col">
+                                    <div class="p-2 border-b sticky top-0 bg-white z-10"><input type="text" id="rtSearch" placeholder="Cari RT atau dusun..." class="w-full px-3 py-1.5 border rounded-lg text-sm" oninput="filterRtOptions(this.value)"></div>
+                                    <div class="overflow-y-auto p-2 space-y-0.5">${rtOptions}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div><label class="block text-sm font-semibold mb-1">Dusun</label><input type="text" id="fDusun" value="${escapeHtml(existData?.dusun||u.dusun||'')}" readonly class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-100 text-gray-600"></div>
+                        <div><label class="block text-sm font-semibold mb-1">Desa</label><input type="text" value="${CONFIG.DESA}" readonly class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-100 text-gray-600"></div>
+                    </div>
+                    <div><label class="block text-sm font-semibold mb-1">Deskripsi <span class="text-red-500">*</span></label><textarea id="fDeskripsi" rows="3" required class="w-full px-4 py-2.5 border rounded-xl text-sm">${escapeHtml(existData?.deskripsi||'')}</textarea></div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div><label class="block text-sm font-semibold mb-1">Volume <span class="text-red-500">*</span></label><input type="number" id="fVolume" value="${existData?.volume||''}" required min="1" class="w-full px-4 py-2.5 border rounded-xl text-sm"></div>
+                        <div><label class="block text-sm font-semibold mb-1">Satuan <span class="text-red-500">*</span></label><select id="fSatuan" required class="w-full px-4 py-2.5 border rounded-xl text-sm bg-white">${CONFIG.SATUAN.map(s=>`<option ${existData?.satuan===s?'selected':''}>${s}</option>`).join('')}</select></div>
+                        <div><label class="block text-sm font-semibold mb-1">Estimasi Biaya (Rp) <span class="text-red-500">*</span></label><input type="text" id="fBiaya" value="${initVal}" required class="w-full px-4 py-2.5 border rounded-xl text-sm" placeholder="0"></div>
+                    </div>
+                    <div><label class="block text-sm font-semibold mb-1">Link Proposal (Opsional)</label><input type="url" id="fLink" value="${escapeHtml(existData?.linkProposal||'')}" class="w-full px-4 py-2.5 border rounded-xl text-sm"></div>
+                    <input type="hidden" id="fId" value="${existData?.id||''}">
+                    <div id="errUsulan" class="hidden text-sm text-red-600 bg-red-50 p-2.5 rounded-lg"></div>
+                    <div class="flex justify-end gap-3 pt-2"><button type="button" onclick="closeModal()" class="px-5 py-2.5 border rounded-xl text-sm font-semibold hover:bg-gray-50">Batal</button><button type="submit" class="px-5 py-2.5 btn-primary rounded-xl shadow">Simpan</button></div>
+                </form>
+            </div>
+        </div>`);
+
+        // Setup Currency Listener
+        setupRupiahInput('fBiaya');
+    }
+
+    function toggleRtDropdown(){const d=document.getElementById('rtDropdown');if(d){d.classList.toggle('hidden');if(!d.classList.contains('hidden')){const s=document.getElementById('rtSearch');if(s){s.value='';filterRtOptions('');s.focus()}}}}
+    function updateRtLabel(){
+        const ch=document.querySelectorAll('.rt-checkbox:checked');
+        const rts=Array.from(ch).map(c=>c.value);
+        const l=document.getElementById('rtLabel');
+        if(l){l.textContent=rts.length?rts.join(', '):'Pilih RT...';l.classList.toggle('text-gray-400',!rts.length)}
+        const d=document.getElementById('fDusun');
+        if(d){const ds=[...new Set(rts.map(r=>CONFIG.RT_MAP[r]))].filter(Boolean);d.value=ds.length?ds.join(', '):(d.value||STATE.currentUser?.dusun||'')}
+    }
+    function toggleRujukan(id,v){const e=document.getElementById('rujuk-'+id);if(e){if(v==='Non Kewenangan Desa')e.classList.remove('hidden');else e.classList.add('hidden')}}
+
+    function showDetail(id){
+        const i=cachedUsulan.find(x=>x.id===id);
+        if(!i){showToast('Data tidak ditemukan','warning');return}
+        openModal(`
+        <div class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this)closeModal()">
+            <div class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl view-enter p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex-1 min-w-0 mr-3"><div class="mb-2">${statusLabel(i.status)}</div><h3 class="font-display font-700 text-xl leading-tight">${escapeHtml(i.judul)}</h3></div>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-1 flex-shrink-0" aria-label="Tutup"><i class="fas fa-times text-lg"></i></button>
+                </div>
+                <div class="space-y-3 text-sm">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-gray-50 p-3 rounded-lg"><span class="text-gray-500 text-xs block mb-0.5">Pengusul / Sumber</span><span class="font-semibold">${escapeHtml(i.username)}</span></div>
+                        <div class="bg-gray-50 p-3 rounded-lg"><span class="text-gray-500 text-xs block mb-0.5">Kategori</span><span class="font-semibold">${escapeHtml(i.kategori)}</span></div>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg"><span class="text-gray-500 text-xs block mb-0.5">RT / Dusun</span><span class="font-semibold">RT ${i.rt.join(', ')} — ${escapeHtml(i.dusun)}</span></div>
+                    <div class="bg-gray-50 p-3 rounded-lg"><span class="text-gray-500 text-xs block mb-0.5">Deskripsi</span><span class="leading-relaxed">${escapeHtml(i.deskripsi)}</span></div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="bg-gray-50 p-3 rounded-lg text-center"><span class="text-gray-500 text-xs block mb-0.5">Volume</span><span class="font-bold text-honey-700">${i.volume} ${escapeHtml(i.satuan)}</span></div>
+                        <div class="bg-gray-50 p-3 rounded-lg text-center"><span class="text-gray-500 text-xs block mb-0.5">Estimasi</span><span class="font-bold text-honey-700 text-sm">${formatRupiah(i.estimasiBiaya)}</span></div>
+                        <div class="bg-gray-50 p-3 rounded-lg text-center"><span class="text-gray-500 text-xs block mb-0.5">Proposal</span>${i.linkProposal?`<a href="${escapeHtml(i.linkProposal)}" target="_blank" rel="noopener" class="text-blue-500 underline font-semibold text-xs">Lihat</a>`:'<span class="text-gray-400">-</span>'}</div>
+                    </div>
+                    ${i.rankingDusun?`<div class="flex justify-between items-center bg-blue-50 p-3 rounded-lg"><span class="text-blue-700 font-medium">Ranking Dusun</span><span class="font-display font-900 text-xl text-blue-700">#${i.rankingDusun}</span></div>`:''}
+                    ${i.rankingDesa?`<div class="flex justify-between items-center bg-forest-50 p-3 rounded-lg"><span class="text-forest-700 font-medium">Ranking Desa</span><span class="font-display font-900 text-xl text-forest-700">#${i.rankingDesa}</span></div>`:''}
+                    ${i.rencanaAksi?`<div class="flex justify-between bg-gray-50 p-3 rounded-lg"><span class="text-gray-500">Rencana Aksi</span><span class="font-semibold">${escapeHtml(i.rencanaAksi)}</span></div>`:''}
+                    ${i.rujukanUsulan?`<div class="flex justify-between bg-gray-50 p-3 rounded-lg"><span class="text-gray-500">Rujukan Ke</span><span class="font-semibold">${escapeHtml(i.rujukanUsulan)}</span></div>`:''}
+                    ${i.catatanKembali?`<div class="bg-red-50 p-3 rounded-lg text-red-700"><i class="fas fa-comment-dots mr-1"></i><b>Catatan:</b><br>${escapeHtml(i.catatanKembali)}</div>`:''}
+                </div>
+            </div>
+        </div>`);
+    }
+
+    function openModalAddUser(){
+        openModal(`
+        <div class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this)closeModal()">
+            <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl view-enter p-6">
+                <div class="flex justify-between items-center mb-4"><h3 class="font-display font-700 text-xl">Tambah User Baru</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-1" aria-label="Tutup"><i class="fas fa-times"></i></button></div>
+                <form id="formAddUser" class="space-y-3">
+                    <input type="text" id="addN" placeholder="Nama Lengkap" required class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-50">
+                    <input type="text" id="addU" placeholder="Username" required autocomplete="off" class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-50">
+                    <input type="email" id="addE" placeholder="Email" required class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-50">
+                    <div class="relative"><input type="password" id="addP" placeholder="Password" required class="w-full pl-4 pr-10 py-2.5 border rounded-xl text-sm bg-gray-50"><button type="button" onclick="togglePassword('addP',this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" aria-label="Tampilkan password"><i class="fas fa-eye"></i></button></div>
+                    <select id="addR" required class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-50"><option value="user">Masyarakat</option><option value="admdusun">Kepala Dusun</option><option value="admrom">Admin Romawi</option><option value="admdesa">Pemerintah Desa</option></select>
+                    <input type="text" id="addD" placeholder="Dusun (Khusus Kepala Dusun)" class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-50">
+                    <div id="addErr" class="hidden text-sm text-red-600 bg-red-50 p-2.5 rounded-lg"></div>
+                    <div class="flex justify-end gap-3 pt-2"><button type="button" onclick="closeModal()" class="px-4 py-2 border rounded-xl text-sm font-semibold hover:bg-gray-50">Batal</button><button type="submit" class="px-4 py-2 btn-primary rounded-xl shadow">Simpan</button></div>
+                </form>
+            </div>
+        </div>`);
+    }
+
+    function openModalResetPw(username){
+        openModal(`
+        <div class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this)closeModal()">
+            <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl view-enter p-6">
+                <h3 class="font-display font-700 text-xl mb-2">Reset Password</h3>
+                <p class="text-sm text-gray-500 mb-4">Untuk: <b id="resetUsername">${escapeHtml(username)}</b></p>
+                <form id="formResetPw" class="space-y-3">
+                    <div class="relative"><input type="password" id="resetP" placeholder="Password Baru" required class="w-full pl-4 pr-10 py-2.5 border rounded-xl text-sm bg-gray-50"><button type="button" onclick="togglePassword('resetP',this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" aria-label="Tampilkan password"><i class="fas fa-eye"></i></button></div>
+                    <div id="resetErr" class="hidden text-sm text-red-600 bg-red-50 p-2.5 rounded-lg"></div>
+                    <div class="flex justify-end gap-3 pt-2"><button type="button" onclick="closeModal()" class="px-4 py-2 border rounded-xl text-sm font-semibold hover:bg-gray-50">Batal</button><button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors">Reset Password</button></div>
+                </form>
+            </div>
+        </div>`);
+    }
+
+    function openModalConfirm(message,onConfirm){
+        openModal(`
+        <div class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this)closeModal()">
+            <div class="bg-white rounded-2xl w-full max-w-sm shadow-2xl view-enter p-6 text-center">
+                <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-exclamation-triangle text-red-500 text-xl"></i></div>
+                <h3 class="font-display font-700 text-lg mb-2">Konfirmasi</h3>
+                <p class="text-sm text-gray-600 mb-6">${message}</p>
+                <div class="flex gap-3 justify-center"><button onclick="closeModal()" class="px-5 py-2.5 border rounded-xl text-sm font-semibold hover:bg-gray-50 transition-colors">Batal</button><button id="confirmYesBtn" class="px-5 py-2.5 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 transition-colors">Ya, Lanjutkan</button></div>
+            </div>
+        </div>`);
+        document.getElementById('confirmYesBtn').onclick=()=>{closeModal();onConfirm()};
+    }
+
+    function openModalKembalikan(id,targetStatus){
+        const isToUser=targetStatus==='dikembalikan_user';
+        const title=isToUser?'Kembalikan ke Warga':'Kembalikan ke Dusun';
+        const desc=isToUser?'Usulan akan kembali ke akun warga pengusul. Berikan catatan agar warga memahami apa yang perlu diperbaiki.':'Usulan akan kembali ke Kepala Dusun. Berikan catatan agar dapat diperbaiki sebelum disubmit ulang.';
+        openModal(`
+        <div class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this)closeModal()">
+            <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl view-enter p-6">
+                <div class="flex justify-between items-center mb-4"><h3 class="font-display font-700 text-xl">${title}</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-1" aria-label="Tutup"><i class="fas fa-times"></i></button></div>
+                <p class="text-sm text-gray-500 mb-4">${desc}</p>
+                <form id="formKembalikan" class="space-y-4">
+                    <input type="hidden" id="kembaliId" value="${id}">
+                    <input type="hidden" id="kembaliStatus" value="${targetStatus}">
+                    <div><label class="block text-sm font-semibold mb-1">Catatan Pengembalian <span class="text-red-500">*</span></label><textarea id="kembaliCatatan" rows="4" required placeholder="Tuliskan alasan atau catatan yang perlu diperbaiki..." class="w-full px-4 py-2.5 border rounded-xl text-sm"></textarea></div>
+                    <div id="errKembali" class="hidden text-sm text-red-600 bg-red-50 p-2.5 rounded-lg"></div>
+                    <div class="flex justify-end gap-3"><button type="button" onclick="closeModal()" class="px-5 py-2.5 border rounded-xl text-sm font-semibold hover:bg-gray-50">Batal</button><button type="submit" class="px-5 py-2.5 bg-amber-500 text-white rounded-xl text-sm font-semibold hover:bg-amber-600 transition-colors"><i class="fas fa-undo mr-1"></i>Kembalikan</button></div>
+                </form>
+            </div>
+        </div>`);
+    }
+
+    /* ==========================================
+       LOGIKA AKSI
+       ========================================== */
+    async function singleSubmitUsulan(id){
+        if(STATE.isLocked){showToast('Pengimputan ditutup untuk tahun ini','error');return}
+        const item=cachedUsulan.find(x=>x.id===id);
+        openModalConfirm(`Ajukan usulan "<b>${escapeHtml(item?.judul||'')}</b>" ke Kepala Dusun?`,async()=>{
+            setTableLoading(true);
+            try{
+                await API.post('updateStatus',{ids:[id],status:'diajukan'});
+                const idx=cachedUsulan.findIndex(x=>x.id===id);
+                if(idx>-1) cachedUsulan[idx].status='diajukan';
+                showToast('Usulan berhasil diajukan ke Kepala Dusun','success'); 
+                renderTab();
+            }
+            catch(e){showToast('Gagal mengajukan usulan','error')}finally{setTableLoading(false)}
+        });
+    }
+
+    async function singleDeleteUsulan(id){
+        if(STATE.isLocked){showToast('Pengimputan ditutup untuk tahun ini','error');return}
+        openModalConfirm('Apakah Anda yakin ingin menghapus usulan ini? Tindakan ini tidak dapat dibatalkan.',async()=>{
+            setTableLoading(true);
+            try{
+                await API.post('deleteUsulan',{ids:[id]});
+                cachedUsulan=cachedUsulan.filter(x=>x.id!==id);
+                showToast('Usulan berhasil dihapus','success'); 
+                renderTab();
+            }
+            catch(e){showToast('Gagal menghapus usulan','error')}finally{setTableLoading(false)}
+        });
+    }
+
+    async function bulkSubmitUser(){
+        if(STATE.isLocked){showToast('Pengimputan ditutup untuk tahun ini','error');return}
+        const ch=document.querySelectorAll('.bulk-check:checked');
+        if(!ch.length)return showToast('Pilih usulan terlebih dahulu','warning');
+        const ids=Array.from(ch).map(c=>c.dataset.id);
+        openModalConfirm(`Ajukan <b>${ids.length}</b> usulan terpilih ke Kepala Dusun?`,async()=>{
+            setTableLoading(true);
+            try{
+                await API.post('updateStatus',{ids,status:'diajukan'});
+                ids.forEach(id=>{const u=cachedUsulan.find(x=>x.id===id);if(u)u.status='diajukan'});
+                showToast(ids.length+' usulan diajukan ke Kepala Dusun','success'); 
+                renderTab();
+            }
+            catch(e){showToast('Gagal mengajukan usulan','error')}finally{setTableLoading(false)}
+        });
+    }
+
+    async function bulkDeleteUsulan(){
+        if(STATE.isLocked){showToast('Pengimputan ditutup untuk tahun ini','error');return}
+        const ch=document.querySelectorAll('.bulk-check:checked');
+        if(!ch.length)return showToast('Pilih usulan terlebih dahulu','warning');
+        const ids=Array.from(ch).map(c=>c.dataset.id);
+        openModalConfirm('Apakah Anda yakin ingin menghapus <b>'+ids.length+'</b> usulan terpilih?',async()=>{
+            setTableLoading(true);
+            try{
+                await API.post('deleteUsulan',{ids});
+                cachedUsulan=cachedUsulan.filter(x=>!ids.includes(x.id));
+                showToast(ids.length+' usulan dihapus','success'); 
+                renderTab();
+            }
+            catch(e){showToast('Gagal menghapus usulan','error')}finally{setTableLoading(false)}
+        });
+    }
+
+    async function bulkProsesDusun(){
+        if(STATE.isLocked){showToast('Pengimputan ditutup untuk tahun ini','error');return}
+        const ch=document.querySelectorAll('.bulk-check:checked');
+        if(!ch.length)return showToast('Pilih usulan terlebih dahulu','warning');
+        const ids=Array.from(ch).map(c=>c.dataset.id);
+        const items=ids.map(id=>({id,rank:document.getElementById('rank-'+id)?.value||''}));
+        if(items.find(x=>!x.rank))return showToast('Isi ranking untuk semua usulan terpilih','warning');
+        setTableLoading(true);
+        try{
+            const results=await Promise.allSettled(items.map(it=>API.post('prosesDusun',{id:it.id,status:'ranked_dusun',rankingDusun:it.rank})));
+            const ok=results.filter(r=>r.status==='fulfilled').length;
+            const fail=results.filter(r=>r.status==='rejected').length;
+            ids.forEach(id=>{const u=cachedUsulan.find(x=>x.id===id);const r=items.find(i=>i.id===id);if(u&&r)u.status='ranked_dusun';});
+            if(fail)showToast(ok+' berhasil, '+fail+' gagal diproses','warning');
+            else showToast(ok+' usulan diinput ke Desa','success');
+            renderTab();
+        }catch(e){showToast('Gagal memproses usulan','error')}finally{setTableLoading(false)}
+    }
+
+    async function prosesDusun(id,status){
+        if(STATE.isLocked){showToast('Pengimputan ditutup untuk tahun ini','error');return}
+        const rank=document.getElementById('rank-'+id)?.value||'';
+        if(status==='ranked_dusun'&&!rank)return showToast('Masukkan peringkat dusun','warning');
+        setTableLoading(true);
+        try{
+            await API.post('prosesDusun',{id,status,rankingDusun:rank});
+            const u=cachedUsulan.find(x=>x.id===id);
+            if(u){u.status=status; if(rank) u.rankingDusun=rank;}
+            showToast('Berhasil diinput ke Desa','success'); 
+            renderTab();
+        }
+        catch(e){showToast('Gagal memproses usulan','error')}finally{setTableLoading(false)}
+    }
+
+    async function prosesDesa(id,status){
+        const rank=document.getElementById('rankd-'+id)?.value;
+        const aksi=document.getElementById('aksi-'+id)?.value;
+        const rujuk=document.getElementById('rujuk-'+id)?.value;
+        if(!aksi)return showToast('Pilih rencana aksi','warning');
+        if(aksi==='Non Kewenangan Desa'&&!rujuk)return showToast('Isi rujukan usulan','warning');
+        setTableLoading(true);
+        try{
+            await API.post('prosesDesa',{id,status,rankingDesa:rank,rencanaAksi:aksi,rujukanUsulan:rujuk});
+            const u=cachedUsulan.find(x=>x.id===id);
+            if(u){
+                u.status=status; 
+                if(rank) u.rankingDesa=rank;
+                if(aksi) u.rencanaAksi=aksi;
+                if(rujuk) u.rujukanUsulan=rujuk;
+            }
+            showToast('Usulan diverifikasi final','success'); 
+            renderTab();
+        }
+        catch(e){showToast('Gagal memverifikasi usulan','error')}finally{setTableLoading(false)}
+    }
+
+    async function loadDeadlineForYear(tahun){
+        const sel=document.getElementById('dlTahun');if(sel)sel.value=tahun;
+        const res=await API.post('getDeadline',{tahun:parseInt(tahun)});
+        if(res.success){
+            STATE.deadline=res.deadline||null;computeLock();
+            const inp=document.getElementById('dlDate');if(inp)inp.value=STATE.deadline?STATE.deadline.slice(0,16):'';
+            const st=document.getElementById('dlStatus');
+            if(st){
+                st.className=STATE.isLocked?'bg-red-50 border-red-200 text-red-700 border rounded-lg p-3 text-xs font-medium':'bg-forest-50 border-forest-200 text-forest-700 border rounded-lg p-3 text-xs font-medium';
+                st.innerHTML=STATE.isLocked?'<i class="fas fa-lock mr-1"></i>Status: DIKUNCULU — Pengimputan tahun ini telah ditutup.':'<i class="fas fa-lock-open mr-1"></i>Status: TERBUKA — Pengimputan tahun ini masih aktif.';
+            }
+            // Update cache local agar ringkasan langsung terupdate
+            cachedDeadlines[tahun] = STATE.deadline;
+            renderDeadlineSummary();
+        }
+    }
+
+    async function clearDeadline(){
+        const tahun=document.getElementById('dlTahun')?.value;
+        if(!tahun)return;
+        setTableLoading(true);
+        try{
+            const res=await API.post('setDeadline',{tahun:parseInt(tahun),deadline:''});
+            if(!res.success){showToast(res.message||'Gagal','error');return}
+            STATE.deadline=res.deadline||null;computeLock();updateLockUI();
+            const inp=document.getElementById('dlDate');if(inp)inp.value='';
+            const st=document.getElementById('dlStatus');
+            if(st){st.className='bg-forest-50 border-forest-200 text-forest-700 border rounded-lg p-3 text-xs font-medium';st.innerHTML='<i class="fas fa-lock-open mr-1"></i>Status: TERBUKA — Pengimputan tahun ini masih aktif.'}
+            showToast('Pengimputan dibuka tanpa batas','success');
+            // Refresh cache & render summary
+            await fetchDeadlinesData();
+            renderDeadlineSummary();
+        }catch(e){showToast('Gagal mengubah batas waktu','error')}
+        finally{setTableLoading(false)}
+    }
+
+    function handleModalSubmit(e){
+        const f=e.target;if(!f||!f.id)return;
+        if(f.id==='formUsulan'){e.preventDefault();handleFormUsulan(f)}
+        else if(f.id==='formAddUser'){e.preventDefault();handleFormAddUser(f)}
+        else if(f.id==='formResetPw'){e.preventDefault();handleFormResetPw(f)}
+        else if(f.id==='formKembalikan'){e.preventDefault();handleFormKembalikan(f)}
+        else if(f.id==='formDeadline'){e.preventDefault();handleFormDeadline(f)}
+    }
+
+    async function handleFormUsulan(form){
+        const errEl=document.getElementById('errUsulan');errEl.classList.add('hidden');
+        const u=STATE.currentUser;
+        const rts=Array.from(form.querySelectorAll('.rt-checkbox:checked')).map(c=>c.value);
+        if(!rts.length){errEl.textContent='Pilih minimal 1 RT.';errEl.classList.remove('hidden');return}
+        const editId=document.getElementById('fId').value;
+        const isEdit=!!editId;
+        
+        // Unformat Rupiah before saving
+        const rawBiaya = document.getElementById('fBiaya').value;
+        const biayaNum = unformatRupiah(rawBiaya);
+
+        const data={
+            id:editId||null,username:u.username,tahun:STATE.tahunAktif,
+            judul:form.querySelector('#fJudul').value.trim(),
+            kategori:form.querySelector('#fKategori').value,
+            deskripsi:form.querySelector('#fDeskripsi').value.trim(),
+            rt:rts,dusun:form.querySelector('#fDusun').value,desa:CONFIG.DESA,
+            volume:parseInt(form.querySelector('#fVolume').value),
+            satuan:form.querySelector('#fSatuan').value,
+            estimasiBiaya: biayaNum, // Save as number
+            linkProposal:form.querySelector('#fLink').value.trim()
+        };
+        if(isEdit){const ex=cachedUsulan.find(x=>x.id===editId);data.status=ex?ex.status:'draft'}
+        else{data.status=(u.role==='admdusun')?'diajukan':'draft';data.rankingDusun='';data.rankingDesa='';data.rencanaAksi='';data.rujukanUsulan='';data.catatanKembali=''}
+        setTableLoading(true);
+        try{
+            const res=await API.post('saveUsulan',data);
+            if(res.success){
+                const newData={...data, ...(res.data||{})};
+                if(isEdit){
+                    const idx=cachedUsulan.findIndex(x=>x.id===editId);
+                    if(idx>-1) cachedUsulan[idx]=newData;
+                } else {
+                    cachedUsulan.unshift(newData);
+                }
+                showToast(isEdit?'Usulan diperbarui':'Usulan berhasil disimpan','success');closeModal();renderTab();
+            }
+            else{errEl.textContent=res.message||'Gagal menyimpan';errEl.classList.remove('hidden')}
+        }catch(e){errEl.textContent='Gagal menyimpan. Periksa koneksi internet.';errEl.classList.remove('hidden')}
+        finally{setTableLoading(false)}
+    }
+
+    async function handleFormAddUser(form){
+        const errEl=document.getElementById('addErr');errEl.classList.add('hidden');
+        const rawPw=form.querySelector('#addP').value;
+        if(!CONFIG.PASS_REGEX.test(rawPw)){errEl.textContent='Password tidak memenuhi syarat (min 8 karakter, huruf besar, kecil, angka, simbol).';errEl.classList.remove('hidden');return}
+        const res=await API.post('addUser',{nama:form.querySelector('#addN').value.trim(),username:form.querySelector('#addU').value.trim(),email:form.querySelector('#addE').value.trim(),password:await sha256(rawPw),role:form.querySelector('#addR').value,dusun:form.querySelector('#addD').value.trim()||'-'});
+        if(res.success){
+            // Optimistic update local cache
+            await fetchUsersData();
+            showToast('User ditambahkan','success');closeModal();renderUserTable();
+        }
+        else{errEl.textContent=res.message;errEl.classList.remove('hidden')}
+    }
+
+    async function handleFormResetPw(form){
+        const errEl=document.getElementById('resetErr');errEl.classList.add('hidden');
+        const username=(document.getElementById('resetUsername')||{}).textContent||'';
+        const rawPw=form.querySelector('#resetP').value;
+        if(!CONFIG.PASS_REGEX.test(rawPw)){errEl.textContent='Password tidak memenuhi syarat (min 8 karakter, huruf besar, kecil, angka, simbol).';errEl.classList.remove('hidden');return}
+        const res=await API.post('resetPassword',{username,newHash:await sha256(rawPw)});
+        if(res.success){showToast('Password direset','success');closeModal()}
+        else{errEl.textContent=res.message;errEl.classList.remove('hidden')}
+    }
+
+    async function handleFormKembalikan(form){
+        const errEl=document.getElementById('errKembali');errEl.classList.add('hidden');
+        const id=document.getElementById('kembaliId').value;
+        const status=document.getElementById('kembaliStatus').value;
+        const catatan=document.getElementById('kembaliCatatan').value.trim();
+        if(!catatan){errEl.textContent='Catatan pengembalian wajib diisi.';errEl.classList.remove('hidden');return}
+        setTableLoading(true);
+        try{
+            const action=status==='dikembalikan_user'?'prosesDusun':'prosesDesa';
+            await API.post(action,{id,status,catatanKembali:catatan});
+            const u=cachedUsulan.find(x=>x.id===id);
+            if(u){u.status=status;u.catatanKembali=catatan;}
+            closeModal();showToast('Usulan dikembalikan','info');renderTab();
+        }catch(e){errEl.textContent='Gagal mengembalikan usulan.';errEl.classList.remove('hidden')}
+        finally{setTableLoading(false)}
+    }
+
+    async function handleFormDeadline(form){
+        const errEl=document.getElementById('dlErr');errEl.classList.add('hidden');
+        const tahun=parseInt(form.querySelector('#dlTahun').value);
+        const dateVal=form.querySelector('#dlDate').value;
+        if(!dateVal){errEl.textContent='Pilih tanggal dan waktu batas.';errEl.classList.remove('hidden');return}
+        const selectedDate=new Date(dateVal);
+        if(selectedDate<=new Date()){errEl.textContent='Batas waktu harus di masa depan.';errEl.classList.remove('hidden');return}
+        setTableLoading(true);
+        try{
+            const res=await API.post('setDeadline',{tahun,deadline:selectedDate.toISOString()});
+            if(!res.success){errEl.textContent=res.message||'Gagal menyimpan.';errEl.classList.remove('hidden');return}
+            STATE.deadline=res.deadline||selectedDate.toISOString();computeLock();updateLockUI();
+            const st=document.getElementById('dlStatus');
+            if(st){st.className='bg-forest-50 border-forest-200 text-forest-700 border rounded-lg p-3 text-xs font-medium';st.innerHTML='<i class="fas fa-lock-open mr-1"></i>Status: TERBUKA — Pengimputan tahun ini masih aktif.'}
+            showToast('Batas waktu berhasil disimpan','success');
+            // Refresh cache & render summary
+            await fetchDeadlinesData();
+            renderDeadlineSummary();
+        }catch(e){errEl.textContent='Gagal menyimpan batas waktu.';errEl.classList.remove('hidden')}
+        finally{setTableLoading(false)}
+    }
+
+    /* ==========================================
+       NAVIGASI & TAB SWITCHING
+       ========================================== */
+    function navigate(v){STATE.currentView=v;render()}
+
+    async function switchTab(tab){
+        STATE.dashboardTab=tab;
+        const sb=document.getElementById('sidebar');
+        const ov=document.getElementById('sidebarOverlay');
+        if(sb&&sb.classList.contains('md:hidden')===false && !sb.classList.contains('-translate-x-full')){ 
+            if(ov && !ov.classList.contains('hidden')) toggleSidebar();
+        }
+        document.querySelectorAll('.sidebar-link').forEach(el=>{el.classList.toggle('active',el.dataset.tab===tab)});
+        const c=document.getElementById('tabContent');
+        
+        const needsDataFetch = cachedUsulan.length === 0 || cachedUsulan[0].tahun != STATE.tahunAktif;
+        
+        // Auto update logic: Fetch specific data when entering specific tabs
+        let fetchPromises = [];
+        if (needsDataFetch) {
+            fetchPromises.push(fetchUsulan(true));
+            fetchPromises.push(fetchDeadline());
+        }
+        
+        // Tambahan: Jika masuk tab users, fetch user data terbaru
+        if (tab === 'users') {
+            fetchPromises.push(fetchUsersData());
+        }
+        
+        // Tambahan: Jika masuk tab pengaturan, fetch deadline data terbaru
+        if (tab === 'pengaturan') {
+            fetchPromises.push(fetchDeadlinesData());
+        }
+
+        if (fetchPromises.length > 0 || needsDataFetch) {
+            if(c)c.innerHTML='<div class="text-center py-16 text-gray-400"><span class="spinner"></span> Memuat data...</div>';
+            try{
+                await Promise.all(fetchPromises);
+                if(c)c.innerHTML=renderTab();
+                if(tab==='users')renderUserTable();
+                if(tab==='pengaturan')renderDeadlineSummary();
+                if(tab==='beranda') initCharts();
+            }catch(e){
+                console.error(e);
+                if(c)c.innerHTML='<div class="text-center py-16 text-red-400"><i class="fas fa-exclamation-circle text-3xl mb-2 block"></i>Gagal memuat data.</div>';
+            }
+        } else {
+            // Smooth: Render langsung dari cache tanpa spinner
+            if(c)c.innerHTML=renderTab();
+            if(tab==='beranda') initCharts();
+            // Selalu render ulang tabel user/deadline dari cache saat switch tab agar DOM fresh
+            if(tab==='users')renderUserTable();
+            if(tab==='pengaturan')renderDeadlineSummary();
+        }
+        attachMainEvents();
+    }
+
+    async function changeTahun(val){
+        STATE.tahunAktif=parseInt(val);saveSession();
+        const c=document.getElementById('tabContent');
+        if(c)c.innerHTML='<div class="text-center py-16 text-gray-400"><span class="spinner"></span> Memuat tahun '+val+'...</div>';
+        try{
+            await Promise.all([fetchUsulan(true), fetchDeadline(), fetchDeadlinesData()]);
+            if(c)c.innerHTML=renderTab();
+            if(STATE.dashboardTab==='users')renderUserTable();
+            if(STATE.dashboardTab==='pengaturan')renderDeadlineSummary();
+            if(STATE.dashboardTab==='beranda') initCharts();
+        }catch(e){
+            console.error(e);
+            if(c)c.innerHTML='<div class="text-center py-16 text-red-400"><i class="fas fa-exclamation-circle text-3xl mb-2 block"></i>Gagal memuat data.</div>';
+        }
+        updateLockUI();attachMainEvents();
+    }
+
+    function toggleSidebar(){
+        const sb=document.getElementById('sidebar');
+        const ov=document.getElementById('sidebarOverlay');
+        if(sb.classList.contains('-translate-x-full')) {
+            sb.classList.remove('-translate-x-full');
+            ov.classList.remove('hidden');
+            setTimeout(()=>ov.classList.remove('opacity-0'),10);
+        } else {
+            sb.classList.add('-translate-x-full');
+            ov.classList.add('opacity-0');
+            setTimeout(()=>ov.classList.add('hidden'),300);
+        }
+    }
+
+    function handleLogout(){
+        clearTimeout(inactivityTimer);clearInterval(deadlineInterval);clearSession();navigate('landing');
+    }
+
+    /* ==========================================
+       EVENT HANDLERS: FORM UTAMA
+       ========================================== */
+    function attachMainEvents(){
+        const lf=document.getElementById('loginForm');
+        if(lf&&!lf._bound){
+            lf._bound=true;
+            lf.addEventListener('submit',async(e)=>{
+                e.preventDefault();
+                const btn=document.getElementById('loginBtn');btn.innerHTML='<span class="spinner"></span>';btn.disabled=true;
+                const errEl=document.getElementById('loginErr');errEl.classList.add('hidden');
+                try{
+                    const res=await API.post('login',{username:document.getElementById('loginU').value.trim(),password:await sha256(document.getElementById('loginP').value)});
+                    if(res.success){
+                        STATE.currentUser=res.user;STATE.tahunAktif=parseInt(document.getElementById('loginT').value);
+                        STATE.dashboardTab='beranda';saveSession();attachInactivityListeners();setupInactivityTimer();startDeadlineCheck();
+                        navigate('dashboard');
+                    }else{errEl.textContent=res.message;errEl.classList.remove('hidden');btn.textContent='Masuk';btn.disabled=false}
+                }catch(err){errEl.textContent='Koneksi gagal. Periksa internet Anda.';errEl.classList.remove('hidden');btn.textContent='Masuk';btn.disabled=false}
+            });
+        }
+        const rf=document.getElementById('regForm');
+        if(rf&&!rf._bound){
+            rf._bound=true;
+            rf.addEventListener('submit',async(e)=>{
+                e.preventDefault();
+                const errEl=document.getElementById('regErr');errEl.classList.add('hidden');
+                const role=document.getElementById('regR').value;
+                const kode=(document.getElementById('regK')||{}).value||'';
+                const dusun=(document.getElementById('regDus')||{}).value||'-';
+                
+                // Validasi Khusus Register
+                if((role === 'user' && !dusun) && dusun === '') {
+                    // User harus pilih dusun
+                }
+
+                const rawPw=document.getElementById('regP').value;
+                if(!CONFIG.PASS_REGEX.test(rawPw)){errEl.textContent='Password tidak memenuhi syarat (min 8 karakter, huruf besar, kecil, angka, simbol).';errEl.classList.remove('hidden');return}
+                try{
+                    const res=await API.post('register',{nama:document.getElementById('regN').value.trim(),username:document.getElementById('regU').value.trim(),email:document.getElementById('regE').value.trim(),password:await sha256(rawPw),role,dusun,kode});
+                    if(res.success){showToast('Berhasil daftar! Silakan masuk.','success');navigate('login')}
+                    else{errEl.textContent=res.message;errEl.classList.remove('hidden')}
+                }catch(err){errEl.textContent='Koneksi gagal.';errEl.classList.remove('hidden')}
+            });
+        }
+        const uf=document.getElementById('formUbahPw');
+        if(uf&&!uf._bound){
+            uf._bound=true;
+            uf.addEventListener('submit',async(e)=>{
+                e.preventDefault();
+                const errEl=document.getElementById('errPw');errEl.classList.add('hidden');
+                const np=document.getElementById('pwNew').value,npC=document.getElementById('pwNewC').value;
+                if(!CONFIG.PASS_REGEX.test(np)){errEl.textContent='Password baru tidak memenuhi syarat.';errEl.classList.remove('hidden');return}
+                if(np!==npC){errEl.textContent='Konfirmasi password tidak cocok.';errEl.classList.remove('hidden');return}
+                try{
+                    const res=await API.post('changePassword',{username:STATE.currentUser.username,oldHash:await sha256(document.getElementById('pwOld').value),newHash:await sha256(np)});
+                    if(res.success){showToast('Password berhasil diubah!','success');e.target.reset()}
+                    else{errEl.textContent=res.message;errEl.classList.remove('hidden')}
+                }catch(err){errEl.textContent='Gagal mengubah password. Periksa koneksi.';errEl.classList.remove('hidden')}
+            });
+        }
+    }
+
+    document.addEventListener('click',(e)=>{
+        const w=document.getElementById('rtSelectWrapper');
+        const d=document.getElementById('rtDropdown');
+        if(w&&d&&!w.contains(e.target))d.classList.add('hidden');
+    });
+
+    document.addEventListener('change',(e)=>{
+        if(e.target.classList.contains('bulk-check'))updateBulkCount();
+    });
+
+    document.addEventListener('submit',handleModalSubmit);
+
+    /* ==========================================
+       BACKGROUND HANDLING
+       ========================================== */
+    document.addEventListener('visibilitychange', async () => {
+        if (document.visibilityState === 'visible' && STATE.currentUser) {
+            try {
+                // Refresh data utama
+                await fetchUsulan(true);
+                await fetchDeadline();
+                
+                // Refresh data spesifik agar auto-update benar-benar terasa
+                await fetchUsersData();
+                await fetchDeadlinesData();
+
+                const c = document.getElementById('tabContent');
+                if(c) {
+                    c.innerHTML = renderTab();
+                    if(STATE.dashboardTab==='beranda') initCharts();
+                    if(STATE.dashboardTab==='users') renderUserTable();
+                    if(STATE.dashboardTab==='pengaturan') renderDeadlineSummary();
+                }
+            } catch (e) {
+                console.error("Background sync failed", e);
+            }
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded',()=>{
+        const saved=localStorage.getItem('ngusulbee_session');
+        if(saved){
+            try{
+                const s=JSON.parse(saved);
+                STATE.currentUser=s.user;STATE.tahunAktif=s.tahun||new Date().getFullYear();
+                STATE.currentView='dashboard';
+                attachInactivityListeners();setupInactivityTimer();startDeadlineCheck();
+            }catch(e){clearSession()}
+        }
+        render();
+    });
+    </script>
+</body>
+</html>

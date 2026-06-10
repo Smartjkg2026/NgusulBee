@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NgusulBee - Aplikasi Usulan Masyarakat Desa Jangkang</title>
+    <link rel="shortcut icon" type="image/png" href="Logo.png">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --honey-500: #FFD700;
+            --honey-600: #FFC107;
+            --honey-700: #FFA000;
+            --forest-500: #228B22;
+            --forest-600: #32CD32;
+            --white: #FFFFFF;
+            --gray-50: #FAFAFA;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #FFF9E6 0%, #FFFFFF 50%, #F0F8F0 100%);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* ==================== APP LOGO STYLE ==================== */
+        .app-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .app-logo-icon {
+            width: 42px;
+            height: 42px;
+            background: var(--honey-500);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(255, 215, 0, 3);
+            flex-shrink: 0;
+        }
+
+        .app-logo-icon i {
+            color: white;
+            font-size: 1rem;
+        }
+
+        .app-logo-text {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 1.35rem;
+            color: var(--honey-700);
+            letter-spacing: -0.5px;
+        }
+
+        /* Large Logo Version */
+        .app-logo-large .app-logo-icon {
+            width: 120px;
+            height: 120px;
+            border-radius: 28px;
+            box-shadow: 0 15px 40px rgba(255, 215, 0, 4);
+        }
+
+        .app-logo-large .app-logo-icon i {
+            font-size: 3rem;
+        }
+
+        /* ==================== PRESENTATION CONTAINER ==================== */
+        .presentation {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ==================== HEADER WITH NAVIGATION ==================== */
+        .header {
+            background: linear-gradient(135deg, var(--honey-500) 0%, var(--honey-600) 100%);
+            padding: 0.8rem 2rem;
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+            z-index: 100;
+            position: relative;
+            flex-wrap: wrap;
+        }
+
+        /* Left Section - Logo */
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Center Section - Progress & Slide Info */
+        .header-center {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+            justify-content: center;
+            max-width: 400px;
+        }
+
+        .progress-bar {
+            width: 140px;
+            height: 7px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--forest-500), var(--forest-600));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .slide-number {
+            font-size: 0.85rem;
+            color: #5D4E37;
+            font-weight: 600;
+            background: rgba(255,255,255,0.95);
+            padding: 0.35rem 0.9rem;
+            border-radius: 18px;
+            white-space: nowrap;
+        }
+
+        /* Right Section - Navigation Buttons in Header */
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        /* Navigation Buttons - Integrated in Header */
+        .nav-btn {
+            padding: 0.45rem 1rem;
+            border: none;
+            border-radius: 16px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            color: white;
+            white-space: nowrap;
+        }
+
+        .nav-btn.prev {
+            background: rgba(0,0,0,0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-btn.next {
+            background: var(--forest-500);
+            box-shadow: 0 3px 12px rgba(34,139,34,0.3);
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.25);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .nav-btn i {
+            font-size: 0.7rem;
+        }
+
+        /* Fullscreen Button in Header */
+        .fullscreen-btn {
+            background: rgba(255,255,255,0.25);
+            border: none;
+            padding: 0.45rem 0.6rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            color: white;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fullscreen-btn:hover {
+            background: rgba(255,255,255,0.45);
+            transform: scale(1.08);
+        }
+
+        /* Slides Container */
+        .slides-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Individual Slide */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 2rem 3rem 1.5rem;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+        }
+
+        /* Page Title Styles */
+        .page-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-title h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: #2D5016;
+            margin-bottom: 0.4rem;
+        }
+
+        .page-title .subtitle {
+            font-size: 1.1rem;
+            color: var(--forest-500);
+            font-weight: 600;
+            margin-top: 0.3rem;
+        }
+
+        .page-title .underline {
+            width: 120px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--honey-500), var(--forest-500));
+            margin: 0.5rem auto 0;
+            border-radius: 2px;
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        /* Footer */
+        .footer {
+            padding: 0.9rem 2.5rem;
+            background: linear-gradient(90deg, var(--forest-500) 0%, var(--forest-600) 100%);
+            color: white;
+            text-align: center;
+            font-size: 0.88rem;
+            font-weight: 500;
+            z-index: 100;
+            position: relative;
+        }
+
+        /* Slide Indicators - Compact on Right Side */
+        .slide-indicators {
+            position: fixed;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            z-index: 200;
+        }
+
+        .indicator {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.35);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            border: 2px solid transparent;
+        }
+
+        .indicator:hover {
+            background: rgba(255,215,0,0.6);
+            transform: scale(1.2);
+        }
+
+        .indicator.active {
+            background: white;
+            border-color: var(--honey-700);
+            transform: scale(1.25);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Grid Layouts */
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.3rem; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; }
+        .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; }
+
+        /* Feature Items */
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.7rem;
+            padding: 0.8rem;
+            background: var(--gray-50);
+            border-radius: 10px;
+            border-left: 3px solid var(--honey-500);
+        }
+
+        .feature-item.green { border-left-color: var(--forest-500); }
+        .feature-item.red { border-left-color: #DC3545; }
+        .feature-item.blue { border-left-color: #17A2B8; }
+
+        /* Icon Containers */
+        .icon-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .icon-box.gold { 
+            background: linear-gradient(135deg, #FFF9E6, #FFE082); 
+        }
+        
+        .icon-box.green { 
+            background: linear-gradient(135deg, #E8F5E9, #C8E6C9); 
+        }
+        
+        .icon-box.blue { 
+            background: linear-gradient(135deg, #E3F2FD, #BBDEFB); 
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 0.32rem 0.8rem;
+            border-radius: 11px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-gold { 
+            background: linear-gradient(135deg, var(--honey-500), var(--honey-700)); 
+            color: white; 
+        }
+        
+        .badge-green { 
+            background: linear-gradient(135deg, var(--forest-500), var(--forest-600)); 
+            color: white; 
+        }
+        
+        .badge-blue { 
+            background: linear-gradient(135deg, #17A2B8, #138496); 
+            color: white; 
+        }
+        
+        .badge-red { 
+            background: linear-gradient(135deg, #DC3545, #EF5350); 
+            color: white; 
+        }
+
+        /* Highlight Box */
+        .highlight {
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            border-left: 4px solid;
+        }
+
+        .highlight-warning { 
+            background: linear-gradient(135deg, #FFF3E0, #FFE0B2); 
+            border-color: #FF9800; 
+        }
+        
+        .highlight-info { 
+            background: linear-gradient(135deg, #E3F2FD, #BBDEFB); 
+            border-color: #17A2B8; 
+        }
+        
+        .highlight-success { 
+            background: linear-gradient(135deg, #E8F5E9, #C8E6C9); 
+            border-color: var(--forest-500); 
+        }
+
+        /* Step Number */
+        .step-num {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--honey-500), var(--honey-700));
+            color: white;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.05rem;
+        }
+
+        /* ==================== RESPONSIVE DESIGN ==================== */
+        
+        /* Tablet & Small Desktop */
+        @media (max-width: 1024px) {
+            .header {
+                padding: 0.7rem 1.5rem;
+                gap: 1rem;
+            }
+
+            .app-logo-text {
+                font-size: 1.2rem;
+            }
+
+            .header-center {
+                max-width: 250px;
+            }
+
+            .progress-bar {
+                width: 100px;
+            }
+
+            .nav-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.72rem;
+            }
+
+            .nav-btn span {
+                display: none; /* Hide text, show only icon */
+            }
+
+            .fullscreen-btn {
+                padding: 0.4rem 0.5rem;
+                font-size: 0.9rem;
+            }
+
+            .grid-5 { grid-template-columns: repeat(3, 1fr); }
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+            
+            .slide-indicators {
+                right: 8px;
+                gap: 5px;
+            }
+
+            .indicator {
+                width: 8px;
+                height: 8px;
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .header {
+                padding: 0.6rem 1rem;
+                flex-wrap: wrap;
+                gap: 0.6rem;
+            }
+
+            .header-left {
+                order: 1;
+            }
+
+            .header-center {
+                order: 3;
+                width: 100%;
+                max-width: 100%;
+                justify-content: center;
+                margin-top: 0.3rem;
+            }
+
+            .header-right {
+                order: 2;
+                gap: 0.4rem;
+            }
+
+            .app-logo-icon {
+                width: 36px;
+                height: 36px;
+                border-radius: 10px;
+            }
+
+            .app-logo-icon i {
+                font-size: 0.85rem;
+            }
+
+            .app-logo-text {
+                font-size: 1.1rem;
+            }
+
+            .progress-bar {
+                width: 80px;
+                height: 6px;
+            }
+
+            .slide-number {
+                font-size: 0.75rem;
+                padding: 0.3rem 0.7rem;
+            }
+
+            .nav-btn {
+                padding: 0.38rem 0.65rem;
+                font-size: 0.7rem;
+                border-radius: 14px;
+            }
+
+            .nav-btn i {
+                font-size: 0.65rem;
+            }
+
+            .fullscreen-btn {
+                padding: 0.38rem 0.5rem;
+                font-size: 0.85rem;
+                border-radius: 8px;
+            }
+
+            .grid-3, .grid-4, .grid-5 { 
+                grid-template-columns: 1fr; 
+            }
+
+            .page-title h1 { 
+                font-size: 1.7rem; 
+            }
+
+            .page-title .subtitle {
+                font-size: 0.95rem;
+            }
+
+            .slide {
+                padding: 1.5rem 1.2rem 1rem;
+            }
+
+            .card {
+                padding: 1.2rem;
+            }
+
+            /* Hide indicators on very small screens or make them smaller */
+            .slide-indicators {
+                right: 5px;
+                gap: 4px;
+            }
+
+            .indicator {
+                width: 7px;
+                height: 7px;
+            }
+
+            .footer {
+                padding: 0.7rem 1.2rem;
+                font-size: 0.78rem;
+            }
+        }
+
+        /* Very Small Mobile */
+        @media (max-width: 480px) {
+            .app-logo-text {
+                display: none; /* Hide text, show only icon */
+            }
+
+            .nav-btn {
+                padding: 0.35rem 0.55rem;
+            }
+
+            .header-right {
+                gap: 0.3rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .float-anim { animation: float 3s ease-in-out infinite; }
+        .pulse-anim { animation: pulse 2s ease-in-out infinite; }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <!-- ==================== HEADER WITH INTEGRATED NAVIGATION ==================== -->
+        <div class="header">
+            <!-- Left: Logo -->
+            <div class="header-left">
+                <div class="app-logo">
+                    <div class="app-logo-icon">
+                        <i class="fas fa-cubes"></i>
+                    </div>
+                    <span class="app-logo-text">NgusulBee</span>
+                </div>
+            </div>
+            
+            <!-- Center: Progress & Slide Info -->
+            <div class="header-center">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <span class="slide-number" id="slideNumber">1 / 10</span>
+            </div>
+
+            <!-- Right: Navigation Buttons + Fullscreen -->
+            <div class="header-right">
+                <button class="nav-btn prev" id="prevBtn" onclick="changeSlide(-1)" title="Slide Sebelumnya">
+                    <i class="fas fa-chevron-left"></i>
+                    <span>Sebelumnya</span>
+                </button>
+                
+                <button class="nav-btn next" id="nextBtn" onclick="changeSlide(1)" title="Slide Selanjutnya">
+                    <span>Selanjutnya</span>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+
+                <button class="fullscreen-btn" onclick="toggleFullscreen()" title="Mode Layar Penuh">
+                    <i class="fas fa-expand"></i>
+                </button>
+            </div>
+            <!--Back to landing page-->
+            <div class="header-right">
+                <a href="index.html" <i class="fas fa-desktop"></i> Home</a>
+            </div>
+        </div>
+
+        <!-- Slides Container -->
+        <div class="slides-container">
+
+            <!-- ==================== SLIDE 1: JUDUL & PEMBUKA ==================== -->
+            <div class="slide active" data-slide="1">
+                <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                    
+                    <!-- Logo -->
+                    <div style="margin-bottom: 1.8rem;" class="float-anim">
+                        <div class="app-logo-large">
+                            <div class="app-logo-icon">
+                                <i class="fas fa-cubes"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Title -->
+                    <h1 style="font-family: 'Poppins', sans-serif; font-size: 4rem; font-weight: 800; color: var(--honey-500); text-shadow: 3px 3px 6px rgba(255,193,7,0.3), -1px -1px 0 #2D5016, 1px -1px 0 #2D5016, -1px 1px 0 #2D5016, 1px 1px 0 #2D5016; letter-spacing: 2px; margin-bottom: 0.8rem;">
+                        NgusulBee
+                    </h1>
+                    
+                    <h2 style="font-family: 'Poppins', sans-serif; font-size: 1.7rem; font-weight: 600; color: #2D5016; margin-bottom: 0.8rem;">
+                        Aplikasi Usulan Masyarakat Desa Jangkang
+                    </h2>
+                    
+                    <p style="font-family: 'Poppins', sans-serif; font-size: 1.3rem; font-style: italic; color: var(--forest-500); margin-bottom: 2rem;">
+                        ✨ Suara Warga, Pembangunan Nyata ✨
+                    </p>
+
+                    <!-- Features Grid -->
+                    <div class="grid-3" style="max-width: 900px; width: 100%;">
+                        <div class="card" style="text-align: center; border-left: 4px solid var(--honey-500);">
+                            <div style="font-size: 2.3rem; margin-bottom: 0.7rem;">📱</div>
+                            <p style="font-size: 0.95rem; color: #444; font-weight: 600;">Platform Digital Musyawarah Desa</p>
+                        </div>
+                        <div class="card" style="text-align: center; border-left: 4px solid var(--honey-500);">
+                            <div style="font-size: 2.3rem; margin-bottom: 0.7rem;">🔍</div>
+                            <p style="font-size: 0.95rem; color: #444; font-weight: 600;">Transparan & Akuntabel</p>
+                        </div>
+                        <div class="card" style="text-align: center; border-left: 4px solid var(--honey-500);">
+                            <div style="font-size: 2.3rem; margin-bottom: 0.7rem;">⚡</div>
+                            <p style="font-size: 0.95rem; color: #444; font-weight: 600;">Efisien & Mudah Digunakan</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer">Solusi Digital untuk Pembangunan Desa yang Partisipatif</div>
+            </div>
+
+
+            <!-- ==================== SLIDE 2: KENAPA KITA BUTUH NGUSULBEE? ==================== -->
+            <div class="slide" data-slide="2">
+                <div class="page-title">
+                    <h1>Kenapa Kita Butuh NgusulBee?</h1>
+                    <div class="underline"></div>
+                </div>
+
+                <div class="grid-2" style="flex: 1;">
+                    <!-- Masalah Lama -->
+                    <div class="card" style="border-top: 5px solid #DC3545;">
+                        <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.2rem; padding-bottom: 1rem; border-bottom: 2px solid #f0f0f0;">
+                            <span style="font-size: 2.3rem;">❌</span>
+                            <h2 style="font-family: 'Poppins', sans-serif; font-size: 1.6rem; font-weight: 700; color: #DC3545;">Masalah Lama</h2>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.9rem;">
+                            <div class="feature-item red">
+                                <span style="font-size: 1.2rem;">📄</span>
+                                <span><strong>Kertas Hilang:</strong> Usulan sering hilang atau sulit dilacak</span>
+                            </div>
+                            <div class="feature-item red">
+                                <span style="font-size: 1.2rem;">🐢</span>
+                                <span><strong>Proses Lambat:</strong> Birokrasi manual yang memakan waktu lama</span>
+                            </div>
+                            <div class="feature-item red">
+                                <span style="font-size: 1.2rem;">❓</span>
+                                <span><strong>Tidak Transparan:</strong> Warga sulit memantau status usulan mereka</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Arrow -->
+                    <div style="display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 3.5rem; color: var(--honey-500); filter: drop-shadow(0 4px 8px rgba(255,193,7,0.4));" class="pulse-anim">➜</span>
+                    </div>
+
+                    <!-- Solusi NgusulBee -->
+                    <div class="card" style="border-top: 5px solid var(--forest-500);">
+                        <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.2rem; padding-bottom: 1rem; border-bottom: 2px solid #f0f0f0;">
+                            <span style="font-size: 2.3rem;">✅</span>
+                            <h2 style="font-family: 'Poppins', sans-serif; font-size: 1.6rem; font-weight: 700; color: var(--forest-500);">Solusi NgusulBee</h2>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.9rem;">
+                            <div class="feature-item green">
+                                <span style="font-size: 1.2rem;">🚪</span>
+                                <span><strong>Satu Pintu:</strong> Semua usulan terdigitalisasi dalam satu sistem</span>
+                            </div>
+                            <div class="feature-item green">
+                                <span style="font-size: 1.2rem;">👁️</span>
+                                <span><strong>Transparan:</strong> Status real-time (Draft → Diajukan → Final)</span>
+                            </div>
+                            <div class="feature-item green">
+                                <span style="font-size: 1.2rem;">📱</span>
+                                <span><strong>Mudah Diakses:</strong> Buka via HP atau Laptop kapan saja</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer">Transformasi Digital untuk Pelayanan Desa yang Lebih Baik</div>
+            </div>
+
+
+            <!-- ==================== SLIDE 3: ALUR USULAN PEMBANGUNAN ==================== -->
+            <div class="slide" data-slide="3">
+                <div class="page-title">
+                    <h1>Alur Usulan Pembangunan</h1>
+                    <div class="underline"></div>
+                </div>
+
+                <div class="grid-4" style="flex: 1; align-items: stretch;">
+                    <!-- Step 1 -->
+                    <div class="card" style="text-align: center; display: flex; flex-direction: column;">
+                        <div class="step-num" style="align-self: center; margin-bottom: 1rem;">1</div>
+                        <div style="font-size: 2.8rem; margin-bottom: 0.8rem;">👥</div>
+                        <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.15rem; font-weight: 700; color: #2D5016; margin-bottom: 0.7rem;">Masyarakat (User)</h3>
+                        <p style="font-size: 0.88rem; line-height: 1.5; color: #555; flex-grow: 1;">Mengisi formulir usulan online dengan detail pembangunan yang diinginkan</p>
+                        <span class="badge badge-gold" style="margin-top: 0.8rem;">📝 Draft</span>
+                    </div>
+
+                    <!-- Arrow -->
+                    <div style="display: flex; align-items: center; justify-content: center;"><span style="font-size: 2.3rem; color: var(--honey-500);">➜</span></div>
+
+                    <!-- Step 2 -->
+                    <div class="card" style="text-align: center; display: flex; flex-direction: column;">
+                        <div class="step-num" style="align-self: center; margin-bottom: 1rem;">2</div>
+                        <div style="font-size: 2.8rem; margin-bottom: 0.8rem;">📤</div>
+                        <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.15rem; font-weight: 700; color: #2D5016; margin-bottom: 0.7rem;">Submit ke Kepala Dusun</h3>
+                        <p style="font-size: 0.88rem; line-height: 1.5; color: #555; flex-grow: 1;">Warga mengirim usulan untuk diverifikasi oleh Kepala Dusun</p>
+                        <span class="badge badge-blue" style="margin-top: 0.8rem;">📨 Diajukan</span>
+                    </div>
+
+                    <!-- Arrow -->
+                    <div style="display: flex; align-items: center; justify-content: center;"><span style="font-size: 2.3rem; color: var(--honey-500);">➜</span></div>
+
+                    <!-- Step 3 -->
+                    <div class="card" style="text-align: center; display: flex; flex-direction: column;">
+                        <div class="step-num" style="align-self: center; margin-bottom: 1rem;">3</div>
+                        <div style="font-size: 2.8rem; margin-bottom: 0.8rem;">✅</div>
+                        <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.15rem; font-weight: 700; color: #2D5016; margin-bottom: 0.7rem;">Verifikasi Dusun</h3>
+                        <p style="font-size: 0.88rem; line-height: 1.5; color: #555; flex-grow: 1;">Kepala Dusun menilai & meranking usulan berdasarkan prioritas</p>
+                        <span class="badge badge-green" style="margin-top: 0.8rem;">🔄 Terinput ke Desa</span>
+                    </div>
+
+                    <!-- Arrow -->
+                    <div style="display: flex; align-items: center; justify-content: center;"><span style="font-size: 2.3rem; color: var(--honey-500);">➜</span></div>
+
+                    <!-- Step 4 -->
+                    <div class="card" style="text-align: center; display: flex; flex-direction: column;">
+                        <div class="step-num" style="align-self: center; margin-bottom: 1rem;">4</div>
+                        <div style="font-size: 2.8rem; margin-bottom: 0.8rem;">🏛️</div>
+                        <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.15rem; font-weight: 700; color: #2D5016; margin-bottom: 0.7rem;">Musyawarah Desa</h3>
+                        <p style="font-size: 0.88rem; line-height: 1.5; color: #555; flex-grow: 1;">Pemdes verifikasi final & tetapkan APBDes untuk dianggarkan</p>
+                        <span class="badge badge-green" style="background: linear-gradient(135deg, var(--forest-500), var(--forest-600)); margin-top: 0.8rem;">⭐ Final</span>
+                    </div>
+                </div>
+
+                <div class="footer">Setiap Langkah Memberikan Notifikasi Status Real-Time</div>
+            </div>
+
+
+            <!-- ==================== SLIDE 4: PANDUAN MASYARAKAT (USER) ==================== -->
+            <div class="slide" data-slide="4">
+                <div class="page-title">
+                    <h1>Cara Mengusulkan</h1>
+                    <p class="subtitle">👥 Panduan Untuk Warga Masyarakat</p>
+                    <div class="underline"></div>
+                </div>
+
+                <div class="grid-3" style="flex: 1;">
+                    <!-- Step 1 -->
+                    <div class="card" style="position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, var(--honey-500), var(--forest-500));"></div>
+                        <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.2rem;">
+                            <div class="step-num">1</div>
+                            <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.25rem; font-weight: 700; color: #2D5016;">Pendaftaran Akun</h3>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.7rem;">
+                            <div class="feature-item"><span style="font-size: 1.1rem;">👤</span><span>Pilih peran <strong>Masyarakat</strong> saat mendaftar</span></div>
+                            <div class="feature-item"><span style="font-size: 1.1rem;">🏘️</span><span>Pilih <strong>Dusun</strong> tempat tinggal Anda</span></div>
+                            <div class="feature-item"><span style="font-size: 1.1rem;">🔓</span><span>Tidak perlu kode verifikasi khusus</span></div>
+                            <div class="highlight highlight-warning">
+                                <p style="font-size: 0.85rem; color: #856404; font-weight: 600;"><span class="badge badge-red" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;">Penting!</span> Pilih dusun yang benar agar usulan masuk ke wilayah yang tepat</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="card" style="position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, var(--honey-500), var(--forest-500));"></div>
+                        <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.2rem;">
+                            <div class="step-num">2</div>
+                            <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.25rem; font-weight: 700; color: #2D5016;">Membuat Usulan</h3>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.7rem;">
+                            <div class="feature-item"><span style="font-size: 1.1rem;">📝</span><span>Isi <strong>Judul</strong> usulan pembangunan</span></div>
+                            <div class="feature-item"><span style="font-size: 1.1rem;">📂</span><span>Pilih <strong>Kategori</strong>: Infrastruktur, Kesehatan, Pendidikan</span></div>
+                            <div class="feature-item"><span style="font-size: 1.1rem;">📍</span><span>Tentukan <strong>RT</strong> yang terdampak</span></div>
+                            <div class="feature-item"><span style="font-size: 1.1rem;">💰</span><span>Isi <strong>Volume & Estimasi Biaya</strong> (format Rupiah otomatis)</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="card" style="position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, var(--honey-500), var(--forest-500));"></div>
+                        <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.2rem;">
+                            <div class="step-num">3</div>
+                            <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.25rem; font-weight: 700; color: #2D5016;">Submit Usulan</h3>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.7rem;">
+                            <div class="feature-item"><span style="font-size: 1.1rem;">💾</span><span><strong>Simpan Draf:</strong> Jika belum selesai, bisa dilanjutkan nanti</span></div>
+                            <div class="feature-item"><span style="font-size: 1.1rem;">✅</span><span><strong>Klik Submit:</strong> Kirim ke Kepala Dusun untuk diverifikasi</span></div>
+                            <div class="highlight highlight-success">
+                                <p style="font-size: 0.82rem; color: #155724; font-weight: 600;">💡 <strong>Tips:</strong> Cukup ketik angka untuk biaya, sistem otomatis ubah ke format Rupiah</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer">Mudah, Cepat, dan Transparan - Suara Warga Didengar!</div>
+            </div>
+
+
+            <!-- ==================== SLIDE 5: TUGAS KEPALA DUSUN ==================== -->
+            <div class="slide" data-slide="5">
+                <div class="page-title">
+                    <h1>Tugas Kepala Dusun</h1>
+                    <p class="subtitle">👨‍✈️ Peran Kunci sebagai Filter Usulan</p>
+                    <div class="underline"></div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 260px 1fr; gap: 1.5rem; flex: 1;">
+                    <!-- Sidebar Login -->
+                    <div class="card" style="border-top: 5px solid var(--forest-500); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🔑</div>
+                        <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--forest-500); margin-bottom: 1rem;">Login System</h3>
+                        <div class="highlight highlight-success" style="width: 100%; text-align: left;">
+                            <p style="font-size: 0.9rem; color: #155724; font-weight: 600;">Gunakan akun <strong>Kepala Dusun</strong> yang telah didaftarkan oleh Pemerintah Desa</p>
+                        </div>
+                    </div>
+
+                    <!-- Tasks Grid -->
+                    <div class="grid-2" style="gap: 1.2rem;">
+                        <div class="card" style="position: relative; overflow: hidden;">
+                            <div style="position: absolute; top: 0; left: 0; width: 5px; height: 100%; background: linear-gradient(180deg, var(--honey-500), var(--honey-700));"></div>
+                            <div style="display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1rem;">
+                                <div class="icon-box gold"><span>📋</span></div>
+                                <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.1rem; font-weight: 700; color: #2D5016;">Verifikasi Usulan Masuk</h3>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                                <div class="feature-item"><span style="color: var(--forest-500); font-weight: 700;">▸</span><span>Lihat semua usulan dari warga di wilayah dusun Anda</span></div>
+                                <div class="feature-item"><span style="color: var(--forest-500); font-weight: 700;">▸</span><span>Beri peringkat (Ranking 1, 2, 3...) berdasarkan prioritas musyawarah</span></div>
+                                <div class="feature-item"><span style="color: var(--forest-500); font-weight: 700;">▸</span><span>Beri catatan jika usulan perlu diperbaiki</span></div>
+                                <span class="badge badge-gold" style="align-self: flex-start; margin-top: 0.3rem;">⚡ Filter Utama</span>
+                            </div>
+                        </div>
+
+                        <div class="card" style="position: relative; overflow: hidden;">
+                            <div style="position: absolute; top: 0; left: 0; width: 5px; height: 100%; background: linear-gradient(180deg, var(--honey-500), var(--honey-700));"></div>
+                            <div style="display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1rem;">
+                                <div class="icon-box gold"><span>↩️</span></div>
+                                <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.1rem; font-weight: 700; color: #2D5016;">Kembalikan ke Warga</h3>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                                <div class="feature-item"><span style="color: var(--forest-500); font-weight: 700;">▸</span><span>Jika usulan kurang lengkap atau perlu revisi</span></div>
+                                <div class="feature-item"><span style="color: var(--forest-500); font-weight: 700;">▸</span><span>Tambahkan catatan perbaikan yang jelas</span></div>
+                                <div class="feature-item"><span style="color: var(--forest-500); font-weight: 700;">▸</span><span>Warga menerima notifikasi untuk memperbaiki usulan</span></div>
+                            </div>
+                        </div>
+
+                        <div class="card" style="position: relative; overflow: hidden;">
+                            <div style="position: absolute; top: 0; left: 0; width: 5px; height: 100%; background: linear-gradient(180deg, var(--honey-500), var(--honey-700));"></div>
+                            <div style="display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1rem;">
+                                <div class="icon-box gold"><span>📝</span></div>
+                                <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.1rem; font-weight: 700; color: #2D5016;">Input Musyawarah Dusun</h3>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                                <div class="feature-item"><span style="color: var(--forest-500); font-weight: 700;">▸</span><span>Jika ada hasil musyawarah dusun yang belum terinput</span></div>
+                                <div class="feature-item"><span style="color: var(--forest-500); font-weight: 700;">▸</span><span>Bisa input manual langsung oleh Kepala Dusun</span></div>
+                                <div class="feature-item"><span style="color: var(--forest-500); font-weight: 700;">▸</span><span>Pastikan data sesuai dengan kesepakatan bersama</span></div>
+                            </div>
+                        </div>
+
+                        <div class="card" style="position: relative; overflow: hidden;">
+                            <div style="position: absolute; top: 0; left: 0; width: 5px; height: 100%; background: linear-gradient(180deg, var(--honey-500), var(--honey-700));"></div>
+                            <div style="display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1rem;">
+                                <div class="icon-box gold"><span>📊</span></div>
+                                <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.1rem; font-weight: 700; color: #2D5016;">Monitoring Progress</h3>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                                <div class="feature-item"><span style="color: var(--forest-500); font-weight: 700;">▸</span><span>Pantau status usulan yang sudah masuk ke Pemerintah Desa</span></div>
+                                <div class="feature-item"><span style="color: var(--forest-500); font-weight: 700;">▸</span><span>Lihat update status verifikasi final dari Pemdes</span></div>
+                                <div class="feature-item"><span style="color: var(--forest-500); font-weight: 700;">▸</span><span>Semua data tersimpan aman dan transparan</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer">Kepala Dusun: Garda Terdepan Pembangunan yang Merata</div>
+            </div>
+
+
+            <!-- ==================== SLIDE 6: PERAN PENGAWAS (ADMIN ROMAWI) ==================== -->
+            <div class="slide" data-slide="6">
+                <div class="page-title">
+                    <h1>Peran Pengawas (Admin Romawi)</h1>
+                    <p class="subtitle">👁️ Menjaga Integritas & Transparansi Sistem</p>
+                    <div class="underline"></div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 300px 1fr; gap: 1.8rem; flex: 1;">
+                    <!-- Role Panel -->
+                    <div class="card" style="border-top: 5px solid #17A2B8; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                        <div style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #E3F2FD, #BBDEFB); display: flex; align-items: center; justify-content: center; margin-bottom: 1.2rem; box-shadow: 0 8px 25px rgba(23,162,184,0.3);">
+                            <span style="font-size: 3.5rem;">🛡️</span>
+                        </div>
+                        <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.45rem; font-weight: 700; color: #17A2B8; margin-bottom: 1rem;">Admin Romawi</h3>
+                        <div style="background: linear-gradient(135deg, #17A2B8, #138496); color: white; padding: 0.8rem 1.3rem; border-radius: 15px; width: 100%; margin-bottom: 1rem;">
+                            <div style="font-size: 0.8rem; opacity: 0.9;">AKSES</div>
+                            <div style="font-family: 'Poppins', sans-serif; font-size: 1.25rem; font-weight: 800; letter-spacing: 1px;">READ-ONLY</div>
+                        </div>
+                        <p style="font-size: 0.9rem; line-height: 1.6; color: #555; font-weight: 500;">Peran pengawas yang dapat memantau seluruh proses tanpa bisa mengubah data apapun</p>
+                    </div>
+
+                    <!-- Functions Panel -->
+                    <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+                        <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.3rem; font-weight: 700; color: #2D5016; padding-bottom: 0.6rem; border-bottom: 3px solid var(--honey-500);">📋 Fungsi & Wewenang</h3>
+                        
+                        <div class="grid-2" style="gap: 1.2rem; flex: 1;">
+                            <div class="card" style="position: relative; overflow: hidden;">
+                                <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #17A2B8, #138496);"></div>
+                                <div style="font-size: 2.3rem; margin-bottom: 0.8rem;">🔍</div>
+                                <h4 style="font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 700; color: #2D5016; margin-bottom: 0.8rem;">Fungsi Utama</h4>
+                                <div style="display: flex; flex-direction: column; gap: 0.55rem;">
+                                    <div class="feature-item blue"><span style="color: #17A2B8; font-weight: 700;">▸</span><span>Memantau transparansi pengajuan usulan</span></div>
+                                    <div class="feature-item blue"><span style="color: #17A2B8; font-weight: 700;">▸</span><span>Memastikan proses sesuai alur yang ditetapkan</span></div>
+                                    <div class="feature-item blue"><span style="color: #17A2B8; font-weight: 700;">▸</span><span>Melakukan audit proses secara berkala</span></div>
+                                </div>
+                            </div>
+
+                            <div class="card" style="position: relative; overflow: hidden;">
+                                <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #17A2B8, #138496);"></div>
+                                <div style="font-size: 2.3rem; margin-bottom: 0.8rem;">📊</div>
+                                <h4 style="font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 700; color: #2D5016; margin-bottom: 0.8rem;">Data yang Dapat Dilihat</h4>
+                                <div style="display: flex; flex-direction: column; gap: 0.55rem;">
+                                    <div class="feature-item blue"><span style="color: var(--forest-500); font-weight: 700;">✅</span><span>Usulan berstatus <strong>Diajukan</strong></span></div>
+                                    <div class="feature-item blue"><span style="color: var(--forest-500); font-weight: 700;">✅</span><span>Usulan berstatus <strong>Sudah Diverifikasi</strong></span></div>
+                                    <div class="feature-item blue"><span style="color: #DC3545; font-weight: 700;">❌</span><span><em>Draft pribadi warga disembunyikan</em></span></div>
+                                </div>
+                                <div class="highlight highlight-warning" style="margin-top: 0.7rem;">
+                                    <p style="font-size: 0.82rem; color: #856404; font-weight: 600;">🔒 Privasi terjaga: Data draft pribadi tidak terlihat</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer">Transparansi dan Akuntabilitas Melalui Pengawasan Independen</div>
+            </div>
+
+
+            <!-- ==================== SLIDE 7: WEWENANG PEMERINTAH DESA ==================== -->
+            <div class="slide" data-slide="7">
+                <div class="page-title">
+                    <h1>Wewenang Pemerintah Desa</h1>
+                    <p class="subtitle">🏛️ Kendali Penuh untuk Pembangunan Desa</p>
+                    <div class="underline"></div>
+                </div>
+
+                <div class="grid-3" style="flex: 1; gap: 1.4rem;">
+                    <!-- Card 1 -->
+                    <div class="card" style="position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, var(--honey-500), var(--honey-700));"></div>
+                        <div style="text-align: center; margin-bottom: 1.2rem;">
+                            <div class="icon-box gold" style="margin: 0 auto 1rem; width: 70px; height: 70px; border-radius: 18px; font-size: 2.5rem;">👥</div>
+                            <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.2rem; font-weight: 700; color: #2D5016;">Manajemen User</h3>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.7rem;">
+                            <div class="feature-item"><span style="font-size: 1.1rem;">➕</span><span><strong>Tambah Akun:</strong> Membuat akun baru untuk Kepala Dusun</span></div>
+                            <div class="feature-item"><span style="font-size: 1.1rem;">🔑</span><span><strong>Reset Password:</strong> Membantu jika lupa password</span></div>
+                            <div class="feature-item"><span style="font-size: 1.1rem;">⚙️</span><span><strong>Kelola Data:</strong> Mengelola informasi pengguna aktif</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="card" style="position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, var(--forest-500), var(--forest-600));"></div>
+                        <div style="text-align: center; margin-bottom: 1.2rem;">
+                            <div class="icon-box green" style="margin: 0 auto 1rem; width: 70px; height: 70px; border-radius: 18px; font-size: 2.5rem;">⏰</div>
+                            <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.2rem; font-weight: 700; color: #2D5016;">Pengaturan Waktu</h3>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.7rem;">
+                            <div class="feature-item green"><span style="font-size: 1.1rem;">📅</span><span><strong>Deadline Pengisian:</strong> Menentukan batas akhir usulan per tahun anggaran</span></div>
+                            <div class="feature-item green"><span style="font-size: 1.1rem;">🔔</span><span><strong>Notifikasi Otomatis:</strong> Sistem mengingatkan warga sebelum deadline</span></div>
+                            <div class="feature-item green"><span style="font-size: 1.1rem;">✅</span><span><strong>Kontrol Penuh:</strong> Buka/tutup periode pengisian sesuai kebutuhan</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="card" style="position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #17A2B8, #138496);"></div>
+                        <div style="text-align: center; margin-bottom: 1.2rem;">
+                            <div class="icon-box blue" style="margin: 0 auto 1rem; width: 70px; height: 70px; border-radius: 18px; font-size: 2.5rem;">⭐</div>
+                            <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.15rem; font-weight: 700; color: #2D5016;">Verifikasi Akhir<br/>(Musrenbang Desa)</h3>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.7rem;">
+                            <div class="feature-item blue"><span style="font-size: 1.1rem;">🏆</span><span><strong>Ranking Desa:</strong> Menentukan skala prioritas pembangunan</span></div>
+                            <div class="feature-item blue"><span style="font-size: 1.1rem;">💰</span><span><strong>Sumber Dana:</strong> Menetapkan APBDes atau Dana Lain</span></div>
+                            <div class="highlight highlight-info" style="margin-top: auto;">
+                                <p style="font-size: 0.85rem; color: #0D47A1; font-weight: 600;">🎯 <strong>Diverifikasi Final</strong> → Siap dianggarkan dalam APBDes!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer">Pemerintah Desa: Penentu Akhir Pembangunan yang Merata dan Berkeadilan</div>
+            </div>
+
+
+            <!-- ==================== SLIDE 8: FITUR UNGGULAN ==================== -->
+            <div class="slide" data-slide="8">
+                <div class="page-title">
+                    <h1>Kenapa NgusulBee Mantap? 🚀</h1>
+                    <p class="subtitle">✨ Fitur-Fitur Unggulan untuk Kemudahan Anda</p>
+                    <div class="underline"></div>
+                </div>
+
+                <div class="grid-5" style="flex: 1; gap: 1rem;">
+                    <!-- Feature 1 -->
+                    <div class="card" style="text-align: center; position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, var(--honey-500), #FFE082);"></div>
+                        <div class="icon-box gold" style="margin: 1rem auto 0.9rem; width: 70px; height: 70px; border-radius: 18px; font-size: 2.5rem;">💰</div>
+                        <h3 style="font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 700; color: #2D5016; margin-bottom: 0.7rem;">Format Uang Otomatis</h3>
+                        <p style="font-size: 0.82rem; line-height: 1.45; color: #555; flex-grow: 1;">Input biaya jadi mudah & rapi. Cukup ketik angka, sistem otomatis ubah ke format Rupiah</p>
+                        <span class="badge badge-gold" style="margin-top: 0.8rem; font-size: 0.72rem;">⚡ Praktis</span>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="card" style="text-align: center; position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, var(--forest-500), #66BB6A);"></div>
+                        <div class="icon-box green" style="margin: 1rem auto 0.9rem; width: 70px; height: 70px; border-radius: 18px; font-size: 2.5rem;">📊</div>
+                        <h3 style="font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 700; color: #2D5016; margin-bottom: 0.7rem;">Dashboard Visual</h3>
+                        <p style="font-size: 0.82rem; line-height: 1.45; color: #555; flex-grow: 1;">Grafik statistik usulan per kategori untuk memantau distribusi pembangunan</p>
+                        <span class="badge badge-green" style="margin-top: 0.8rem; font-size: 0.72rem;">📈 Informatif</span>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="card" style="text-align: center; position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, #17A2B8, #4DD0E1);"></div>
+                        <div class="icon-box blue" style="margin: 1rem auto 0.9rem; width: 70px; height: 70px; border-radius: 18px; font-size: 2.5rem;">📥</div>
+                        <h3 style="font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 700; color: #2D5016; margin-bottom: 0.7rem;">Export Excel</h3>
+                        <p style="font-size: 0.82rem; line-height: 1.45; color: #555; flex-grow: 1;">Laporan usulan bisa diunduh langsung dalam bentuk Excel untuk administrasi</p>
+                        <span class="badge badge-blue" style="margin-top: 0.8rem; font-size: 0.72rem;">📄 Efisien</span>
+                    </div>
+
+                    <!-- Feature 4 -->
+                    <div class="card" style="text-align: center; position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, #DC3545, #EF5350);"></div>
+                        <div style="width: 70px; height: 70px; border-radius: 18px; background: linear-gradient(135deg, #FFEBEE, #FFCDD2); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 1rem auto 0.9rem;">🔒</div>
+                        <h3 style="font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 700; color: #2D5016; margin-bottom: 0.7rem;">Keamanan Terjamin</h3>
+                        <p style="font-size: 0.82rem; line-height: 1.45; color: #555; flex-grow: 1;">Sistem password & Role-Based Access. Hanya yang berhak yang bisa akses data</p>
+                        <span class="badge badge-red" style="margin-top: 0.8rem; font-size: 0.72rem;">🛡️ Aman</span>
+                    </div>
+
+                    <!-- Feature 5 -->
+                    <div class="card" style="text-align: center; position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, #9C27B0, #AB47BC);"></div>
+                        <div style="width: 70px; height: 70px; border-radius: 18px; background: linear-gradient(135deg, #F3E5F5, #E1BEE7); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 1rem auto 0.9rem;">📱</div>
+                        <h3 style="font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 700; color: #2D5016; margin-bottom: 0.7rem;">Responsif</h3>
+                        <p style="font-size: 0.82rem; line-height: 1.45; color: #555; flex-grow: 1;">Tampilan menyesuaikan HP dan Laptop. Akses kapan saja, di mana saja!</p>
+                        <span style="display: inline-block; background: linear-gradient(135deg, #9C27B0, #AB47BC); color: white; padding: 0.35rem 0.85rem; border-radius: 12px; font-size: 0.72rem; font-weight: 700; margin-top: 0.8rem;">🌐 Fleksibel</span>
+                    </div>
+                </div>
+
+                <div class="footer">Teknologi Modern untuk Pelayanan Desa yang Lebih Baik</div>
+            </div>
+
+
+            <!-- ==================== SLIDE 9: CARA MENGAKSES & DUKUNGAN ==================== -->
+            <div class="slide" data-slide="9">
+                <div class="page-title">
+                    <h1>Mulai Gunakan Sekarang! 🚀</h1>
+                    <p class="subtitle">📱 Akses Mudah & Dukungan Penuh</p>
+                    <div class="underline"></div>
+                </div>
+
+                <div class="grid-2" style="flex: 1; gap: 1.8rem;">
+                    <!-- Left Column -->
+                    <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+                        <div class="card" style="position: relative; overflow: hidden;">
+                            <div style="position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, var(--honey-500), var(--honey-700));"></div>
+                            <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.2rem;">
+                                <div class="icon-box gold"><span>🌐</span></div>
+                                <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.3rem; font-weight: 700; color: #2D5016;">Cara Mengakses</h3>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+                                <div class="feature-item"><div class="step-num" style="width: 28px; height: 28px; font-size: 0.9rem;">1</div><span><strong>Buka Browser</strong> di perangkat Anda</span></div>
+                                <div class="feature-item"><div class="step-num" style="width: 28px; height: 28px; font-size: 0.9rem;">2</div><span><strong>Masukkan URL Aplikasi NgusulBee</strong></span></div>
+                                <div class="feature-item"><div class="step-num" style="width: 28px; height: 28px; font-size: 0.9rem;">3</div><span><strong>Login</strong> dengan akun yang sudah didaftarkan</span></div>
+                                <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                                    <span class="badge badge-blue" style="font-size: 0.78rem;">🌐 Chrome</span>
+                                    <span class="badge badge-blue" style="font-size: 0.78rem;">🌐 Edge</span>
+                                    <span class="badge badge-blue" style="font-size: 0.78rem;">🌐 Safari</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="highlight highlight-warning">
+                            <p style="font-size: 0.88rem; color: #E65100; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.2rem;">☁️</span>
+                                <span>Aplikasi bersifat <strong>Cloud/Online</strong>. Pastikan koneksi internet stabil saat mengakses. Tidak perlu instal aplikasi tambahan!</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+                        <div class="card" style="position: relative; overflow: hidden;">
+                            <div style="position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, var(--forest-500), var(--forest-600));"></div>
+                            <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.2rem;">
+                                <div class="icon-box green"><span>💻</span></div>
+                                <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.3rem; font-weight: 700; color: #2D5016;">Perangkat yang Didukung</h3>
+                            </div>
+                            <div class="grid-2" style="gap: 0.8rem;">
+                                <div style="background: linear-gradient(135deg, #E8F5E9, #C8E6C9); padding: 0.9rem; border-radius: 12px; text-align: center;">
+                                    <div style="font-size: 2rem; margin-bottom: 0.3rem;">🤖</div>
+                                    <div style="font-size: 0.85rem; font-weight: 700; color: #2D5016;">Android</div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #E8F5E9, #C8E6C9); padding: 0.9rem; border-radius: 12px; text-align: center;">
+                                    <div style="font-size: 2rem; margin-bottom: 0.3rem;">🍎</div>
+                                    <div style="font-size: 0.85rem; font-weight: 700; color: #2D5016;">iPhone</div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #E8F5E9, #C8E6C9); padding: 0.9rem; border-radius: 12px; text-align: center;">
+                                    <div style="font-size: 2rem; margin-bottom: 0.3rem;">📱</div>
+                                    <div style="font-size: 0.85rem; font-weight: 700; color: #2D5016;">Tablet</div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #E8F5E9, #C8E6C9); padding: 0.9rem; border-radius: 12px; text-align: center;">
+                                    <div style="font-size: 2rem; margin-bottom: 0.3rem;">🖥️</div>
+                                    <div style="font-size: 0.85rem; font-weight: 700; color: #2D5016;">Komputer</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" style="position: relative; overflow: hidden;">
+                            <div style="position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, #17A2B8, #138496);"></div>
+                            <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1rem;">
+                                <div class="icon-box blue"><span>🆘</span></div>
+                                <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.3rem; font-weight: 700; color: #2D5016;">Butuh Bantuan?</h3>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.7rem;">
+                                <div style="display: flex; align-items: center; gap: 0.7rem; padding: 0.8rem; background: linear-gradient(135deg, #E3F2FD, #BBDEFB); border-radius: 10px;">
+                                    <span style="font-size: 1.5rem;">👨‍💼</span>
+                                    <span style="font-size: 0.88rem; color: #1565C0; font-weight: 600;">Hubungi Admin Desa untuk masalah akun & akses</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.7rem; padding: 0.8rem; background: linear-gradient(135deg, #E3F2FD, #BBDEFB); border-radius: 10px;">
+                                    <span style="font-size: 1.5rem;">👨‍💻</span>
+                                    <span style="font-size: 0.88rem; color: #1565C0; font-weight: 600;">Hubungi Tim IT untuk kendala teknis</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.7rem; padding: 0.8rem; background: linear-gradient(135deg, #E3F2FD, #BBDEFB); border-radius: 10px;">
+                                    <span style="font-size: 1.5rem;">📶</span>
+                                    <span style="font-size: 0.88rem; color: #1565C0; font-weight: 600;">Pastikan koneksi internet stabil dan cepat</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer">Siap Membangun Desa Jangkang Bersama Teknologi Digital!</div>
+            </div>
+
+
+            <!-- ==================== SLIDE 10: TERIMA KASIH ==================== -->
+            <div class="slide" data-slide="10">
+                <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 2rem;">
+                    
+                    <!-- Thank You Icon -->
+                    <div style="margin-bottom: 1.5rem;" class="float-anim">
+                        <div style="width: 140px; height: 140px; border-radius: 32px; background: linear-gradient(135deg, var(--honey-500), var(--honey-700)); display: flex; align-items: center; justify-content: center; box-shadow: 0 15px 50px rgba(255,193,7,0.4); position: relative;">
+                            <div style="position: absolute; width: 160px; height: 160px; border-radius: 36px; border: 3px dashed rgba(255,215,0,0.5); animation: rotate 20s linear infinite;"></div>
+                            <i class="fas fa-cubes" style="font-size: 4rem; color: white;"></i>
+                        </div>
+                    </div>
+
+                    <!-- Main Title -->
+                    <h1 style="font-family: 'Poppins', sans-serif; font-size: 4rem; font-weight: 800; color: var(--honey-500); margin-bottom: 0.8rem; text-shadow: 3px 3px 6px rgba(255,193,7,0.3), -1px -1px 0 #2D5016, 1px -1px 0 #2D5016, -1px 1px 0 #2D5016, 1px 1px 0 #2D5016;">
+                        Terima Kasih!
+                    </h1>
+                    
+                    <p style="font-family: 'Poppins', sans-serif; font-size: 1.5rem; color: var(--forest-500); font-weight: 600; margin-bottom: 2rem;">
+                        Atas Perhatian dan Partisipasi Anda
+                    </p>
+
+                    <!-- Message Cards -->
+                    <div class="grid-2" style="max-width: 850px; width: 100%; margin-bottom: 2rem; gap: 1.5rem;">
+                        <div class="card" style="border-top: 5px solid var(--honey-500);">
+                            <div style="font-size: 2.8rem; margin-bottom: 0.9rem;">🏘️</div>
+                            <p style="font-size: 1.05rem; line-height: 1.6; color: #333; font-weight: 600;">Mari bersama membangun <strong>Desa Jangkang</strong> yang lebih baik melalui teknologi digital</p>
+                        </div>
+                        <div class="card" style="border-top: 5px solid var(--forest-500);">
+                            <div style="font-size: 2.8rem; margin-bottom: 0.9rem;">💚</div>
+                            <p style="font-size: 1.05rem; line-height: 1.6; color: #333; font-weight: 600;"><strong>Transparansi</strong> dan akuntabilitas pembangunan dimulai dari kita semua</p>
+                        </div>
+                    </div>
+
+                    <!-- Q&A Section -->
+                    <div style="background: linear-gradient(135deg, var(--forest-500), var(--forest-600)); padding: 1.5rem 3rem; border-radius: 20px; box-shadow: 0 10px 35px rgba(34,139,34,0.4); max-width: 700px; width: 100%;">
+                        <h2 style="font-family: 'Poppins', sans-serif; font-size: 1.7rem; font-weight: 700; color: white; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.8rem;">
+                            <span>❓</span>
+                            <span>Pertanyaan & Diskusi?</span>
+                            <span>💬</span>
+                        </h2>
+                        <p style="font-size: 1rem; color: rgba(255,255,255,0.95); font-weight: 500;">Silakan ajukan pertanyaan atau coba demo langsung aplikasi NgusulBee</p>
+                    </div>
+                </div>
+
+                <div class="footer" style="background: linear-gradient(90deg, var(--honey-500), var(--honey-700)); color: #2D5016; font-weight: 700;">
+                    <div class="app-logo" style="justify-content: center;">
+                        <div class="app-logo-icon" style="width: 32px; height: 32px; border-radius: 8px;">
+                            <i class="fas fa-cubes" style="font-size: 0.8rem;"></i>
+                        </div>
+                        <span class="app-logo-text" style="font-size: 1.1rem;">NgusulBee - Suara Warga, Pembangunan Nyata | Desa Jangkang</span>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- End Slides Container -->
+
+        <!-- Slide Indicators - Fixed Position -->
+        <div class="slide-indicators" id="indicators"></div>
+
+    </div><!-- End Presentation -->
+
+    <script>
+        // Slide Management
+        let currentSlide = 1;
+        const totalSlides = 10;
+
+        // Initialize indicators
+        function initIndicators() {
+            const container = document.getElementById('indicators');
+            for (let i = 1; i <= totalSlides; i++) {
+                const dot = document.createElement('div');
+                dot.className = `indicator ${i === 1 ? 'active' : ''}`;
+                dot.onclick = () => goToSlide(i);
+                container.appendChild(dot);
+            }
+        }
+
+        // Update slide display
+        function updateSlide() {
+            // Hide all slides
+            document.querySelectorAll('.slide').forEach(slide => {
+                slide.classList.remove('active');
+            });
+
+            // Show current slide
+            const activeSlide = document.querySelector(`[data-slide="${currentSlide}"]`);
+            if (activeSlide) {
+                activeSlide.classList.add('active');
+            }
+
+            // Update slide number
+            document.getElementById('slideNumber').textContent = `${currentSlide} / ${totalSlides}`;
+
+            // Update progress bar
+            const progress = (currentSlide / totalSlides) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+
+            // Update indicators
+            document.querySelectorAll('.indicator').forEach((ind, index) => {
+                ind.classList.toggle('active', index + 1 === currentSlide);
+            });
+
+            // Update button states
+            document.getElementById('prevBtn').disabled = currentSlide === 1;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides;
+
+            // Update fullscreen icon based on state
+            updateFullscreenIcon();
+        }
+
+        // Change slide
+        function changeSlide(direction) {
+            const newSlide = currentSlide + direction;
+            if (newSlide >= 1 && newSlide <= totalSlides) {
+                currentSlide = newSlide;
+                updateSlide();
+            }
+        }
+
+        // Go to specific slide
+        function goToSlide(slideNum) {
+            currentSlide = slideNum;
+            updateSlide();
+        }
+
+        // Toggle fullscreen
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Update fullscreen icon
+        function updateFullscreenIcon() {
+            const btn = document.querySelector('.fullscreen-btn i');
+            if (btn) {
+                btn.className = document.fullscreenElement ? 'fas fa-compress' : 'fas fa-expand';
+            }
+        }
+
+        // Listen for fullscreen changes
+        document.addEventListener('fullscreenchange', updateFullscreenIcon);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+                e.preventDefault();
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                changeSlide(-1);
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                goToSlide(1);
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                goToSlide(totalSlides);
+            } else if (e.key === 'f' || e.key === 'F') {
+                toggleFullscreen();
+            }
+        });
+
+        // Touch/Swipe support
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const diff = touchStartX - touchEndX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) {
+                    changeSlide(1); // Swipe left = next
+                } else {
+                    changeSlide(-1); // Swipe right = prev
+                }
+            }
+        }
+
+        // Initialize on load
+        window.onload = () => {
+            initIndicators();
+            updateSlide();
+        };
+    </script>
+
+    <!-- MathJax Script -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)'], ['$$', '$$'], ['\\[', '\\]']], 
+                displayMath: []
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</body>
+</html>
