@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pusat Tutorial Video - Sistem NgusulBee</title>
+    
+    <!-- Menggunakan Font Google untuk tipografi yang lebih baik -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- RESET & VARIABEL --- */
+        :root {
+            --primary: #f97316; /* Orange yang lebih modern */
+            --primary-dark: #ea580c;
+            --secondary: #3b82f6; /* Biru untuk aksen */
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- HEADER & NAVIGASI --- */
+        header {
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-main);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .logo:hover {
+            transform: scale(1.02);
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-home {
+            padding: 0.6rem 1.2rem;
+            background-color: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-home:hover {
+            border-color: var(--secondary);
+            color: var(--secondary);
+            background-color: #eff6ff;
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            text-align: center;
+            padding: 4rem 1.5rem 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Latar belakang dekoratif halus */
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(249, 115, 22, 0.05) 0%, rgba(255,255,255,0) 70%);
+            z-index: -1;
+            animation: rotateBg 20s linear infinite;
+        }
+
+        @keyframes rotateBg {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+            letter-spacing: -0.025em;
+            animation: fadeUp 0.8s ease-out forwards;
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            font-size: 1.125rem;
+            animation: fadeUp 0.8s ease-out 0.1s forwards;
+            opacity: 0;
+        }
+
+        /* --- SEARCH BAR --- */
+        .search-wrapper {
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+            animation: fadeUp 0.8s ease-out 0.2s forwards;
+            opacity: 0;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            padding-left: 3rem;
+            border: 2px solid transparent;
+            border-radius: 50px;
+            background-color: white;
+            box-shadow: var(--shadow-md);
+            font-size: 1rem;
+            color: var(--text-main);
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        /* --- VIDEO GRID --- */
+        .video-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            padding: 2rem 1.5rem 5rem;
+        }
+
+        @media (min-width: 768px) {
+            .video-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+        }
+
+        /* --- VIDEO CARD --- */
+        .video-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            animation: fadeUp 0.6s ease-out forwards;
+            opacity: 0; /* JS akan mengatur delay animasi */
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(249, 115, 22, 0.3);
+        }
+
+        .card-content {
+            padding: 1.5rem;
+            order: 2; /* Konten di atas video di mobile jika mau, tapi di sini kita simpan standar */
+        }
+
+        .card-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .card-header p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Video Wrapper & Preview State */
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            background-color: #000;
+            order: 1;
+            overflow: hidden;
+        }
+
+        /* Thumbnail placeholder image */
+        .thumbnail {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease;
+        }
+
+        .play-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            z-index: 10;
+        }
+
+        .play-overlay:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .play-button {
+            width: 64px;
+            height: 64px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7);
+            animation: pulse 2s infinite;
+            transition: transform 0.2s;
+        }
+
+        .play-overlay:hover .play-button {
+            transform: scale(1.1);
+            background-color: var(--primary-dark);
+        }
+
+        .play-icon {
+            width: 0;
+            height: 0;
+            border-left: 20px solid white;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            margin-left: 4px; /* Visual center correction */
+        }
+
+        /* Iframe Styling */
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            z-index: 5;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 1rem;
+            margin-top: auto;
+        }
+
+        .btn-link {
+            text-decoration: none;
+            color: var(--secondary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: color 0.2s;
+        }
+
+        .btn-link:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+
+        .tag {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--primary);
+            background: #fff7ed;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            margin-top: auto;
+            background-color: white;
+            border-top: 1px solid var(--border);
+            padding: 2rem 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(249, 115, 22, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
+        }
+
+        /* --- TOAST NOTIFICATION --- */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideInRight 0.3s ease-out forwards;
+            max-width: 300px;
+        }
+
+        .toast.success { border-left: 4px solid #22c55e; }
+        .toast.info { border-left: 4px solid #3b82f6; }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateY(10px); }
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+    <div class="container navbar">
+        <a href="#" class="logo">
+            <div class="logo-icon">▶</div>
+            <span>Sistem <span style="color:var(--primary)">NgusulBee</span></span>
+        </a>
+        
+        <nav class="nav-menu">
+            <a href="index.html" class="btn-home"><span>←</span> Home</a>
+        </nav>
+    </div>
+</header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <h1>Pusat Tutorial Video</h1>
+                <p>Pelajari fitur sistem NgusulBee dengan mudah melalui panduan visual langkah demi langkah.</p>
+                
+                <!-- Search Bar -->
+                <div class="search-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Cari tutorial (contoh: daftar, usul)...">
+                </div>
+            </div>
+        </section>
+
+        <!-- Video Grid Section -->
+        <div class="container video-grid" id="videoGrid">
+            
+            <!-- Video 1 -->
+            <!-- data-src berisi URL embed Google Drive -->
+            <article class="video-card" data-title="daftar user baru akun">
+                <div class="video-wrapper">
+                    <!-- Gambar placeholder random yang konsisten -->
+                    <img src="https://picsum.photos/seed/ngusul1/800/450" alt="Thumbnail Video 1" class="thumbnail">
+                    
+                    <!-- Tombol Play Overlay -->
+                    <div class="play-overlay" onclick="loadVideo(this, 'https://drive.google.com/file/d/1nugQfLbd0OkLockZWsUdznxNg_yZrK-V/preview')">
+                        <div class="play-button">
+                            <div class="play-icon"></div>
+                        </div>
+                    </div>
+                    <!-- Iframe akan disuntikkan di sini oleh JS -->
+                </div>
+
+                <div class="card-content">
+                    <div class="card-header">
+                        <span class="tag">Dasar</span>
+                        <h2>1. Cara Daftar User Baru</h2>
+                        <p>Panduan langkah awal untuk membuat akun, verifikasi email, dan mulai menggunakan sistem.</p>
+                    </div>
+                    <div class="card-actions">
+                        <a href="https://drive.google.com/file/d/1nugQfLbd0OkLockZWsUdznxNg_yZrK-V/view?usp=sharing" target="_blank" class="btn-link">
+                            Buka di Drive ↗
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Video 2 -->
+            <article class="video-card" data-title="melakukan pengusulan ajukan usulan">
+                <div class="video-wrapper">
+                    <img src="https://picsum.photos/seed/ngusul2/800/450" alt="Thumbnail Video 2" class="thumbnail">
+                    
+                    <div class="play-overlay" onclick="loadVideo(this, 'https://drive.google.com/file/d/1nabW78g4qd4fh09LVqZvchUY_tBqLfWC/preview')">
+                        <div class="play-button">
+                            <div class="play-icon"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-content">
+                    <div class="card-header">
+                        <span class="tag" style="color:var(--secondary); background:#eff6ff;">Fitur Utama</span>
+                        <h2>2. Cara Melakukan Pengusulan</h2>
+                        <p>Tutorial lengkap cara mengisi formulir, melampirkan berkas, dan mengajukan usulan dengan benar.</p>
+                    </div>
+                    <div class="card-actions">
+                        <a href="https://drive.google.com/file/d/1nabW78g4qd4fh09LVqZvchUY_tBqLfWC/view?usp=sharing" target="_blank" class="btn-link">
+                            Buka di Drive ↗
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+        
+        <!-- Empty State (Ditampilkan jika pencarian tidak ada hasil) -->
+        <div id="noResults" style="text-align: center; padding: 3rem; display: none; color: var(--text-muted);">
+            <p style="font-size: 1.2rem; margin-bottom: 0.5rem;">Tidak ditemukan tutorial yang cocok.</p>
+            <p>Coba kata kunci lain seperti "daftar" atau "usul".</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Sistem NgusulBee. Dibuat untuk efisiensi dan kemudahan.</p>
+        </div>
+    </footer>
+
+    <!-- Container Toast Notifikasi -->
+    <div id="toast-container"></div>
+
+    <script>
+        // --- LOGIKA PENCARIAN (SEARCH) ---
+        const searchInput = document.getElementById('searchInput');
+        const videoCards = document.querySelectorAll('.video-card');
+        const noResults = document.getElementById('noResults');
+
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            let hasVisibleCards = false;
+
+            videoCards.forEach(card => {
+                // Ambil teks dari judul dan deskripsi
+                const title = card.querySelector('h2').textContent.toLowerCase();
+                const desc = card.querySelector('p').textContent.toLowerCase();
+                const keywords = card.getAttribute('data-title') || '';
+
+                if (title.includes(searchTerm) || desc.includes(searchTerm) || keywords.includes(searchTerm)) {
+                    card.style.display = 'flex';
+                    // Animasi ulang agar muncul halus
+                    card.style.animation = 'none';
+                    card.offsetHeight; /* trigger reflow */
+                    card.style.animation = 'fadeUp 0.5s ease-out forwards';
+                    hasVisibleCards = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Tampilkan pesan jika tidak ada hasil
+            noResults.style.display = hasVisibleCards ? 'none' : 'block';
+        });
+
+        // --- LOGIKA LOAD VIDEO (CLICK-TO-PLAY) ---
+        // Mencegah semua video load sekaligus saat page load. Hanya load saat diklik.
+        function loadVideo(overlayElement, srcUrl) {
+            const wrapper = overlayElement.parentElement;
+            
+            // Tampilkan loading state sederhana
+            showToast('Memuat video...', 'info');
+
+            // Buat elemen iframe
+            const iframe = document.createElement('iframe');
+            iframe.setAttribute('src', srcUrl);
+            iframe.setAttribute('allow', 'autoplay');
+            iframe.setAttribute('allowfullscreen', 'true');
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.border = 'none';
+            iframe.style.position = 'absolute';
+            iframe.style.top = '0';
+            iframe.style.left = '0';
+            iframe.style.zIndex = '5';
+
+            // Hapus overlay dan thumbnail, ganti dengan iframe
+            wrapper.innerHTML = ''; 
+            wrapper.appendChild(iframe);
+
+            showToast('Video siap diputar!', 'success');
+        }
+
+        // --- LOGIKA TOAST NOTIFICATION ---
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            // Icon berdasarkan tipe
+            const icon = type === 'success' ? '✅' : 'ℹ️';
+            
+            toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+            
+            container.appendChild(toast);
+
+            // Hapus toast setelah 3 detik
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.5s forwards';
+                toast.addEventListener('animationend', () => {
+                    toast.remove();
+                });
+            }, 3000);
+        }
+
+        // --- ANIMASI ENTRY SAAT LOAD ---
+        document.addEventListener("DOMContentLoaded", () => {
+            // Set animasi delay berurutan untuk kartu video
+            const cards = document.querySelectorAll('.video-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.2}s`; // Delay 0.2s, 0.4s, dst
+            });
+        });
+
+    </script>
+</body>
+</html>
