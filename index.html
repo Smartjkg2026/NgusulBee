@@ -2197,6 +2197,15 @@ async function doExportKoordinasi() {
                             ${item.rujukanUsulan ? `<div><span class="text-gray-500 block text-xs">Rujukan</span><span class="font-semibold">${escapeHtml(item.rujukanUsulan)}</span></div>` : ''}
                         </div>
                         <div><span class="text-gray-500 block text-xs mb-1">Deskripsi</span><p class="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">${escapeHtml(item.deskripsi) || '-'}</p></div>
+                        <div>
+                            <span class="text-gray-500 block text-xs mb-1">Proposal</span>
+                            <div class="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
+                                <!-- Menampilkan link dengan teks "Lihat Proposal" -->
+                                <a href="${escapeHtml(item.linkProposal)}" target="_blank" rel="noopener noreferrer" class="text-blue-600 font-semibold hover:text-blue-800 hover:underline">
+                                    Lihat Proposal
+                                </a>
+                            </div>
+                        </div>
                         ${item.catatanKembali ? `<div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800"><i class="fas fa-comment-dots mr-1"></i><b>Catatan:</b> ${escapeHtml(item.catatanKembali)}</div>` : ''}
                         ${item.kordinator ? `<div><span class="text-gray-500 block text-xs">Kordinator</span><span class="font-semibold">${escapeHtml(item.kordinator)}</span></div>` : ''}
                         </div>
