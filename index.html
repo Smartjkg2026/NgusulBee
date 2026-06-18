@@ -175,7 +175,7 @@
        1. KONFIGURASI APLIKASI
        ========================================== */
     const CONFIG = {
-        API_URL: 'https://script.google.com/macros/s/AKfycbwnZtqmZAued5EKrSlgP3kyahgpul2i6YwtTHS_p3kXZQDg2QI4iEnzT5w9pLLVhc8MfQ/exec',
+        API_URL: 'https://script.google.com/macros/s/AKfycby5xb1XfTt5H1n9k8TkkJFiHsiSi78nnY9SRvDcuPMQOiUGoOv1JQPuW-JsoLAC-u_UHg/exec',
         APP_NAME: 'NgusulBee',
         DESA: 'Desa Jangkang',
         KATEGORI: ['Infrastruktur', 'Pendidikan', 'Kesehatan', 'Ekonomi', 'Sosial', 'Lingkungan'],
@@ -196,6 +196,25 @@
             '021': 'Dusun Air Asam', '022': 'Dusun Air Asam', '023': 'Dusun Air Asam', '024': 'Dusun Air Asam',
             '025': 'Dusun Air Asam', '026': 'Dusun Air Asam', '027': 'Dusun Air Asam'
         },
+        SDGS: [
+            { id:1,  kode:'SDG 1',  nama:'Tanpa Kemiskinan',              warna:'#E5243B' },
+            { id:2,  kode:'SDG 2',  nama:'Tanpa Kelaparan',              warna:'#DDA63A' },
+            { id:3,  kode:'SDG 3',  nama:'Kehidupan Sehat & Sejahtera',  warna:'#4C9F38' },
+            { id:4,  kode:'SDG 4',  nama:'Pendidikan Berkualitas',       warna:'#C5192D' },
+            { id:5,  kode:'SDG 5',  nama:'Kesetaraan Gender',            warna:'#FF3A21' },
+            { id:6,  kode:'SDG 6',  nama:'Air Bersih & Sanitasi',        warna:'#26BDE2' },
+            { id:7,  kode:'SDG 7',  nama:'Energi Bersih & Terjangkau',   warna:'#FCC30B' },
+            { id:8,  kode:'SDG 8',  nama:'Pekerjaan Layak & Ekonomi',    warna:'#A21942' },
+            { id:9,  kode:'SDG 9',  nama:'Industri, Inovasi & Infra',    warna:'#FD6925' },
+            { id:10, kode:'SDG 10', nama:'Berkurangnya Kesenjangan',     warna:'#DD1367' },
+            { id:11, kode:'SDG 11', nama:'Kota & Komunitas Berkelanjutan',warna:'#FD9D24' },
+            { id:12, kode:'SDG 12', nama:'Konsumsi & Produksi Bertanggung',warna:'#BF8B2E' },
+            { id:13, kode:'SDG 13', nama:'Aksi Iklim',                   warna:'#3F7E44' },
+            { id:14, kode:'SDG 14', nama:'Ekosistem Laut',               warna:'#0A97D9' },
+            { id:15, kode:'SDG 15', nama:'Ekosistem Darat',              warna:'#56C02B' },
+            { id:16, kode:'SDG 16', nama:'Perdamaian & Keadilan',        warna:'#00689D' },
+            { id:17, kode:'SDG 17', nama:'Kemitraan Untuk Tujuan',       warna:'#19486A' }
+        ],
          PASS_REGEX: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
         INACTIVITY_TIMEOUT: 30 * 60 * 1000
     };
@@ -383,63 +402,67 @@
     }
 
     function sortForMonitoring(list, role) {
+        // Cegah error jika list kosong/undefined
+        if (!list || list.length === 0) return [];
+
         return [...list].sort((a, b) => {
+            // LOGIKA KASIKAUR: Urutkan berdasarkan Ranking Desa (Prioritas Utama)
+            // Jika Ranking Desa sama, urutkan berdasarkan Ranking Dusun
+            if (role === 'kasikaur') {
+                const ra = parseInt(a.rankingDesa) || 999;
+                const rb = parseInt(b.rankingDesa) || 999;
+                if (ra !== rb) return ra - rb;
+                
+                const rda = parseInt(a.rankingDusun) || 999;
+                const rdb = parseInt(b.rankingDusun) || 999;
+                return rda - rdb;
+            }
+
+            // LOGIKA ADM DESA (Existing)
             if (role === 'admdesa') {
                 const ra = parseInt(a.rankingDesa) || 999, rb = parseInt(b.rankingDesa) || 999;
                 if (ra !== rb) return ra - rb;
                 return (parseInt(a.rankingDusun) || 999) - (parseInt(b.rankingDusun) || 999);
-            } else {
-                const ra = parseInt(a.rankingDusun) || 999, rb = parseInt(b.rankingDusun) || 999;
-                if (ra !== rb) return ra - rb;
-                return (parseInt(a.rankingDesa) || 999) - (parseInt(b.rankingDesa) || 999);
             }
+
+            // LOGIKA DEFAULT (AdmDusun/User dll)
+            const rda = parseInt(a.rankingDusun) || 999, rdb = parseInt(b.rankingDusun) || 999;
+            if (rda !== rdb) return rda - rdb;
+            return (parseInt(a.rankingDesa) || 999) - (parseInt(b.rankingDesa) || 999);
         });
     }
 
     function validateChangePw(event) {
-    // Mencegah submit default
-    event.preventDefault();
-
-    const oldPw = document.getElementById('pwOld').value;
-    const newPw = document.getElementById('pwNew').value;
-    const confPw = document.getElementById('pwNewC').value;
-    const errBox = document.getElementById('errPw');
-
-    // 1. Cek Apakah Password Baru Kosong
-    if (!newPw) {
-        showErrorPw(errBox, 'Password baru tidak boleh kosong.');
-        return false;
+        event.preventDefault();
+        const oldPw = document.getElementById('pwOld').value;
+        const newPw = document.getElementById('pwNew').value;
+        const confPw = document.getElementById('pwNewC').value;
+        const errBox = document.getElementById('errPw');
+        if (!newPw) {
+            showErrorPw(errBox, 'Password baru tidak boleh kosong.');
+            return false;
+        }
+        if (!CONFIG.PASS_REGEX.test(newPw)) {
+            showErrorPw(errBox, 'Password baru tidak memenuhi syarat (Min 8 karakter, huruf besar, kecil, angka, simbol).');
+            return false;
+        }
+        if (oldPw === newPw) {
+            showErrorPw(errBox, 'Password baru tidak boleh sama dengan password lama.');
+            return false;
+        }
+        if (newPw !== confPw) {
+            showErrorPw(errBox, 'Konfirmasi password baru tidak cocok.');
+            return false;
+        }
+        errBox.classList.add('hidden');
+        event.target.submit(); 
+        return true;
     }
 
-    // 2. Cek Validitas Password (Menggunakan CONFIG.PASS_REGEX)
-    if (!CONFIG.PASS_REGEX.test(newPw)) {
-        showErrorPw(errBox, 'Password baru tidak memenuhi syarat (Min 8 karakter, huruf besar, kecil, angka, simbol).');
-        return false;
+    function showErrorPw(element, message) {
+        element.textContent = message;
+        element.classList.remove('hidden');
     }
-
-    // 3. Cek Kesamaan dengan Password Lama
-    if (oldPw === newPw) {
-        showErrorPw(errBox, 'Password baru tidak boleh sama dengan password lama.');
-        return false;
-    }
-
-    // 4. Cek Konfirmasi Password
-    if (newPw !== confPw) {
-        showErrorPw(errBox, 'Konfirmasi password baru tidak cocok.');
-        return false;
-    }
-
-    // Jika Semua Lolos, Submit Form
-    errBox.classList.add('hidden');
-    event.target.submit(); 
-    return true;
-}
-
-// Helper function untuk menampilkan error agar kode lebih rapi
-function showErrorPw(element, message) {
-    element.textContent = message;
-    element.classList.remove('hidden');
-}
 
     /* ==========================================
        4. EXPORT EXCEL
@@ -466,7 +489,9 @@ function showErrorPw(element, message) {
                 { h: 'Judul Usulan', get: v => v.judul }, { h: 'Sumber', get: v => v.username },
                 { h: 'Kategori', get: v => v.kategori }, { h: 'RT', get: v => Array.isArray(v.rt) ? v.rt.join(', ') : v.rt },
                 { h: 'Volume', get: v => v.volume + ' ' + v.satuan }, { h: 'Estimasi Biaya (Rp)', get: v => v.estimasiBiaya || 0 },
-                { h: 'Ranking Dusun', get: v => v.rankingDusun || '' }, { h: 'Ranking Desa', get: v => v.rankingDesa || '' },
+                { h: 'Ranking Dusun', get: v => v.rankingDusun || '' }, 
+                { h: 'Mendukung SDGs', get: v => v.sdgId ? CONFIG.SDGS.find(s => s.id == v.sdgId)?.kode || '' : '' },
+                { h: 'Ranking Desa', get: v => v.rankingDesa || '' },
                 { h: 'Rencana Aksi', get: v => v.rencanaAksi || '' }, { h: 'Catatan', get: v => v.catatanKembali || '' }
             ],
             admdusun: [
@@ -474,7 +499,9 @@ function showErrorPw(element, message) {
                 { h: 'Judul Usulan', get: v => v.judul }, { h: 'Sumber', get: v => v.username },
                 { h: 'Kategori', get: v => v.kategori }, { h: 'RT', get: v => Array.isArray(v.rt) ? v.rt.join(', ') : v.rt },
                 { h: 'Volume', get: v => v.volume + ' ' + v.satuan }, { h: 'Estimasi Biaya (Rp)', get: v => v.estimasiBiaya || 0 },
-                { h: 'Ranking Dusun', get: v => v.rankingDusun || '' }, { h: 'Ranking Desa', get: v => v.rankingDesa || '' },
+                { h: 'Ranking Dusun', get: v => v.rankingDusun || '' }, 
+                { h: 'Mendukung SDGs', get: v => v.sdgId ? CONFIG.SDGS.find(s => s.id == v.sdgId)?.kode || '' : '' },
+                { h: 'Ranking Desa', get: v => v.rankingDesa || '' },
                 { h: 'Rencana Aksi', get: v => v.rencanaAksi || '' }, { h: 'Catatan', get: v => v.catatanKembali || '' }
             ],
             admrom: [
@@ -483,7 +510,9 @@ function showErrorPw(element, message) {
                 { h: 'Dusun', get: v => v.dusun }, { h: 'Kategori', get: v => v.kategori },
                 { h: 'RT', get: v => Array.isArray(v.rt) ? v.rt.join(', ') : v.rt },
                 { h: 'Volume', get: v => v.volume + ' ' + v.satuan }, { h: 'Estimasi Biaya (Rp)', get: v => v.estimasiBiaya || 0 },
-                { h: 'Ranking Dusun', get: v => v.rankingDusun || '' }, { h: 'Ranking Desa', get: v => v.rankingDesa || '' }
+                { h: 'Ranking Dusun', get: v => v.rankingDusun || '' }, 
+                { h: 'Mendukung SDGs', get: v => v.sdgId ? CONFIG.SDGS.find(s => s.id == v.sdgId)?.kode || '' : '' },
+                { h: 'Ranking Desa', get: v => v.rankingDesa || '' }
             ],
             kasikaur: [
                 { h: 'No', get: (_, i) => i + 1 }, { h: 'Status', get: v => statusText(v.status) },
@@ -491,7 +520,9 @@ function showErrorPw(element, message) {
                 { h: 'Dusun', get: v => v.dusun }, { h: 'Kategori', get: v => v.kategori },
                 { h: 'RT', get: v => Array.isArray(v.rt) ? v.rt.join(', ') : v.rt },
                 { h: 'Volume', get: v => v.volume + ' ' + v.satuan }, { h: 'Estimasi Biaya (Rp)', get: v => v.estimasiBiaya || 0 },
-                { h: 'Ranking Dusun', get: v => v.rankingDusun || '' }, { h: 'Ranking Desa', get: v => v.rankingDesa || '' }
+                { h: 'Ranking Dusun', get: v => v.rankingDusun || '' }, 
+                { h: 'Mendukung SDGs', get: v => v.sdgId ? CONFIG.SDGS.find(s => s.id == v.sdgId)?.kode || '' : '' },
+                { h: 'Ranking Desa', get: v => v.rankingDesa || '' }
             ],
             admdesa: [
                 { h: 'No', get: (_, i) => i + 1 }, { h: 'Status', get: v => statusText(v.status) },
@@ -499,7 +530,9 @@ function showErrorPw(element, message) {
                 { h: 'Dusun', get: v => v.dusun }, { h: 'Kategori', get: v => v.kategori },
                 { h: 'RT', get: v => Array.isArray(v.rt) ? v.rt.join(', ') : v.rt },
                 { h: 'Volume', get: v => v.volume + ' ' + v.satuan }, { h: 'Estimasi Biaya (Rp)', get: v => v.estimasiBiaya || 0 },
-                { h: 'Ranking Dusun', get: v => v.rankingDusun || '' }, { h: 'Ranking Desa', get: v => v.rankingDesa || '' },
+                { h: 'Ranking Dusun', get: v => v.rankingDusun || '' }, 
+                { h: 'Mendukung SDGs', get: v => v.sdgId ? CONFIG.SDGS.find(s => s.id == v.sdgId)?.kode || '' : '' },
+                { h: 'Ranking Desa', get: v => v.rankingDesa || '' },
                 { h: 'Rencana Aksi', get: v => v.rencanaAksi || '' }, { h: 'Rujukan', get: v => v.rujukanUsulan || '' },
                 { h: 'Catatan', get: v => v.catatanKembali || '' }
             ]
@@ -618,12 +651,12 @@ function showErrorPw(element, message) {
     ];
 
     const MOCK_USULAN = [
-        { id: 'USL-1', username: 'budi', tahun: 2025, judul: 'Pembangunan Jalan RT 003', kategori: 'Infrastruktur', deskripsi: 'Jalan berlubang parah, perlu perbaikan segera untuk akses warga.', rt: ['003', '004'], dusun: 'Dusun Jangkang', desa: 'Desa Jangkang', volume: 500, satuan: 'Meter', estimasiBiaya: 50000000, linkProposal: '', status: 'draft', rankingDusun: '', rankingDesa: '', rencanaAksi: '', rujukanUsulan: '', catatanKembali: '' },
-        { id: 'USL-2', username: 'budi', tahun: 2025, judul: 'Perbaikan Saluran Irigasi RT 005', kategori: 'Infrastruktur', deskripsi: 'Saluran air tersumbat menyebabkan banjir saat hujan deras.', rt: ['005'], dusun: 'Dusun Jangkang', desa: 'Desa Jangkang', volume: 200, satuan: 'Meter', estimasiBiaya: 15000000, linkProposal: '', status: 'diajukan', rankingDusun: '', rankingDesa: '', rencanaAksi: '', rujukanUsulan: '', catatanKembali: '' },
-        { id: 'USL-3', username: 'budi', tahun: 2025, judul: 'Pengadaan Alat Posyandu RT 001', kategori: 'Kesehatan', deskripsi: 'Posyandu membutuhkan timbangan bayi dan alat ukur lingkar kepala.', rt: ['001'], dusun: 'Dusun Jangkang', desa: 'Desa Jangkang', volume: 1, satuan: 'Unit', estimasiBiaya: 5000000, linkProposal: '', status: 'dikembalikan_user', rankingDusun: '', rankingDesa: '', rencanaAksi: '', rujukanUsulan: '', catatanKembali: 'Mohon lengkapi volume pengadaan dan sertakan link proposal yang menjelaskan spesifikasi alat.' },
-        { id: 'USL-4', username: 'pakdusun', tahun: 2025, judul: 'Musyawarah: Pembangunan Jembatan Penghubung RT 007-008', kategori: 'Infrastruktur', deskripsi: 'Hasil musyawarah dusun tanggal 15 Januari: prioritas pembangunan jembatan penghubung antar RT.', rt: ['007', '008'], dusun: 'Dusun Jangkang', desa: 'Desa Jangkang', volume: 1, satuan: 'Unit', estimasiBiaya: 100000000, linkProposal: '', status: 'ranked_dusun', rankingDusun: '1', rankingDesa: '', rencanaAksi: '', rujukanUsulan: '', catatanKembali: '' },
-        { id: 'USL-5', username: 'budi', tahun: 2025, judul: 'Renovasi Balai RT 002', kategori: 'Sosial', deskripsi: 'Balai pertemuan RT 002 sudah tidak layak pakai, atap bocor.', rt: ['002'], dusun: 'Dusun Jangkang', desa: 'Desa Jangkang', volume: 1, satuan: 'Unit', estimasiBiaya: 75000000, linkProposal: '', status: 'ranked_dusun', rankingDusun: '2', rankingDesa: '', rencanaAksi: '', rujukanUsulan: '', catatanKembali: '' },
-        { id: 'USL-6', username: 'budi', tahun: 2025, judul: 'Pengadaan Buku Perpustakaan Desa', kategori: 'Pendidikan', deskripsi: 'Perpustakaan desa membutuhkan tambahan koleksi buku pelajaran dan cerita anak.', rt: ['001', '002', '003'], dusun: 'Dusun Jangkang', desa: 'Desa Jangkang', volume: 200, satuan: 'Buah', estimasiBiaya: 25000000, linkProposal: '', status: 'ranked_dusun', rankingDusun: '3', rankingDesa: '1', rencanaAksi: 'Kewenangan Desa', rujukanUsulan: '', catatanKembali: '' }
+        { id: 'USL-1', username: 'budi', tahun: 2025, judul: 'Pembangunan Jalan RT 003', kategori: 'Infrastruktur', deskripsi: 'Jalan berlubang parah, perlu perbaikan segera untuk akses warga.', rt: ['003', '004'], dusun: 'Dusun Jangkang', desa: 'Desa Jangkang', volume: 500, satuan: 'Meter', estimasiBiaya: 50000000, linkProposal: '', status: 'draft', rankingDusun: '', rankingDesa: '', rencanaAksi: '', rujukanUsulan: '', catatanKembali: '', sdgId: '' },
+        { id: 'USL-2', username: 'budi', tahun: 2025, judul: 'Perbaikan Saluran Irigasi RT 005', kategori: 'Infrastruktur', deskripsi: 'Saluran air tersumbat menyebabkan banjir saat hujan deras.', rt: ['005'], dusun: 'Dusun Jangkang', desa: 'Desa Jangkang', volume: 200, satuan: 'Meter', estimasiBiaya: 15000000, linkProposal: '', status: 'diajukan', rankingDusun: '', rankingDesa: '', rencanaAksi: '', rujukanUsulan: '', catatanKembali: '', sdgId: '' },
+        { id: 'USL-3', username: 'budi', tahun: 2025, judul: 'Pengadaan Alat Posyandu RT 001', kategori: 'Kesehatan', deskripsi: 'Posyandu membutuhkan timbangan bayi dan alat ukur lingkar kepala.', rt: ['001'], dusun: 'Dusun Jangkang', desa: 'Desa Jangkang', volume: 1, satuan: 'Unit', estimasiBiaya: 5000000, linkProposal: '', status: 'dikembalikan_user', rankingDusun: '', rankingDesa: '', rencanaAksi: '', rujukanUsulan: '', catatanKembali: 'Mohon lengkapi volume pengadaan dan sertakan link proposal yang menjelaskan spesifikasi alat.', sdgId: '' },
+        { id: 'USL-4', username: 'pakdusun', tahun: 2025, judul: 'Musyawarah: Pembangunan Jembatan Penghubung RT 007-008', kategori: 'Infrastruktur', deskripsi: 'Hasil musyawarah dusun tanggal 15 Januari: prioritas pembangunan jembatan penghubung antar RT.', rt: ['007', '008'], dusun: 'Dusun Jangkang', desa: 'Desa Jangkang', volume: 1, satuan: 'Unit', estimasiBiaya: 100000000, linkProposal: '', status: 'ranked_dusun', rankingDusun: '1', rankingDesa: '', rencanaAksi: '', rujukanUsulan: '', catatanKembali: '', sdgId: '9' },
+        { id: 'USL-5', username: 'budi', tahun: 2025, judul: 'Renovasi Balai RT 002', kategori: 'Sosial', deskripsi: 'Balai pertemuan RT 002 sudah tidak layak pakai, atap bocor.', rt: ['002'], dusun: 'Dusun Jangkang', desa: 'Desa Jangkang', volume: 1, satuan: 'Unit', estimasiBiaya: 75000000, linkProposal: '', status: 'ranked_dusun', rankingDusun: '2', rankingDesa: '', rencanaAksi: '', rujukanUsulan: '', catatanKembali: '', sdgId: '11' },
+        { id: 'USL-6', username: 'budi', tahun: 2025, judul: 'Pengadaan Buku Perpustakaan Desa', kategori: 'Pendidikan', deskripsi: 'Perpustakaan desa membutuhkan tambahan koleksi buku pelajaran dan cerita anak.', rt: ['001', '002', '003'], dusun: 'Dusun Jangkang', desa: 'Desa Jangkang', volume: 200, satuan: 'Buah', estimasiBiaya: 25000000, linkProposal: '', status: 'ranked_dusun', rankingDusun: '3', rankingDesa: '1', rencanaAksi: 'Kewenangan Desa', rujukanUsulan: '', catatanKembali: '', sdgId: '4' }
     ];
 
     const MOCK_DEADLINE = { '2025': '' };
@@ -716,6 +749,21 @@ function showErrorPw(element, message) {
                 (data.ids || []).forEach(id => { const u = MOCK_USULAN.find(x => x.id === id); if (u) u.status = data.status; });
                 return { success: true };
             }
+            if (action === 'updateMetaUsulan') {
+                const ids = data.id ? [data.id] : (data.ids || []);
+                let processed = 0;
+                ids.forEach(id => {
+                    const u = MOCK_USULAN.find(x => x.id === id);
+                    if (u) {
+                        if (data.sdgId !== undefined) u.sdgId = data.sdgId || '';
+                        if (data.rencanaAksi !== undefined) u.rencanaAksi = data.rencanaAksi || '';
+                        if (data.rujukanUsulan !== undefined) u.rujukanUsulan = data.rujukanUsulan || '';
+                        if (data.kordinator !== undefined) u.kordinator = data.kordinator || '';
+                        processed++;
+                    }
+                });
+                return processed ? { success: true } : { success: false, message: 'Gagal memperbarui data' };
+            }
             if (action === 'prosesDusun') {
                 const ids = data.ids || (data.id ? [data.id] : []);
                 let processed = 0;
@@ -725,6 +773,7 @@ function showErrorPw(element, message) {
                     if (mockLock(u.tahun)) return;
                     if (data.status !== undefined) u.status = data.status;
                     if (data.rankingDusun !== undefined) u.rankingDusun = data.rankingDusun;
+                    if (data.sdgId !== undefined) u.sdgId = data.sdgId;
                     if (data.catatanKembali !== undefined) u.catatanKembali = data.catatanKembali;
                     processed++;
                 });
@@ -1013,7 +1062,7 @@ function showErrorPw(element, message) {
             ],
             kasikaur: [
                 { key: 'beranda', label: 'Beranda', icon: 'fa-home' },
-                { key: 'monitoring', label: 'Monitoring', icon: 'fa-eye' },
+                { key: 'koordinasi', label: 'Usulan Rujukan', icon: 'fa-eye' },
                 { key: 'ubahpw', label: 'Ubah Password', icon: 'fa-key' }
             ],
             admdesa: [
@@ -1230,10 +1279,101 @@ function showErrorPw(element, message) {
         return '';
     }
 
-    function rKoordinasiTable(u, list) {
-        const sorted = sortForMonitoring(list, 'kasikaur');
-        return `<div class="space-y-4">${statsBar(sorted)}<div><h3 class="font-display font-700 text-xl">Usulan Koordinasi Saya</h3><p class="text-xs text-gray-400 mt-0.5">Daftar usulan yang ditugaskan kepada Anda untuk dikoordinasikan penyelesaiannya.</p></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th class="w-10 text-center">No</th><th>Judul Usulan</th><th class="w-28">Dusun</th><th class="w-20">RT</th><th class="w-28">Volume</th><th class="w-32 text-right">Estimasi</th><th class="w-14 text-center">Rank</th></tr></thead><tbody>${sorted.length ? sorted.map((i, n) => `<tr class="main-row cursor-pointer" onclick="showDetail('${escapeJs(i.id)}')"><td class="text-center text-gray-400 text-xs">${n + 1}</td><td class="font-semibold text-gray-800">${escapeHtml(i.judul)}</td><td class="text-xs text-gray-500">${escapeHtml(i.dusun)}</td><td class="text-xs text-gray-500">${i.rt.join(', ')}</td><td class="text-xs text-gray-600">${i.volume} ${escapeHtml(i.satuan)}</td><td class="text-right text-xs font-semibold text-gray-700 whitespace-nowrap">${formatRupiah(i.estimasiBiaya)}</td><td class="text-center"><span class="font-display font-800 text-forest-600">#${i.rankingDesa || '-'}</span></td></tr>`).join('') : emptyRow(7, 'Belum ada usulan yang dikordinatori kepada Anda')}</tbody></table></div></div>`;
+function rKoordinasiTable(u, list) {
+    const sorted = sortForMonitoring(list, 'kasikaur');
+    return `<div class="space-y-4">
+        ${statsBar(sorted)}
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+                <h3 class="font-display font-bold text-xl text-gray-800">Usulan di Koordinasi Saya</h3>
+                <p class="text-xs text-gray-400 mt-0.5">Daftar usulan yang ditugaskan kepada Anda untuk dikoordinasikan penyelesaiannya.</p>
+            </div>
+            ${sorted.length ? `<button onclick="doExportKoordinasi()" class="btn-success px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 self-start"><i class="fas fa-file-excel"></i>Unduh Excel</button>` : ''}
+        </div>
+        <div class="tbl-wrap">
+            <table class="tbl">
+                <thead>
+                    <tr>
+                        <th class="w-10 text-center">No</th>
+                        <th>Judul Usulan</th>
+                        <th class="w-28">Dusun</th>
+                        <th class="w-20">RT</th>
+                        <th class="w-28">Volume</th>
+                        <th class="w-32 text-right">Estimasi</th>
+                        <th class="w-14 text-center">Rank</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${sorted.length
+                        ? sorted.map((i, n) => `
+                            <tr class="main-row cursor-pointer" onclick="showDetail('${escapeJs(i.id)}')">
+                                <td class="text-center text-gray-400 text-xs">${n + 1}</td>
+                                <td class="font-semibold text-gray-800">${escapeHtml(i.judul)}</td>
+                                <td class="text-xs text-gray-500">${escapeHtml(i.dusun)}</td>
+                                <td class="text-xs text-gray-500">${Array.isArray(i.rt) ? i.rt.join(', ') : i.rt}</td>
+                                <td class="text-xs text-gray-600">${i.volume || 0} ${escapeHtml(i.satuan || '')}</td>
+                                <td class="text-right text-xs font-semibold text-gray-700 whitespace-nowrap">${formatRupiah(i.estimasiBiaya)}</td>
+                                <td class="text-center"><span class="font-display font-extrabold text-forest-600">#${i.rankingDesa || '-'}</span></td>
+                            </tr>`
+                        ).join('')
+                        : emptyRow(7, 'Belum ada usulan yang dikordinatori kepada Anda')
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>`;
+}
+
+async function doExportKoordinasi() {
+    try { await loadXlsx(); } catch (e) {
+        showToast('Gagal memuat library Excel', 'error');
+        return;
     }
+
+    const user = STATE.currentUser;
+    if (!user) return;
+
+    // Ambil data usulan yang statusnya final (sudah diverifikasi desa)
+    let list = cachedUsulan.filter(x => x.status === 'final');
+    list = sortForMonitoring(list, 'kasikaur');
+
+    if (!list.length) {
+        showToast('Tidak ada data koordinasi untuk diekspor', 'warning');
+        return;
+    }
+
+    const kolom = [
+        { h: 'No',               get: (_, i) => i + 1 },
+        { h: 'Judul Usulan',     get: v => v.judul },
+        { h: 'Dusun',            get: v => v.dusun || '-' },
+        { h: 'RT',               get: v => Array.isArray(v.rt) ? v.rt.join(', ') : (v.rt || '-') },
+        { h: 'Volume',           get: v => (v.volume || 0) + ' ' + (v.satuan || '') },
+        { h: 'Estimasi Biaya',   get: v => v.estimasiBiaya || 0 },
+        { h: 'Ranking Desa',     get: v => v.rankingDesa || '' },
+        { h: 'Ranking Dusun',    get: v => v.rankingDusun || '' },
+        { h: 'Rencana Aksi',     get: v => v.rencanaAksi || '-' },
+        { h: 'Mendukung SDGs',   get: v => v.sdgId ? (CONFIG.SDGS.find(s => s.id == v.sdgId)?.kode || '-') : '-' },
+        { h: 'Kategori',         get: v => v.kategori || '-' },
+        { h: 'Sumber/Pengusul',  get: v => v.username || '-' }
+    ];
+
+    const baris = list.map((item, idx) => {
+        const row = {};
+        kolom.forEach(k => { row[k.h] = k.get(item, idx); });
+        return row;
+    });
+
+    const ws = XLSX.utils.json_to_sheet(baris);
+    ws['!cols'] = kolom.map(k => ({ wch: Math.max(k.h.length + 4, 18) }));
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Koordinasi Usulan');
+
+    const namaFile = `Koordinasi_Usulan_${STATE.tahunAktif}_${user.nama.replace(/\s+/g, '_')}.xlsx`;
+    XLSX.writeFile(wb, namaFile);
+
+    showToast('File Excel koordinasi berhasil diunduh', 'success');
+}
 
     function emptyRow(colspan, msg) { 
         return `<tr><td colspan="${colspan}" class="text-center py-12 text-gray-400"><i class="fas fa-inbox text-3xl mb-2 block opacity-40"></i>${msg}</td></tr>`; 
@@ -1308,13 +1448,82 @@ function showErrorPw(element, message) {
     }
 
     function rMonitorTable(list, role) {
+        // 1. Validasi Data
+        if (!list) list = [];
+        
+        // 2. Urutkan Data
         const sorted = sortForMonitoring(list, role);
+        
+        // 3. Logika Kolom (Sama seperti sebelumnya)
         const colDusun = role !== 'user';
-        const colRankDusun = role === 'admdusun' || role === 'admdesa' || role === 'admrom';
-        const colRankDesa = role === 'admdesa' || role === 'admrom';
-        const colAksi = role === 'admdesa';
+        const colRankDusun = role === 'admdusun' || role === 'admdesa' || role === 'admrom' || role === 'kasikaur';
+        const colRankDesa = role === 'admdesa' || role === 'admrom' || role === 'kasikaur';
+        const colAksi = role === 'admdesa' || role === 'kasikaur';
         const totalCol = 9 + (colDusun ? 1 : 0) + (colRankDusun ? 1 : 0) + (colRankDesa ? 1 : 0) + (colAksi ? 1 : 0);
-        return `<div class="space-y-4">${statsBar(sorted)}<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3"><div><h3 class="font-display font-700 text-xl">Monitoring Usulan</h3><p class="text-xs text-gray-400 mt-0.5">Diurutkan berdasarkan ranking — klik baris untuk melihat detail</p></div><button onclick="doExportExcel()" class="px-4 py-2 bg-forest-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-forest-700 transition-colors flex items-center gap-2 flex-shrink-0"><i class="fas fa-file-excel"></i> Unduh Excel</button></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th class="w-10 text-center">No</th><th class="w-40">Status</th><th>Judul Usulan</th><th class="w-28">Sumber</th>${colDusun ? '<th class="w-28">Dusun</th>' : ''}<th class="w-28">Kategori</th><th class="w-28">RT</th><th class="w-28">Volume</th><th class="w-32 text-right">Estimasi</th>${colRankDusun ? '<th class="w-14 text-center">Rank Dusun</th>' : ''}${colRankDesa ? '<th class="w-14 text-center">Rank Desa</th>' : ''}${colAksi ? '<th class="w-36">Rencana Aksi</th>' : ''}<th class="w-20 text-center">Detail</th></tr></thead><tbody>${sorted.length ? sorted.map((i, n) => `<tr class="main-row cursor-pointer" onclick="showDetail('${escapeJs(i.id)}')"><td class="text-center text-gray-400 text-xs">${n + 1}</td><td class="text-center">${statusLabel(i.status)}</td><td class="font-semibold text-gray-800">${escapeHtml(i.judul)}</td><td class="text-xs text-gray-500 whitespace-nowrap">${escapeHtml(i.username)}</td>${colDusun ? `<td class="text-xs text-gray-500">${escapeHtml(i.dusun)}</td>` : ''}<td><span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded font-medium">${escapeHtml(i.kategori)}</span></td><td class="text-xs text-gray-500">${i.rt.join(', ')}</td><td class="text-xs text-gray-600">${i.volume} ${escapeHtml(i.satuan)}</td><td class="text-right text-xs font-semibold text-gray-700 whitespace-nowrap">${formatRupiah(i.estimasiBiaya)}</td>${colRankDusun ? `<td class="text-center">${i.rankingDusun ? `<span class="font-display font-800 text-blue-600 text-sm">#${i.rankingDusun}</span>` : '<span class="text-gray-300">-</span>'}</td>` : ''}${colRankDesa ? `<td class="text-center">${i.rankingDesa ? `<span class="font-display font-800 text-forest-600 text-sm">#${i.rankingDesa}</span>` : '<span class="text-gray-300">-</span>'}</td>` : ''}${colAksi ? `<td class="text-xs">${i.rencanaAksi ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${i.rencanaAksi === 'Kewenangan Desa' ? 'bg-forest-100 text-forest-700' : 'bg-amber-100 text-amber-700'}">${escapeHtml(i.rencanaAksi)}</span>${i.rujukanUsulan ? `<br><span class="text-gray-400">→ ${escapeHtml(i.rujukanUsulan)}</span>` : ''}` : '<span class="text-gray-300">-</span>'}</td>` : ''}<td class="text-center"><span class="px-2.5 py-1 bg-honey-100 text-honey-700 text-xs font-semibold rounded hover:bg-honey-200 transition-colors inline-block"><i class="fas fa-eye mr-1"></i>Lihat</span></td></tr>`).join('') : emptyRow(totalCol, 'Belum ada data monitoring')}</tbody></table></div></div>`;
+
+        // 4. Coba ambil statsBar, jika error abaikan (Try-Catch Sederhana)
+        let statsHTML = '';
+        try {
+            if (typeof statsBar === 'function') {
+                statsHTML = statsBar(sorted);
+            }
+        } catch (e) {
+            console.error("Error statsBar:", e);
+        }
+
+        // 5. Render HTML
+        return `
+        <div class="space-y-4">
+            ${statsHTML}
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div>
+                    <h3 class="font-display font-700 text-xl">Monitoring Usulan</h3>
+                    <p class="text-xs text-gray-400 mt-0.5">Diurutkan berdasarkan ranking — klik baris untuk melihat detail</p>
+                </div>
+                <button onclick="doExportExcel()" class="px-4 py-2 bg-forest-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-forest-700 transition-colors flex items-center gap-2 flex-shrink-0">
+                    <i class="fas fa-file-excel"></i> Unduh Excel
+                </button>
+            </div>
+            <div class="tbl-wrap">
+                <table class="tbl">
+                    <thead>
+                        <tr>
+                            <th class="w-10 text-center">No</th>
+                            <th class="w-40">Status</th>
+                            <th>Judul Usulan</th>
+                            <th class="w-28">Sumber</th>
+                            ${colDusun ? '<th class="w-28">Dusun</th>' : ''}
+                            <th class="w-28">Kategori</th>
+                            <th class="w-28">RT</th>
+                            <th class="w-28">Volume</th>
+                            <th class="w-32 text-right">Estimasi</th>
+                            ${colRankDusun ? '<th class="w-14 text-center">Rank Dusun</th>' : ''}
+                            ${colRankDesa ? '<th class="w-14 text-center">Rank Desa</th>' : ''}
+                            ${colAksi ? '<th class="w-36">Rencana Aksi</th>' : ''}
+                            <th class="w-20 text-center">Detail</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sorted.length ? sorted.map((i, n) => `
+                        <tr class="main-row cursor-pointer" onclick="showDetail('${escapeJs(i.id)}')">
+                            <td class="text-center text-gray-400 text-xs">${n + 1}</td>
+                            <td class="text-center">${statusLabel(i.status)}</td>
+                            <td class="font-semibold text-gray-800">${escapeHtml(i.judul)}</td>
+                            <td class="text-xs text-gray-500 whitespace-nowrap">${escapeHtml(i.username)}</td>
+                            ${colDusun ? `<td class="text-xs text-gray-500">${escapeHtml(i.dusun)}</td>` : ''}
+                            <td><span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded font-medium">${escapeHtml(i.kategori)}</span></td>
+                            <td class="text-xs text-gray-500">${Array.isArray(i.rt) ? i.rt.join(', ') : i.rt}</td>
+                            <td class="text-xs text-gray-600">${i.volume} ${escapeHtml(i.satuan)}</td>
+                            <td class="text-right text-xs font-semibold text-gray-700 whitespace-nowrap">${formatRupiah(i.estimasiBiaya)}</td>
+                            ${colRankDusun ? `<td class="text-center">${i.rankingDusun ? `<span class="font-display font-800 text-blue-600 text-sm">#${i.rankingDusun}</span>` : '<span class="text-gray-300">-</span>'}</td>` : ''}
+                            ${colRankDesa ? `<td class="text-center">${i.rankingDesa ? `<span class="font-display font-800 text-forest-600 text-sm">#${i.rankingDesa}</span>` : '<span class="text-gray-300">-</span>'}</td>` : ''}
+                            ${colAksi ? `<td class="text-xs">${i.rencanaAksi ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${i.rencanaAksi === 'Kewenangan Desa' ? 'bg-forest-100 text-forest-700' : 'bg-amber-100 text-amber-700'}">${escapeHtml(i.rencanaAksi)}</span>${i.rujukanUsulan ? `<br><span class="text-gray-400">→ ${escapeHtml(i.rujukanUsulan)}</span>` : ''}` : '<span class="text-gray-300">-</span>'}</td>` : ''}
+                            <td class="text-center"><span class="px-2.5 py-1 bg-honey-100 text-honey-700 text-xs font-semibold rounded hover:bg-honey-200 transition-colors inline-block"><i class="fas fa-eye mr-1"></i>Lihat</span></td>
+                        </tr>`).join('') : (typeof emptyRow === 'function' ? emptyRow(totalCol, 'Belum ada data monitoring') : '<tr><td colspan="' + totalCol + '" class="text-center py-8 text-gray-400">Belum ada data monitoring</td></tr>')}
+                    </tbody>
+                </table>
+            </div>
+        </div>`;
     }
 
     function rPengaturan() {
@@ -1445,7 +1654,7 @@ function showErrorPw(element, message) {
             
             // --- PERBAIKAN DI SINI ---
             
-            // Ubah tulisan tombol menjadi "Berhasil!"
+            // Ubah tulisan tombol menjadi "Berhasil!"`
             btn.innerText = "Berhasil!";
             
             // Kosongkan input secara MANUAL (agar tombol tidak ikut kembali ke "Simpan Password")
@@ -1453,7 +1662,7 @@ function showErrorPw(element, message) {
             document.getElementById('pwNew').value = '';
             document.getElementById('pwNewC').value = '';
             
-            // Tutup modal setelah delay 1 detik agar user sempat melihat tulisan "Berhasil!"
+            // Tutup modal setelah delay 1 detik agar user sempat melihat tulisan "Berhasil!"`}
             setTimeout(() => {
                 closeModal();
             }, 1000);
@@ -1502,7 +1711,7 @@ function showErrorPw(element, message) {
     function showDetail(id) {
         const i = cachedUsulan.find(x => x.id === id);
         if (!i) { showToast('Data tidak ditemukan', 'warning'); return; }
-        openModal(`<div class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this)closeModal()"><div class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl view-enter p-6"><div class="flex justify-between items-start mb-4"><div class="flex-1 min-w-0 mr-3"><div class="mb-2">${statusLabel(i.status)}</div><h3 class="font-display font-700 text-xl leading-tight">${escapeHtml(i.judul)}</h3></div><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-1 flex-shrink-0" aria-label="Tutup"><i class="fas fa-times text-lg"></i></button></div><div class="space-y-3 text-sm"><div class="grid grid-cols-2 gap-3"><div class="bg-gray-50 p-3 rounded-lg"><span class="text-gray-500 text-xs block mb-0.5">Pengusul / Sumber</span><span class="font-semibold">${escapeHtml(i.username)}</span></div><div class="bg-gray-50 p-3 rounded-lg"><span class="text-gray-500 text-xs block mb-0.5">Kategori</span><span class="font-semibold">${escapeHtml(i.kategori)}</span></div></div><div class="bg-gray-50 p-3 rounded-lg"><span class="text-gray-500 text-xs block mb-0.5">RT / Dusun</span><span class="font-semibold">RT ${i.rt.join(', ')} — ${escapeHtml(i.dusun)}</span></div><div class="bg-gray-50 p-3 rounded-lg"><span class="text-gray-500 text-xs block mb-0.5">Deskripsi</span><span class="leading-relaxed">${escapeHtml(i.deskripsi)}</span></div><div class="grid grid-cols-3 gap-2"><div class="bg-gray-50 p-3 rounded-lg text-center"><span class="text-gray-500 text-xs block mb-0.5">Volume</span><span class="font-bold text-honey-700">${i.volume} ${escapeHtml(i.satuan)}</span></div><div class="bg-gray-50 p-3 rounded-lg text-center"><span class="text-gray-500 text-xs block mb-0.5">Estimasi</span><span class="font-bold text-honey-700 text-sm">${formatRupiah(i.estimasiBiaya)}</span></div><div class="bg-gray-50 p-3 rounded-lg text-center"><span class="text-gray-500 text-xs block mb-0.5">Proposal</span>${i.linkProposal ? `<a href="${escapeHtml(i.linkProposal)}" target="_blank" rel="noopener" class="text-blue-500 underline font-semibold text-xs">Lihat</a>` : '<span class="text-gray-400">-</span>'}</div></div>${i.rankingDusun ? `<div class="flex justify-between items-center bg-blue-50 p-3 rounded-lg"><span class="text-blue-700 font-medium">Ranking Dusun</span><span class="font-display font-900 text-xl text-blue-700">#${i.rankingDusun}</span></div>` : ''}${i.rankingDesa ? `<div class="flex justify-between items-center bg-forest-50 p-3 rounded-lg"><span class="text-forest-700 font-medium">Ranking Desa</span><span class="font-display font-900 text-xl text-forest-700">#${i.rankingDesa}</span></div>` : ''}${i.rencanaAksi ? `<div class="flex justify-between bg-gray-50 p-3 rounded-lg"><span class="text-gray-500">Rencana Aksi</span><span class="font-semibold">${escapeHtml(i.rencanaAksi)}</span></div>` : ''}${i.rujukanUsulan ? `<div class="flex justify-between bg-gray-50 p-3 rounded-lg"><span class="text-gray-500">Rujukan Ke</span><span class="font-semibold">${escapeHtml(i.rujukanUsulan)}</span></div>` : ''}${i.catatanKembali ? `<div class="bg-red-50 p-3 rounded-lg text-red-700"><i class="fas fa-comment-dots mr-1"></i><b>Catatan:</b><br>${escapeHtml(i.catatanKembali)}</div>` : ''}</div></div></div>`);
+        openModal(`<div class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this)closeModal()"><div class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl view-enter p-6"><div class="flex justify-between items-start mb-4"><div class="flex-1 min-w-0 mr-3"><div class="mb-2">${statusLabel(i.status)}</div><h3 class="font-display font-700 text-xl leading-tight">${escapeHtml(i.judul)}</h3></div><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-1 flex-shrink-0" aria-label="Tutup"><i class="fas fa-times text-lg"></i></button></div><div class="space-y-3 text-sm"><div class="grid grid-cols-2 gap-3"><div class="bg-gray-50 p-3 rounded-lg"><span class="text-gray-500 text-xs block mb-0.5">Pengusul / Sumber</span><span class="font-semibold">${escapeHtml(i.username)}</span></div><div class="bg-gray-50 p-3 rounded-lg"><span class="text-gray-500 text-xs block mb-0.5">Kategori</span><span class="font-semibold">${escapeHtml(i.kategori)}</span></div></div><div class="bg-gray-50 p-3 rounded-lg"><span class="text-gray-500 text-xs block mb-0.5">RT / Dusun</span><span class="font-semibold">RT ${i.rt.join(', ')} — ${escapeHtml(i.dusun)}</span></div><div class="bg-gray-50 p-3 rounded-lg"><span class="text-gray-500 text-xs block mb-0.5">Deskripsi</span><span class="leading-relaxed">${escapeHtml(i.deskripsi)}</span></div><div class="grid grid-cols-3 gap-2"><div class="bg-gray-50 p-3 rounded-lg text-center"><span class="text-gray-500 text-xs block mb-0.5">Volume</span><span class="font-bold text-honey-700">${i.volume} ${escapeHtml(i.satuan)}</span></div><div class="bg-gray-50 p-3 rounded-lg text-center"><span class="text-gray-500 text-xs block mb-0.5">Estimasi</span><span class="font-bold text-honey-700 text-sm">${formatRupiah(i.estimasiBiaya)}</span></div><div class="bg-gray-50 p-3 rounded-lg text-center"><span class="text-gray-500 text-xs block mb-0.5">Proposal</span>${i.linkProposal ? `<a href="${escapeHtml(i.linkProposal)}" target="_blank" rel="noopener" class="text-blue-500 underline font-semibold text-xs">Lihat</a>` : '<span class="text-gray-400">-</span>'}</div></div>${i.rankingDusun ? `<div class="flex justify-between items-center bg-blue-50 p-3 rounded-lg"><span class="text-blue-700 font-medium">Ranking Dusun</span><span class="font-display font-900 text-xl text-blue-700">#${i.rankingDusun}</span></div>` : ''}${i.sdgId ? `<div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg"><span class="text-gray-600 font-medium">Mendukung SDGs</span><span class="font-semibold text-gray-800">${CONFIG.SDGS.find(s => s.id == i.sdgId)?.kode || ''} - ${CONFIG.SDGS.find(s => s.id == i.sdgId)?.nama || ''}</span></div>` : ''}${i.rankingDesa ? `<div class="flex justify-between items-center bg-forest-50 p-3 rounded-lg"><span class="text-forest-700 font-medium">Ranking Desa</span><span class="font-display font-900 text-xl text-forest-700">#${i.rankingDesa}</span></div>` : ''}${i.rencanaAksi ? `<div class="flex justify-between bg-gray-50 p-3 rounded-lg"><span class="text-gray-500">Rencana Aksi</span><span class="font-semibold">${escapeHtml(i.rencanaAksi)}</span></div>` : ''}${i.rujukanUsulan ? `<div class="flex justify-between bg-gray-50 p-3 rounded-lg"><span class="text-gray-500">Rujukan Ke</span><span class="font-semibold">${escapeHtml(i.rujukanUsulan)}</span></div>` : ''}${i.catatanKembali ? `<div class="bg-red-50 p-3 rounded-lg text-red-700"><i class="fas fa-comment-dots mr-1"></i><b>Catatan:</b><br>${escapeHtml(i.catatanKembali)}</div>` : ''}</div></div></div>`);
     }
 
     window.handleAddUserRoleChange = function(role) {
@@ -1982,6 +2191,7 @@ function showErrorPw(element, message) {
                             <div><span class="text-gray-500 block text-xs">Volume</span><span class="font-semibold">${item.volume} ${escapeHtml(item.satuan)}</span></div>
                             <div class="col-span-2"><span class="text-gray-500 block text-xs">Estimasi Biaya</span><span class="font-display font-700 text-honey-600">${formatRupiah(item.estimasiBiaya)}</span></div>
                             ${item.rankingDusun ? `<div><span class="text-gray-500 block text-xs">Ranking Dusun</span><span class="font-display font-700 text-blue-600">#${item.rankingDusun}</span></div>` : ''}
+                            ${item.sdgId ? `<div class="col-span-2"><span class="text-gray-500 block text-xs">Mendukung SDGs</span><span class="font-semibold">${CONFIG.SDGS.find(s => s.id == item.sdgId)?.kode || ''} - ${CONFIG.SDGS.find(s => s.id == item.sdgId)?.nama || ''}</span></div>` : ''}
                             ${item.rankingDesa ? `<div><span class="text-gray-500 block text-xs">Ranking Desa</span><span class="font-display font-700 text-forest-600">#${item.rankingDesa}</span></div>` : ''}
                             ${item.rencanaAksi ? `<div><span class="text-gray-500 block text-xs">Rencana Aksi</span><span class="font-semibold">${escapeHtml(item.rencanaAksi)}</span></div>` : ''}
                             ${item.rujukanUsulan ? `<div><span class="text-gray-500 block text-xs">Rujukan</span><span class="font-semibold">${escapeHtml(item.rujukanUsulan)}</span></div>` : ''}
@@ -2015,7 +2225,7 @@ function showErrorPw(element, message) {
                 });
             }
 
-            return `<tr class="main-row cursor-pointer" onclick="showDetail('${escapeJs(i.id)}')"><td class="text-center" onclick="event.stopPropagation()"><input type="checkbox" class="bulk-check-desa accent-honey-500" data-id="${i.id}" onchange="updateBulkCountDesa()"></td><td class="text-center text-gray-400 text-xs">${n + 1}</td><td class="text-center">${statusLabel(i.status)}</td><td class="font-semibold text-gray-800">${escapeHtml(i.judul)}</td><td class="text-xs text-gray-500 whitespace-nowrap">${escapeHtml(i.username)}</td><td class="text-xs text-gray-500">${escapeHtml(i.dusun)}</td><td class="text-xs text-gray-500">${i.rt.join(', ')}</td><td class="text-xs text-gray-600">${i.volume} ${escapeHtml(i.satuan)}</td><td class="text-right text-xs font-semibold text-gray-700 whitespace-nowrap">${formatRupiah(i.estimasiBiaya)}</td><td class="text-center"><span class="font-display font-800 text-blue-600">#${i.rankingDusun || '-'}</span></td></tr><tr class="sub-row"><td colspan="10"><div class="space-y-2">${i.status === 'dikembalikan_dusun' ? `<div class="flex items-start gap-2 text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2"><i class="fas fa-info-circle mt-0.5 flex-shrink-0"></i><span>Usulan ini dikembalikan dari proses sebelumnya.</span></div>` : ''}<div class="flex flex-wrap items-start gap-2"><label class="text-xs font-semibold text-gray-600 mt-2">Rank Desa:</label><input type="number" min="1" placeholder="#" value="${i.rankingDesa}" class="w-20 px-2 py-1.5 border rounded-lg text-sm text-center" id="rankd-${i.id}"><label class="text-xs font-semibold text-gray-600 mt-2">Rencana Aksi:</label><select id="aksi-${i.id}" onchange="toggleRujukan('${escapeJs(i.id)}',this.value)" class="px-2 py-1.5 border rounded-lg text-sm bg-white mt-1"><option value="">Pilih...</option><option value="Kewenangan Desa" ${i.rencanaAksi === 'Kewenangan Desa' ? 'selected' : ''}>Kewenangan Desa</option><option value="Non Kewenangan Desa" ${i.rencanaAksi === 'Non Kewenangan Desa' ? 'selected' : ''}>Non Kewenangan Desa</option></select><textarea id="rujuk-${i.id}" placeholder="Rujukan ke..." rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" class="w-56 px-2 py-1.5 border rounded-lg text-sm resize-none overflow-hidden ${i.rencanaAksi === 'Non Kewenangan Desa' ? '' : 'hidden'}">${escapeHtml(i.rujukanUsulan || '')}</textarea><label class="text-xs font-semibold text-gray-600 mt-2">Kordinator:</label><select id="kord-${i.id}" class="px-2 py-1.5 border rounded-lg text-sm bg-white mt-1">${kordHtml}</select><button onclick="prosesDesa('${escapeJs(i.id)}','final')" class="p-1.5 text-green-600 hover:bg-green-100 rounded-md transition-colors mt-1" title="Verifikasi Final"><i class="fas fa-check-double text-sm"></i></button><button onclick="openModalKembalikan('${escapeJs(i.id)}','dikembalikan_dusun')" class="p-1.5 text-amber-600 hover:bg-amber-100 rounded-md transition-colors mt-1" title="Kembalikan ke Dusun"><i class="fas fa-undo text-sm"></i></button></div></div></td></tr>`;
+            return `<tr class="main-row cursor-pointer" onclick="showDetail('${escapeJs(i.id)}')"><td class="text-center" onclick="event.stopPropagation()"><input type="checkbox" class="bulk-check-desa accent-honey-500" data-id="${i.id}" onchange="updateBulkCountDesa()"></td><td class="text-center text-gray-400 text-xs">${n + 1}</td><td class="text-center">${statusLabel(i.status)}</td><td class="font-semibold text-gray-800">${escapeHtml(i.judul)}</td><td class="text-xs text-gray-500 whitespace-nowrap">${escapeHtml(i.username)}</td><td class="text-xs text-gray-500">${escapeHtml(i.dusun)}</td><td class="text-xs text-gray-500">${i.rt.join(', ')}</td><td class="text-xs text-gray-600">${i.volume} ${escapeHtml(i.satuan)}</td><td class="text-right text-xs font-semibold text-gray-700 whitespace-nowrap">${formatRupiah(i.estimasiBiaya)}</td><td class="text-center"><span class="font-display font-800 text-blue-600">#${i.rankingDusun || '-'}</span></td></tr><tr class="sub-row"><td colspan="10"><div class="space-y-2">${i.status === 'dikembalikan_dusun' ? `<div class="flex items-start gap-2 text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2"><i class="fas fa-info-circle mt-0.5 flex-shrink-0"></i><span>Usulan ini dikembalikan dari proses sebelumnya.</span></div>` : ''}<div class="flex flex-wrap items-start gap-2"><label class="text-xs font-semibold text-gray-600 mt-2">Rank Desa:</label><input type="number" min="1" placeholder="#" value="${i.rankingDesa}" class="w-20 px-2 py-1.5 border rounded-lg text-sm text-center" id="rankd-${i.id}"><label class="text-xs font-semibold text-gray-600 mt-2">Rencana Aksi:</label><select id="aksi-${i.id}" onchange="toggleRujukan('${escapeJs(i.id)}',this.value)" class="px-2 py-1.5 border rounded-lg text-sm bg-white mt-1"><option value="">Pilih...</option><option value="Kewenangan Desa" ${i.rencanaAksi === 'Kewenangan Desa' ? 'selected' : ''}>Kewenangan Desa</option><option value="Non Kewenangan Desa" ${i.rencanaAksi === 'Non Kewenangan Desa' ? 'selected' : ''}>Non Kewenangan Desa</option></select><textarea id="rujuk-${i.id}" placeholder="Rujukan ke..." rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" class="w-56 px-2 py-1.5 border rounded-lg text-sm resize-none overflow-hidden ${i.rencanaAksi === 'Non Kewenangan Desa' ? '' : 'hidden'}">${escapeHtml(i.rujukanUsulan || '')}</textarea><label class="text-xs font-semibold text-gray-600 mt-2">Kordinator:</label><select id="kord-${i.id}" class="px-2 py-1.5 border rounded-lg text-sm bg-white mt-1">${kordHtml}</select><button onclick="updateMetaDesa('${escapeJs(i.id)}')" class="px-3 py-1.5 bg-blue-100 text-blue-600 text-xs font-semibold rounded-md hover:bg-blue-200 transition-colors mt-1"><i class="fas fa-save mr-1"></i>Update Data</button><button onclick="prosesDesa('${escapeJs(i.id)}','final')" class="p-1.5 text-green-600 hover:bg-green-100 rounded-md transition-colors mt-1" title="Verifikasi Final"><i class="fas fa-check-double text-sm"></i></button><button onclick="openModalKembalikan('${escapeJs(i.id)}','dikembalikan_dusun')" class="p-1.5 text-amber-600 hover:bg-amber-100 rounded-md transition-colors mt-1" title="Kembalikan ke Dusun"><i class="fas fa-undo text-sm"></i></button></div></div></td></tr>`;
         }).join('') : emptyRow(10, 'Semua usulan sudah diverifikasi')}</tbody></table></div></div>`;
     }
 
@@ -2025,7 +2235,7 @@ function showErrorPw(element, message) {
     function rVerifDusunTable(u, list) {
         const locked = STATE.isLocked;
         const btns = locked ? '' : `<div class="flex flex-wrap items-center gap-2 mb-3"><button onclick="bulkProsesDusun()" class="px-3 py-1.5 btn-success text-xs rounded-md"><i class="fas fa-check-double mr-1"></i>Submit Terpilih ke Desa</button><span id="bulkCount" class="bulk-count hidden text-xs text-honey-700 font-semibold ml-1"><span id="bulkNum">0</span> terpilih</span></div>`;
-        return `<div class="space-y-4">${statsBar(list)}<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3"><div><h3 class="font-display font-700 text-xl">Verifikasi & Input Dusun</h3><p class="text-xs text-gray-400 mt-0.5">Usulan dari warga dan hasil musyawarah — beri peringkat lalu submit ke Desa. Klik baris untuk detail.</p></div>${locked ? '<span class="px-3 py-1.5 bg-red-100 text-red-700 text-xs font-bold rounded-lg"><i class="fas fa-lock mr-1"></i>Pengimputan Ditutup</span>' : `<button onclick="openFormUsulan('musyawarah')" class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-blue-700 transition-colors"><i class="fas fa-plus mr-1"></i> Input Hasil Musyawarah</button>`}</div>${list.length && !locked ? btns : ''}<div class="tbl-wrap"><table class="tbl"><thead><tr><th class="w-8 text-center">${locked ? '' : `<input type="checkbox" onchange="document.querySelectorAll('.bulk-check').forEach(c=>{c.checked=this.checked});updateBulkCount()" aria-label="Pilih semua">`}</th><th class="w-10 text-center">No</th><th class="w-36">Status</th><th>Judul Usulan</th><th class="w-20">RT</th><th class="w-28">Volume</th><th class="w-32 text-right">Estimasi</th><th class="w-28 text-center">Sumber</th></tr></thead><tbody>${list.length ? list.map((i, n) => { const isOwnMusyawarah = i.username === u.username; const isDiajukan = i.status === 'diajukan'; const isDikembalikan = i.status === 'dikembalikan_dusun'; const canEditMusyawarah = isOwnMusyawarah && isDiajukan && !locked; return `<tr class="main-row cursor-pointer" onclick="showDetail('${escapeJs(i.id)}')"><td class="text-center">${locked ? '' : `<input type="checkbox" class="bulk-check accent-honey-500" data-id="${i.id}" onchange="updateBulkCount()">`}</td><td class="text-center text-gray-400 text-xs">${n + 1}</td><td class="text-center">${statusLabel(i.status)}</td><td class="font-semibold text-gray-800">${escapeHtml(i.judul)}</td><td class="text-xs text-gray-500">${i.rt.join(', ')}</td><td class="text-xs text-gray-600">${i.volume} ${escapeHtml(i.satuan)}</td><td class="text-right text-xs font-semibold text-gray-700 whitespace-nowrap">${formatRupiah(i.estimasiBiaya)}</td><td class="text-center">${isOwnMusyawarah ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-honey-50 text-honey-700 rounded-full font-semibold text-xs" title="Hasil Musyawarah Dusun"><i class="fas fa-users text-[10px]"></i>Musyawarah</span>' : `<span class="text-xs text-gray-400">${escapeHtml(i.username)}</span>`}</td></tr><tr class="sub-row"><td colspan="8"><div class="space-y-2">${isDikembalikan ? `<div class="flex items-start gap-2 text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2.5"><i class="fas fa-comment-dots mt-0.5 flex-shrink-0"></i><div><b class="block mb-0.5">Catatan dari Pemerintah Desa:</b>${escapeHtml(i.catatanKembali)}</div></div>` : ''}${locked ? '<div class="text-xs text-red-500 font-medium"><i class="fas fa-lock mr-1"></i>Pengimputan ditutup — tidak dapat memproses usulan.</div>' : `<div class="flex flex-wrap items-center gap-2"><label class="text-xs font-semibold text-gray-600">Ranking Dusun:</label><input type="number" min="1" placeholder="#" value="${i.rankingDusun}" class="w-20 px-2 py-1.5 border rounded-lg text-sm text-center" id="rank-${i.id}"><button onclick="prosesDusun('${escapeJs(i.id)}','ranked_dusun')" class="px-3 py-1.5 btn-success text-xs rounded-md"><i class="fas fa-check mr-1"></i>Submit ke Desa</button>${isDiajukan && !isOwnMusyawarah ? `<button onclick="openModalKembalikan('${escapeJs(i.id)}','dikembalikan_user')" class="px-3 py-1.5 bg-amber-100 text-amber-700 text-xs font-semibold rounded-md hover:bg-amber-200 transition-colors"><i class="fas fa-undo mr-1"></i>Kembalikan ke Warga</button>` : ''}${isDikembalikan && isOwnMusyawarah ? `<button onclick="openFormUsulan('${escapeJs(i.id)}')" class="px-3 py-1.5 bg-blue-100 text-blue-600 text-xs font-semibold rounded-md hover:bg-blue-200 transition-colors"><i class="fas fa-edit mr-1"></i>Edit Usulan</button>` : ''}${canEditMusyawarah ? `<button onclick="openFormUsulan('${escapeJs(i.id)}')" class="px-3 py-1.5 bg-blue-100 text-blue-600 text-xs font-semibold rounded-md hover:bg-blue-200 transition-colors"><i class="fas fa-edit mr-1"></i>Edit</button><button onclick="hapusUsulanMusyawarah('${escapeJs(i.id)}','${escapeJs(i.judul)}')" class="px-3 py-1.5 btn-danger text-xs rounded-md"><i class="fas fa-trash-alt mr-1"></i>Hapus</button>` : ''}</div>`}</div></td></tr>`; }).join('') : emptyRow(8, 'Tidak ada usulan yang perlu diproses')}</tbody></table></div></div>`;
+        return `<div class="space-y-4">${statsBar(list)}<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3"><div><h3 class="font-display font-700 text-xl">Verifikasi & Input Dusun</h3><p class="text-xs text-gray-400 mt-0.5">Usulan dari warga dan hasil musyawarah — beri peringkat lalu submit ke Desa. Klik baris untuk detail.</p></div>${locked ? '<span class="px-3 py-1.5 bg-red-100 text-red-700 text-xs font-bold rounded-lg"><i class="fas fa-lock mr-1"></i>Pengimputan Ditutup</span>' : `<button onclick="openFormUsulan('musyawarah')" class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-blue-700 transition-colors"><i class="fas fa-plus mr-1"></i> Input Hasil Musyawarah</button>`}</div>${list.length && !locked ? btns : ''}<div class="tbl-wrap"><table class="tbl"><thead><tr><th class="w-8 text-center">${locked ? '' : `<input type="checkbox" onchange="document.querySelectorAll('.bulk-check').forEach(c=>{c.checked=this.checked});updateBulkCount()" aria-label="Pilih semua">`}</th><th class="w-10 text-center">No</th><th class="w-36">Status</th><th>Judul Usulan</th><th class="w-20">RT</th><th class="w-28">Volume</th><th class="w-32 text-right">Estimasi</th><th class="w-28 text-center">Sumber</th></tr></thead><tbody>${list.length ? list.map((i, n) => { const isOwnMusyawarah = i.username === u.username; const isDiajukan = i.status === 'diajukan'; const isDikembalikan = i.status === 'dikembalikan_dusun'; const canEditMusyawarah = isOwnMusyawarah && isDiajukan && !locked; return `<tr class="main-row cursor-pointer" onclick="showDetail('${escapeJs(i.id)}')"><td class="text-center">${locked ? '' : `<input type="checkbox" class="bulk-check accent-honey-500" data-id="${i.id}" onchange="updateBulkCount()">`}</td><td class="text-center text-gray-400 text-xs">${n + 1}</td><td class="text-center">${statusLabel(i.status)}</td><td class="font-semibold text-gray-800">${escapeHtml(i.judul)}</td><td class="text-xs text-gray-500">${i.rt.join(', ')}</td><td class="text-xs text-gray-600">${i.volume} ${escapeHtml(i.satuan)}</td><td class="text-right text-xs font-semibold text-gray-700 whitespace-nowrap">${formatRupiah(i.estimasiBiaya)}</td><td class="text-center">${isOwnMusyawarah ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-honey-50 text-honey-700 rounded-full font-semibold text-xs" title="Hasil Musyawarah Dusun"><i class="fas fa-users text-[10px]"></i>Musyawarah</span>' : `<span class="text-xs text-gray-400">${escapeHtml(i.username)}</span>`}</td></tr><tr class="sub-row"><td colspan="8"><div class="space-y-2">${isDikembalikan ? `<div class="flex items-start gap-2 text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2.5"><i class="fas fa-comment-dots mt-0.5 flex-shrink-0"></i><div><b class="block mb-0.5">Catatan dari Pemerintah Desa:</b>${escapeHtml(i.catatanKembali)}</div></div>` : ''}${locked ? '<div class="text-xs text-red-500 font-medium"><i class="fas fa-lock mr-1"></i>Pengimputan ditutup — tidak dapat memproses usulan.</div>' : `<div class="flex flex-wrap items-center gap-2"><label class="text-xs font-semibold text-gray-600">Ranking Dusun:</label><input type="number" min="1" placeholder="#" value="${i.rankingDusun}" class="w-20 px-2 py-1.5 border rounded-lg text-sm text-center" id="rank-${i.id}"><label class="text-xs font-semibold text-gray-600 ml-2">Mendukung SDGs:</label><select id="sdg-${i.id}" class="px-2 py-1.5 border rounded-lg text-sm bg-white max-w-[200px]"><option value="">Pilih SDG...</option>${CONFIG.SDGS.map(s => `<option value="${s.id}" ${i.sdgId == s.id ? 'selected' : ''}>${s.kode} - ${s.nama}</option>`).join('')}</select><button onclick="updateMetaDusun('${escapeJs(i.id)}')" class="px-3 py-1.5 bg-blue-100 text-blue-600 text-xs font-semibold rounded-md hover:bg-blue-200 transition-colors ml-2"><i class="fas fa-save mr-1"></i>Update</button><button onclick="prosesDusun('${escapeJs(i.id)}','ranked_dusun')" class="px-3 py-1.5 btn-success text-xs rounded-md ml-2"><i class="fas fa-check mr-1"></i>Submit ke Desa</button>${isDiajukan && !isOwnMusyawarah ? `<button onclick="openModalKembalikan('${escapeJs(i.id)}','dikembalikan_user')" class="px-3 py-1.5 bg-amber-100 text-amber-700 text-xs font-semibold rounded-md hover:bg-amber-200 transition-colors"><i class="fas fa-undo mr-1"></i>Kembalikan ke Warga</button>` : ''}${isDikembalikan && isOwnMusyawarah ? `<button onclick="openFormUsulan('${escapeJs(i.id)}')" class="px-3 py-1.5 bg-blue-100 text-blue-600 text-xs font-semibold rounded-md hover:bg-blue-200 transition-colors"><i class="fas fa-edit mr-1"></i>Edit Usulan</button>` : ''}${canEditMusyawarah ? `<button onclick="openFormUsulan('${escapeJs(i.id)}')" class="px-3 py-1.5 bg-blue-100 text-blue-600 text-xs font-semibold rounded-md hover:bg-blue-200 transition-colors"><i class="fas fa-edit mr-1"></i>Edit</button><button onclick="hapusUsulanMusyawarah('${escapeJs(i.id)}','${escapeJs(i.judul)}')" class="px-3 py-1.5 btn-danger text-xs rounded-md"><i class="fas fa-trash-alt mr-1"></i>Hapus</button>` : ''}</div>`}</div></td></tr>`; }).join('') : emptyRow(8, 'Tidak ada usulan yang perlu diproses')}</tbody></table></div></div>`;
     }
 
     /* ==========================================
@@ -2033,14 +2243,17 @@ function showErrorPw(element, message) {
     ========================================== */
     async function prosesDusun(id, status) {
         const rankEl = document.getElementById('rank-' + id);
+        const sdgEl = document.getElementById('sdg-' + id);
         const rank = rankEl ? rankEl.value : '';
+        const sdgId = sdgEl ? sdgEl.value : '';
+        
         if (status === 'ranked_dusun' && !rank) {
             showToast('Masukkan ranking dusun terlebih dahulu', 'warning');
             if (rankEl) rankEl.focus();
             return;
         }
         setTableLoading(true);
-        const res = await API.post('prosesDusun', { id: id, status: status, rankingDusun: rank });
+        const res = await API.post('prosesDusun', { id: id, status: status, rankingDusun: rank, sdgId: sdgId });
         if (res.success) {
             showToast('Usulan berhasil diproses', 'success');
             await refreshCurrentTab();
@@ -2058,15 +2271,17 @@ function showErrorPw(element, message) {
         checks.forEach(c => {
             const id = c.dataset.id;
             const rankEl = document.getElementById('rank-' + id);
+            const sdgEl = document.getElementById('sdg-' + id);
             const rank = rankEl ? rankEl.value : '';
+            const sdgId = sdgEl ? sdgEl.value : '';
             if (!rank) hasEmptyRank = true;
-            ids.push({ id: id, rankingDusun: rank });
+            ids.push({ id: id, rankingDusun: rank, sdgId: sdgId });
         });
         if (hasEmptyRank) { showToast('Semua usulan terpilih harus memiliki ranking', 'warning'); return; }
         setTableLoading(true);
         let allOk = true;
         for (const item of ids) {
-            const res = await API.post('prosesDusun', { id: item.id, status: 'ranked_dusun', rankingDusun: item.rankingDusun });
+            const res = await API.post('prosesDusun', { id: item.id, status: 'ranked_dusun', rankingDusun: item.rankingDusun, sdgId: item.sdgId });
             if (!res.success) allOk = false;
         }
         if (allOk) {
@@ -2184,6 +2399,56 @@ function showErrorPw(element, message) {
             showToast('Gagal memfinalisasi usulan', 'error');
             setTableLoading(false);
         }
+    }
+
+    async function updateMetaDusun(id) {
+        const sdgEl = document.getElementById('sdg-' + id);
+        if (!sdgEl) return;
+        const sdgId = sdgEl.value;
+        
+        setTableLoading(true);
+        const res = await API.post('updateMetaUsulan', { id: id, sdgId: sdgId });
+        if (res.success) {
+            const u = cachedUsulan.find(x => x.id === id);
+            if (u) u.sdgId = sdgId;
+            showToast('Data SDG berhasil diperbarui', 'success');
+        } else {
+            showToast(res.message || 'Gagal memperbarui data', 'error');
+        }
+        setTableLoading(false);
+    }
+
+    async function updateMetaDesa(id) {
+        const aksiEl = document.getElementById('aksi-' + id);
+        const rujukEl = document.getElementById('rujuk-' + id);
+        const kordEl = document.getElementById('kord-' + id);
+        
+        const payload = { 
+            id: id, 
+            rencanaAksi: aksiEl ? aksiEl.value : '', 
+            rujukanUsulan: rujukEl ? rujukEl.value : '', 
+            kordinator: kordEl ? kordEl.value : ''
+        };
+        
+        if (payload.rencanaAksi === 'Non Kewenangan Desa' && !payload.rujukanUsulan) {
+            showToast('Isi rujukan ke mana usulan ini dikembalikan', 'warning');
+            return;
+        }
+        
+        setTableLoading(true);
+        const res = await API.post('updateMetaUsulan', payload);
+        if (res.success) {
+            const u = cachedUsulan.find(x => x.id === id);
+            if (u) {
+                u.rencanaAksi = payload.rencanaAksi;
+                u.rujukanUsulan = payload.rujukanUsulan;
+                u.kordinator = payload.kordinator;
+            }
+            showToast('Data usulan berhasil diperbarui', 'success');
+        } else {
+            showToast(res.message || 'Gagal memperbarui data', 'error');
+        }
+        setTableLoading(false);
     }
 
     /* ==========================================
