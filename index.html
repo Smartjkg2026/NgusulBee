@@ -1290,33 +1290,33 @@ function rKoordinasiTable(u, list) {
             </div>
             ${sorted.length ? `<button onclick="doExportKoordinasi()" class="btn-success px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 self-start"><i class="fas fa-file-excel"></i>Unduh Excel</button>` : ''}
         </div>
-        <div class="tbl-wrap">
-            <table class="tbl">
-                <thead>
+        <div class="tbl-wrap max-h-[75vh] overflow-auto border border-gray-200 rounded-lg">
+            <table class="tbl w-full">
+                <thead class="text-xs text-gray-600 uppercase">
                     <tr>
-                        <th class="w-10 text-center">No</th>
-                        <th>Judul Usulan</th>
-                        <th class="w-28">Dusun</th>
-                        <th class="w-20">RT</th>
-                        <th class="w-28">Volume</th>
-                        <th class="w-32 text-right">Estimasi</th>
-                        <th class="w-14 text-center">Rank</th>
+                        <th class="sticky top-0 z-10 bg-gray-50 w-10 text-center border-b">No</th>
+                        <th class="sticky top-0 z-10 bg-gray-50 text-left border-b">Judul Usulan</th>
+                        <th class="sticky top-0 z-10 bg-gray-50 w-28 border-b">Dusun</th>
+                        <th class="sticky top-0 z-10 bg-gray-50 w-20 border-b">RT</th>
+                        <th class="sticky top-0 z-10 bg-gray-50 w-28 border-b">Volume</th>
+                        <th class="sticky top-0 z-10 bg-gray-50 w-32 text-right border-b">Estimasi</th>
+                        <th class="sticky top-0 z-10 bg-gray-50 w-14 text-center border-b">Rank</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="text-sm">
                     ${sorted.length
                         ? sorted.map((i, n) => `
-                            <tr class="main-row cursor-pointer" onclick="showDetail('${escapeJs(i.id)}')">
-                                <td class="text-center text-gray-400 text-xs">${n + 1}</td>
-                                <td class="font-semibold text-gray-800">${escapeHtml(i.judul)}</td>
-                                <td class="text-xs text-gray-500">${escapeHtml(i.dusun)}</td>
-                                <td class="text-xs text-gray-500">${Array.isArray(i.rt) ? i.rt.join(', ') : i.rt}</td>
-                                <td class="text-xs text-gray-600">${i.volume || 0} ${escapeHtml(i.satuan || '')}</td>
-                                <td class="text-right text-xs font-semibold text-gray-700 whitespace-nowrap">${formatRupiah(i.estimasiBiaya)}</td>
-                                <td class="text-center"><span class="font-display font-extrabold text-forest-600">#${i.rankingDesa || '-'}</span></td>
+                            <tr class="main-row cursor-pointer hover:bg-gray-50" onclick="showDetail('${escapeJs(i.id)}')">
+                                <td class="text-center text-gray-400 text-xs border-b">${n + 1}</td>
+                                <td class="font-semibold text-gray-800 border-b">${escapeHtml(i.judul)}</td>
+                                <td class="text-xs text-gray-500 border-b">${escapeHtml(i.dusun)}</td>
+                                <td class="text-xs text-gray-500 border-b">${Array.isArray(i.rt) ? i.rt.join(', ') : i.rt}</td>
+                                <td class="text-xs text-gray-600 border-b">${i.volume || 0} ${escapeHtml(i.satuan || '')}</td>
+                                <td class="text-right text-xs font-semibold text-gray-700 whitespace-nowrap border-b">${formatRupiah(i.estimasiBiaya)}</td>
+                                <td class="text-center border-b"><span class="font-display font-extrabold text-forest-600">#${i.rankingDesa || '-'}</span></td>
                             </tr>`
                         ).join('')
-                        : emptyRow(7, 'Belum ada usulan yang dikordinatori kepada Anda')
+                        : (typeof emptyRow === 'function' ? emptyRow(7, 'Belum ada usulan yang dikordinatori kepada Anda') : '<tr><td colspan="7" class="text-center py-8 text-gray-400">Belum ada usulan yang dikordinatori kepada Anda</td></tr>')
                     }
                 </tbody>
             </table>
@@ -1484,41 +1484,41 @@ async function doExportKoordinasi() {
                     <i class="fas fa-file-excel"></i> Unduh Excel
                 </button>
             </div>
-            <div class="tbl-wrap">
-                <table class="tbl">
-                    <thead>
+            <div class="tbl-wrap max-h-[75vh] overflow-auto border border-gray-200 rounded-lg">
+                <table class="tbl w-full">
+                    <thead class="text-xs text-gray-600 uppercase">
                         <tr>
-                            <th class="w-10 text-center">No</th>
-                            <th class="w-40">Status</th>
-                            <th>Judul Usulan</th>
-                            <th class="w-28">Sumber</th>
-                            ${colDusun ? '<th class="w-28">Dusun</th>' : ''}
-                            <th class="w-28">Kategori</th>
-                            <th class="w-28">RT</th>
-                            <th class="w-28">Volume</th>
-                            <th class="w-32 text-right">Estimasi</th>
-                            ${colRankDusun ? '<th class="w-14 text-center">Rank Dusun</th>' : ''}
-                            ${colRankDesa ? '<th class="w-14 text-center">Rank Desa</th>' : ''}
-                            ${colAksi ? '<th class="w-36">Rencana Aksi</th>' : ''}
-                            <th class="w-20 text-center">Detail</th>
+                            <th class="sticky top-0 z-10 bg-gray-50 w-10 text-center border-b">No</th>
+                            <th class="sticky top-0 z-10 bg-gray-50 w-40 text-center border-b">Status</th>
+                            <th class="sticky top-0 z-10 bg-gray-50 text-left border-b">Judul Usulan</th>
+                            <th class="sticky top-0 z-10 bg-gray-50 w-28 border-b">Sumber</th>
+                            ${colDusun ? '<th class="sticky top-0 z-10 bg-gray-50 w-28 border-b">Dusun</th>' : ''}
+                            <th class="sticky top-0 z-10 bg-gray-50 w-28 border-b">Kategori</th>
+                            <th class="sticky top-0 z-10 bg-gray-50 w-28 border-b">RT</th>
+                            <th class="sticky top-0 z-10 bg-gray-50 w-28 border-b">Volume</th>
+                            <th class="sticky top-0 z-10 bg-gray-50 w-32 text-right border-b">Estimasi</th>
+                            ${colRankDusun ? '<th class="sticky top-0 z-10 bg-gray-50 w-14 text-center border-b">Rank Dusun</th>' : ''}
+                            ${colRankDesa ? '<th class="sticky top-0 z-10 bg-gray-50 w-14 text-center border-b">Rank Desa</th>' : ''}
+                            ${colAksi ? '<th class="sticky top-0 z-10 bg-gray-50 w-36 border-b">Rencana Aksi</th>' : ''}
+                            <th class="sticky top-0 z-10 bg-gray-50 w-20 text-center border-b">Detail</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="text-sm">
                         ${sorted.length ? sorted.map((i, n) => `
-                        <tr class="main-row cursor-pointer" onclick="showDetail('${escapeJs(i.id)}')">
-                            <td class="text-center text-gray-400 text-xs">${n + 1}</td>
-                            <td class="text-center">${statusLabel(i.status)}</td>
-                            <td class="font-semibold text-gray-800">${escapeHtml(i.judul)}</td>
-                            <td class="text-xs text-gray-500 whitespace-nowrap">${escapeHtml(i.username)}</td>
-                            ${colDusun ? `<td class="text-xs text-gray-500">${escapeHtml(i.dusun)}</td>` : ''}
-                            <td><span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded font-medium">${escapeHtml(i.kategori)}</span></td>
-                            <td class="text-xs text-gray-500">${Array.isArray(i.rt) ? i.rt.join(', ') : i.rt}</td>
-                            <td class="text-xs text-gray-600">${i.volume} ${escapeHtml(i.satuan)}</td>
-                            <td class="text-right text-xs font-semibold text-gray-700 whitespace-nowrap">${formatRupiah(i.estimasiBiaya)}</td>
-                            ${colRankDusun ? `<td class="text-center">${i.rankingDusun ? `<span class="font-display font-800 text-blue-600 text-sm">#${i.rankingDusun}</span>` : '<span class="text-gray-300">-</span>'}</td>` : ''}
-                            ${colRankDesa ? `<td class="text-center">${i.rankingDesa ? `<span class="font-display font-800 text-forest-600 text-sm">#${i.rankingDesa}</span>` : '<span class="text-gray-300">-</span>'}</td>` : ''}
-                            ${colAksi ? `<td class="text-xs">${i.rencanaAksi ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${i.rencanaAksi === 'Kewenangan Desa' ? 'bg-forest-100 text-forest-700' : 'bg-amber-100 text-amber-700'}">${escapeHtml(i.rencanaAksi)}</span>${i.rujukanUsulan ? `<br><span class="text-gray-400">→ ${escapeHtml(i.rujukanUsulan)}</span>` : ''}` : '<span class="text-gray-300">-</span>'}</td>` : ''}
-                            <td class="text-center"><span class="px-2.5 py-1 bg-honey-100 text-honey-700 text-xs font-semibold rounded hover:bg-honey-200 transition-colors inline-block"><i class="fas fa-eye mr-1"></i>Lihat</span></td>
+                        <tr class="main-row cursor-pointer hover:bg-gray-50" onclick="showDetail('${escapeJs(i.id)}')">
+                            <td class="text-center text-gray-400 text-xs border-b">${n + 1}</td>
+                            <td class="text-center border-b">${statusLabel(i.status)}</td>
+                            <td class="font-semibold text-gray-800 border-b">${escapeHtml(i.judul)}</td>
+                            <td class="text-xs text-gray-500 whitespace-nowrap border-b">${escapeHtml(i.username)}</td>
+                            ${colDusun ? `<td class="text-xs text-gray-500 border-b">${escapeHtml(i.dusun)}</td>` : ''}
+                            <td class="border-b"><span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded font-medium">${escapeHtml(i.kategori)}</span></td>
+                            <td class="text-xs text-gray-500 border-b">${Array.isArray(i.rt) ? i.rt.join(', ') : i.rt}</td>
+                            <td class="text-xs text-gray-600 border-b">${i.volume} ${escapeHtml(i.satuan)}</td>
+                            <td class="text-right text-xs font-semibold text-gray-700 whitespace-nowrap border-b">${formatRupiah(i.estimasiBiaya)}</td>
+                            ${colRankDusun ? `<td class="text-center border-b">${i.rankingDusun ? `<span class="font-display font-800 text-blue-600 text-sm">#${i.rankingDusun}</span>` : '<span class="text-gray-300">-</span>'}</td>` : ''}
+                            ${colRankDesa ? `<td class="text-center border-b">${i.rankingDesa ? `<span class="font-display font-800 text-forest-600 text-sm">#${i.rankingDesa}</span>` : '<span class="text-gray-300">-</span>'}</td>` : ''}
+                            ${colAksi ? `<td class="text-xs border-b">${i.rencanaAksi ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${i.rencanaAksi === 'Kewenangan Desa' ? 'bg-forest-100 text-forest-700' : 'bg-amber-100 text-amber-700'}">${escapeHtml(i.rencanaAksi)}</span>${i.rujukanUsulan ? `<br><span class="text-gray-400">→ ${escapeHtml(i.rujukanUsulan)}</span>` : ''}` : '<span class="text-gray-300">-</span>'}</td>` : ''}
+                            <td class="text-center border-b"><span class="px-2.5 py-1 bg-honey-100 text-honey-700 text-xs font-semibold rounded hover:bg-honey-200 transition-colors inline-block"><i class="fas fa-eye mr-1"></i>Lihat</span></td>
                         </tr>`).join('') : (typeof emptyRow === 'function' ? emptyRow(totalCol, 'Belum ada data monitoring') : '<tr><td colspan="' + totalCol + '" class="text-center py-8 text-gray-400">Belum ada data monitoring</td></tr>')}
                     </tbody>
                 </table>
