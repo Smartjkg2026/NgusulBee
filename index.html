@@ -164,105 +164,6 @@
         
         /* Chart Container */
         .chart-container { position: relative; height: 300px; width: 100%; }
-        
-        /* ==========================================
-        CUSTOM MODAL KONFIRMASI HAPUS
-        ========================================== */
-        .confirm-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.2s ease;
-        }
-        .confirm-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        .confirm-card {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 32px;
-            max-width: 420px;
-            width: 90%;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            transform: scale(0.9) translateY(20px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            text-align: center;
-            font-family: inherit;
-        }
-        .confirm-overlay.active .confirm-card {
-            transform: scale(1) translateY(0);
-        }
-        .confirm-icon {
-            width: 64px;
-            height: 64px;
-            background: #FEE2E2;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-        }
-        .confirm-icon svg {
-            width: 32px;
-            height: 32px;
-            color: #DC2626;
-        }
-        .confirm-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #111827;
-            margin-bottom: 8px;
-        }
-        .confirm-message {
-            font-size: 14px;
-            color: #6B7280;
-            margin-bottom: 24px;
-            line-height: 1.5;
-        }
-        .confirm-message strong {
-            color: #374151;
-            font-weight: 600;
-        }
-        .confirm-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-        .confirm-btn {
-            flex: 1;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s ease;
-        }
-        .confirm-btn-cancel {
-            background: #F3F4F6;
-            color: #374151;
-        }
-        .confirm-btn-cancel:hover {
-            background: #E5E7EB;
-        }
-        .confirm-btn-delete {
-            background: #DC2626;
-            color: #FFFFFF;
-            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4);
-        }
-        .confirm-btn-delete:hover {
-            background: #B91C1C;
-            box-shadow: 0 6px 16px rgba(220, 38, 38, 0.5);
-            transform: translateY(-1px);
-        }
     </style>
 </head>
 <body>
@@ -1449,8 +1350,6 @@
         }
     }
 
-    
-
     /* ==========================================
        8. RENDERING UTAMA
        ========================================== */
@@ -2107,34 +2006,9 @@ async function doExportKoordinasi() {
         </div>`;
     }
 
-        function rDraftTable(u, list) {
+    function rDraftTable(u, list) {
         const locked = STATE.isLocked;
-        
-        // ✅ PERUBAHAN: Tombol kiri (hanya icon) dan kanan (bulk action) dijadikan satu baris
-        const btns = locked ? '' : `
-        <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-            <!-- KIRI: Tombol Submit & Hapus Terpilih -->
-            <div class="flex items-center gap-2">
-                <button onclick="bulkSubmitUser()" class="h-10 px-4 flex items-center gap-1.5 btn-success text-xs font-semibold rounded-lg shadow-sm">
-                    <i class="fas fa-paper-plane"></i>Submit Terpilih
-                </button>
-                <button onclick="bulkDeleteUsulan()" class="h-10 px-4 flex items-center gap-1.5 btn-danger text-xs font-semibold rounded-lg shadow-sm">
-                    <i class="fas fa-trash"></i>Hapus Terpilih
-                </button>
-                <span id="bulkCount" class="bulk-count hidden text-xs text-honey-700 font-semibold ml-1"><span id="bulkNum">0</span> terpilih</span>
-            </div>
-            <!-- KANAN: Tombol Hanya Icon + Tooltip -->
-            <div class="flex items-center gap-2">
-                <button onclick="openFormUsulan()" class="group relative w-10 h-10 flex items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm hover:bg-blue-700 transition-colors">
-                    <i class="fas fa-plus text-sm"></i>
-                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Buat Usulan</span>
-                </button>
-                <button onclick="openModalAjukanKembali()" class="group relative w-10 h-10 flex items-center justify-center rounded-lg bg-amber-500 text-white shadow-sm hover:bg-amber-600 transition-colors">
-                    <i class="fas fa-recycle text-sm"></i>
-                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Ajukan Kembali</span>
-                </button>
-            </div>
-        </div>`;
+        const btns = locked ? '' : `<div class="flex flex-wrap items-center gap-2 mb-3"><button onclick="bulkSubmitUser()" class="px-3 py-1.5 btn-success text-xs rounded-md"><i class="fas fa-paper-plane mr-1"></i>Submit Terpilih</button><button onclick="bulkDeleteUsulan()" class="px-3 py-1.5 btn-danger text-xs rounded-md"><i class="fas fa-trash mr-1"></i>Hapus Terpilih</button><span id="bulkCount" class="bulk-count hidden text-xs text-honey-700 font-semibold ml-1"><span id="bulkNum">0</span> terpilih</span></div>`;
         
         return `<div class="space-y-4">
             ${statsBar(list)}
@@ -2143,8 +2017,12 @@ async function doExportKoordinasi() {
                     <h3 class="font-display font-700 text-xl">Usulan Saya</h3>
                     <p class="text-xs text-gray-400 mt-0.5">Draft dan usulan yang dikembalikan — bisa diedit, dihapus, atau disubmit</p>
                 </div>
-                <!-- ✅ PERUBAHAN: Header hanya menampilkan status Lock jika ditutup -->
-                ${locked ? '<span class="px-3 py-1.5 bg-red-100 text-red-700 text-xs font-bold rounded-lg"><i class="fas fa-lock mr-1"></i>Pengimputan Ditutup</span>' : ''}
+                ${locked ? '<span class="px-3 py-1.5 bg-red-100 text-red-700 text-xs font-bold rounded-lg"><i class="fas fa-lock mr-1"></i>Pengimputan Ditutup</span>' : `
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="openFormUsulan()" class="px-4 py-2 btn-primary text-sm rounded-lg shadow flex items-center"><i class="fas fa-plus mr-1"></i> Buat Usulan</button>
+                    <button onclick="openModalAjukanKembali()" class="px-4 py-2 bg-amber-500 text-white text-sm font-semibold rounded-lg shadow hover:bg-amber-600 transition-colors flex items-center"><i class="fas fa-recycle mr-1"></i> Ajukan Kembali</button>
+                </div>
+                `}
             </div>
             ${list.length && !locked ? btns : ''}
             <div class="tbl-wrap max-h-[75vh] overflow-auto border border-gray-200 rounded-lg">
@@ -2203,7 +2081,7 @@ async function doExportKoordinasi() {
                                     <div><b class="block mb-0.5">Catatan dari Kepala Dusun:</b>${escapeHtml(i.catatanKembali)}</div>
                                 </div>
                             </td>
-                        </tr>` : ''}`).join('') : (typeof emptyRow === 'function' ? emptyRow(9, 'Belum ada draf usulan. Klik tombol + untuk memulai.') : '<tr><td colspan="9" class="text-center py-8 text-gray-400">Belum ada draf usulan. Klik tombol + untuk memulai.</td></tr>')}
+                        </tr>` : ''}`).join('') : (typeof emptyRow === 'function' ? emptyRow(9, 'Belum ada draf usulan. Klik "Buat Usulan" untuk memulai.') : '<tr><td colspan="9" class="text-center py-8 text-gray-400">Belum ada draf usulan. Klik "Buat Usulan" untuk memulai.</td></tr>')}
                     </tbody>
                 </table>
             </div>
@@ -3118,121 +2996,15 @@ async function doExportKoordinasi() {
     }
 
     function openFormUsulan(id) {
-        const u = STATE.currentUser; 
-        if (STATE.isLocked && u.role !== 'admdesa') { showToast('Pengimputan ditutup untuk tahun ini', 'error'); return; }
-        
-        // ✅ TAMBAHAN: Deteksi jika ini input musdes dari Admin Desa
-        const isMusdesDesa = (id === 'musdes_desa');
-        const isMusyawarah = (id === 'musyawarah') || isMusdesDesa; 
+        const u = STATE.currentUser; if (STATE.isLocked && u.role !== 'admdesa') { showToast('Pengimputan ditutup untuk tahun ini', 'error'); return; }
+        const isMusyawarah = (id === 'musyawarah');
         const existData = isMusyawarah ? null : (id ? cachedUsulan.find(x => x.id === id) : null);
         const initVal = existData?.estimasiBiaya ? formatRupiah(existData.estimasiBiaya) : '';
-        
         const rtOptions = Object.keys(CONFIG.RT_MAP).map(rt => `<label class="rt-option flex items-center gap-2 py-1.5 px-2 hover:bg-honey-50 rounded cursor-pointer text-sm" data-rt="${rt}" data-dusun="${CONFIG.RT_MAP[rt]}"><input type="checkbox" class="rt-checkbox accent-honey-500" value="${rt}" ${existData?.rt?.includes(rt) ? 'checked' : ''} onchange="updateRtLabel()"> RT ${rt} <span class="text-gray-400 text-xs ml-auto">(${CONFIG.RT_MAP[rt]})</span></label>`).join('');
         
-        // ✅ PERUBAHAN: Logika Dropdown Dusun
-        const uniqueDusuns = [...new Set(Object.values(CONFIG.RT_MAP))].sort();
-        const dusunDropdown = uniqueDusuns.map(d => `<option value="${d}">${d}</option>`).join('');
-        
-        const dusunFieldHtml = isMusdesDesa 
-            ? `<div><label class="block text-sm font-semibold mb-1">Dusun <span class="text-red-500">*</span></label><select id="fDusun" required class="w-full px-4 py-2.5 border rounded-xl text-sm bg-white focus:ring-2 focus:ring-indigo-200"><option value="">-- Pilih Dusun --</option>${dusunDropdown}</select></div>`
-            : `<div><label class="block text-sm font-semibold mb-1">Dusun</label><input type="text" id="fDusun" value="${escapeHtml(existData?.dusun || u.dusun || '')}" readonly class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-100 text-gray-600"></div>`;
-
-        // ✅ TAMBAHAN: Logika SDGs
-        let currentSdgIds = [];
-        if (existData?.sdgId) {
-            if (Array.isArray(existData.sdgId)) {
-                currentSdgIds = existData.sdgId.map(String);
-            } else if (typeof existData.sdgId === 'string' && existData.sdgId.trim() !== '') {
-                currentSdgIds = existData.sdgId.split(',').map(s => s.trim()).filter(Boolean);
-            }
-        }
-        
-        const sdgOptionsHtml = CONFIG.SDGS ? CONFIG.SDGS.map(s => {
-            const isChecked = currentSdgIds.includes(String(s.id)) ? 'checked' : '';
-            return `<label class="flex items-center gap-2 px-2 py-1.5 hover:bg-blue-50 rounded cursor-pointer text-sm transition-colors" data-sdg-text="${s.kode} ${s.nama}"><input type="checkbox" value="${s.id}" class="sdg-musdes-cb accent-blue-600 rounded" ${isChecked} onchange="updateSdgMusdesLabel()"><span class="font-semibold text-gray-500 w-8 text-xs">${s.kode}</span><span class="text-gray-700 text-xs">${s.nama}</span></label>`;
-        }).join('') : '';
-
-        const sdgLabel = currentSdgIds.length > 0 
-            ? currentSdgIds.map(sid => { const s = CONFIG.SDGS?.find(x => String(x.id) === sid); return s ? s.kode : ''; }).filter(Boolean).join(', ')
-            : '';
-            
-        const sdgFieldHtml = `
-        <input type="hidden" id="fSdgId" value="${currentSdgIds.join(',')}">
-        <div>
-            <label class="block text-sm font-semibold mb-1">Mendukung SDGs (Opsional)</label>
-            <div class="relative">
-                <button type="button" onclick="toggleSdgMusdesDropdown()" class="w-full px-4 py-2.5 border rounded-xl text-sm text-left bg-white flex justify-between items-center min-h-[42px]">
-                    <span id="sdgMusdesLabel" class="${sdgLabel ? 'text-gray-800' : 'text-gray-400'} text-sm">${sdgLabel || 'Pilih SDGs...'}</span>
-                    <i class="fas fa-chevron-down text-xs text-gray-400 ml-2"></i>
-                </button>
-                <div id="sdgMusdesDropdown" class="hidden absolute z-20 w-full mt-1 bg-white border rounded-xl shadow-lg max-h-48 overflow-y-auto">
-                    <div class="p-2 border-b sticky top-0 bg-white z-10">
-                        <input type="text" placeholder="Cari SDGs..." class="w-full px-3 py-1.5 border rounded-lg text-sm" oninput="filterSdgMusdesOptions(this.value)">
-                    </div>
-                    <div class="p-2 space-y-0.5" id="sdgMusdesOptions">
-                        ${sdgOptionsHtml}
-                    </div>
-                </div>
-            </div>
-        </div>`;
-
-        openModal(`<div class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this)closeModal()"><div class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl view-enter p-6"><div class="flex justify-between items-center mb-5"><h3 class="font-display font-700 text-xl">${existData ? 'Edit' : 'Buat'} Usulan ${isMusyawarah ? '(Hasil Musyawarah)' : ''}</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-1" aria-label="Tutup"><i class="fas fa-times text-lg"></i></button></div><form id="formUsulan" class="space-y-4"><div><label class="block text-sm font-semibold mb-1">Judul Usulan <span class="text-red-500">*</span></label><input type="text" id="fJudul" value="${escapeHtml(existData?.judul || '')}" required class="w-full px-4 py-2.5 border rounded-xl text-sm"></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="block text-sm font-semibold mb-1">Kategori <span class="text-red-500">*</span></label><select id="fKategori" required class="w-full px-4 py-2.5 border rounded-xl text-sm bg-white">${CONFIG.KATEGORI.map(k => `<option ${existData?.kategori === k ? 'selected' : ''}>${k}</option>`).join('')}</select></div><div><label class="block text-sm font-semibold mb-1">RT <span class="text-red-500">*</span></label><div class="relative" id="rtSelectWrapper"><button type="button" onclick="toggleRtDropdown()" class="w-full px-4 py-2.5 border rounded-xl text-sm text-left bg-white flex justify-between items-center"><span id="rtLabel" class="${existData?.rt?.length ? '' : 'text-gray-400'}">${existData?.rt?.length ? existData.rt.join(', ') : 'Pilih RT...'}</span><i class="fas fa-chevron-down text-xs text-gray-400"></i></button><div id="rtDropdown" class="hidden absolute z-20 w-full mt-1 bg-white border rounded-xl shadow-lg max-h-56 overflow-hidden flex flex-col"><div class="p-2 border-b sticky top-0 bg-white z-10"><input type="text" id="rtSearch" placeholder="Cari RT atau dusun..." class="w-full px-3 py-1.5 border rounded-lg text-sm" oninput="filterRtOptions(this.value)"></div><div class="overflow-y-auto p-2 space-y-0.5">${rtOptions}</div></div></div></div></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4">${dusunFieldHtml}<div><label class="block text-sm font-semibold mb-1">Desa</label><input type="text" value="${CONFIG.DESA}" readonly class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-100 text-gray-600"></div></div><div><label class="block text-sm font-semibold mb-1">Deskripsi <span class="text-red-500">*</span></label><textarea id="fDeskripsi" rows="3" required class="w-full px-4 py-2.5 border rounded-xl text-sm">${escapeHtml(existData?.deskripsi || '')}</textarea></div><div class="grid grid-cols-1 sm:grid-cols-3 gap-4"><div><label class="block text-sm font-semibold mb-1">Volume <span class="text-red-500">*</span></label><input type="number" id="fVolume" value="${existData?.volume || ''}" required min="1" class="w-full px-4 py-2.5 border rounded-xl text-sm"></div><div><label class="block text-sm font-semibold mb-1">Satuan <span class="text-red-500">*</span></label><select id="fSatuan" required class="w-full px-4 py-2.5 border rounded-xl text-sm bg-white">${CONFIG.SATUAN.map(s => `<option ${existData?.satuan === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div><div><label class="block text-sm font-semibold mb-1">Estimasi Biaya (Rp) <span class="text-red-500">*</span></label><input type="text" id="fBiaya" value="${initVal}" required class="w-full px-4 py-2.5 border rounded-xl text-sm" placeholder="0"></div></div>
-        
-        ${sdgFieldHtml}
-        
-        <div><label class="block text-sm font-semibold mb-1">Link Proposal (Opsional)</label><input type="url" id="fLink" value="${escapeHtml(existData?.linkProposal || '')}" class="w-full px-4 py-2.5 border rounded-xl text-sm"></div><input type="hidden" id="fId" value="${existData?.id || ''}"><input type="hidden" id="fIsMusdesDesa" value="${isMusdesDesa}"><div id="errUsulan" class="hidden text-sm text-red-600 bg-red-50 p-2.5 rounded-lg"></div><div class="flex justify-end gap-3 pt-2"><button type="button" onclick="closeModal()" class="px-5 py-2.5 border rounded-xl text-sm font-semibold hover:bg-gray-50">Batal</button><button type="submit" class="px-5 py-2.5 btn-primary rounded-xl shadow">Simpan</button></div></form></div></div>`);
-        
+        openModal(`<div class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this)closeModal()"><div class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl view-enter p-6"><div class="flex justify-between items-center mb-5"><h3 class="font-display font-700 text-xl">${existData ? 'Edit' : 'Buat'} Usulan ${isMusyawarah ? '(Hasil Musyawarah)' : ''}</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-1" aria-label="Tutup"><i class="fas fa-times text-lg"></i></button></div><form id="formUsulan" class="space-y-4"><div><label class="block text-sm font-semibold mb-1">Judul Usulan <span class="text-red-500">*</span></label><input type="text" id="fJudul" value="${escapeHtml(existData?.judul || '')}" required class="w-full px-4 py-2.5 border rounded-xl text-sm"></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="block text-sm font-semibold mb-1">Kategori <span class="text-red-500">*</span></label><select id="fKategori" required class="w-full px-4 py-2.5 border rounded-xl text-sm bg-white">${CONFIG.KATEGORI.map(k => `<option ${existData?.kategori === k ? 'selected' : ''}>${k}</option>`).join('')}</select></div><div><label class="block text-sm font-semibold mb-1">RT <span class="text-red-500">*</span></label><div class="relative" id="rtSelectWrapper"><button type="button" onclick="toggleRtDropdown()" class="w-full px-4 py-2.5 border rounded-xl text-sm text-left bg-white flex justify-between items-center"><span id="rtLabel" class="${existData?.rt?.length ? '' : 'text-gray-400'}">${existData?.rt?.length ? existData.rt.join(', ') : 'Pilih RT...'}</span><i class="fas fa-chevron-down text-xs text-gray-400"></i></button><div id="rtDropdown" class="hidden absolute z-20 w-full mt-1 bg-white border rounded-xl shadow-lg max-h-56 overflow-hidden flex flex-col"><div class="p-2 border-b sticky top-0 bg-white z-10"><input type="text" id="rtSearch" placeholder="Cari RT atau dusun..." class="w-full px-3 py-1.5 border rounded-lg text-sm" oninput="filterRtOptions(this.value)"></div><div class="overflow-y-auto p-2 space-y-0.5">${rtOptions}</div></div></div></div></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="block text-sm font-semibold mb-1">Dusun</label><input type="text" id="fDusun" value="${escapeHtml(existData?.dusun || u.dusun || '')}" readonly class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-100 text-gray-600"></div><div><label class="block text-sm font-semibold mb-1">Desa</label><input type="text" value="${CONFIG.DESA}" readonly class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-100 text-gray-600"></div></div><div><label class="block text-sm font-semibold mb-1">Deskripsi <span class="text-red-500">*</span></label><textarea id="fDeskripsi" rows="3" required class="w-full px-4 py-2.5 border rounded-xl text-sm">${escapeHtml(existData?.deskripsi || '')}</textarea></div><div class="grid grid-cols-1 sm:grid-cols-3 gap-4"><div><label class="block text-sm font-semibold mb-1">Volume <span class="text-red-500">*</span></label><input type="number" id="fVolume" value="${existData?.volume || ''}" required min="1" class="w-full px-4 py-2.5 border rounded-xl text-sm"></div><div><label class="block text-sm font-semibold mb-1">Satuan <span class="text-red-500">*</span></label><select id="fSatuan" required class="w-full px-4 py-2.5 border rounded-xl text-sm bg-white">${CONFIG.SATUAN.map(s => `<option ${existData?.satuan === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div><div><label class="block text-sm font-semibold mb-1">Estimasi Biaya (Rp) <span class="text-red-500">*</span></label><input type="text" id="fBiaya" value="${initVal}" required class="w-full px-4 py-2.5 border rounded-xl text-sm" placeholder="0"></div></div><div><label class="block text-sm font-semibold mb-1">Link Proposal (Opsional)</label><input type="url" id="fLink" value="${escapeHtml(existData?.linkProposal || '')}" class="w-full px-4 py-2.5 border rounded-xl text-sm"></div><input type="hidden" id="fId" value="${existData?.id || ''}"><div id="errUsulan" class="hidden text-sm text-red-600 bg-red-50 p-2.5 rounded-lg"></div><div class="flex justify-end gap-3 pt-2"><button type="button" onclick="closeModal()" class="px-5 py-2.5 border rounded-xl text-sm font-semibold hover:bg-gray-50">Batal</button><button type="submit" class="px-5 py-2.5 btn-primary rounded-xl shadow">Simpan</button></div></form></div></div>`);
         setupRupiahInput('fBiaya');
     }
-
-    // ==========================================
-    // HELPER SDGs MODAL MUSDES
-    // ==========================================
-    function toggleSdgMusdesDropdown() {
-        const dd = document.getElementById('sdgMusdesDropdown');
-        if(dd) dd.classList.toggle('hidden');
-    }
-
-    function updateSdgMusdesLabel() {
-        const checkboxes = document.querySelectorAll('.sdg-musdes-cb:checked');
-        const label = document.getElementById('sdgMusdesLabel');
-        const hiddenInput = document.getElementById('fSdgId');
-        
-        const selectedIds = Array.from(checkboxes).map(cb => cb.value);
-        hiddenInput.value = selectedIds.join(',');
-        
-        if (selectedIds.length === 0) {
-            label.innerText = 'Pilih SDGs...';
-            label.classList.add('text-gray-400');
-            label.classList.remove('text-gray-800');
-        } else {
-            const labels = selectedIds.map(id => {
-                const s = CONFIG.SDGS?.find(x => String(x.id) === id);
-                return s ? s.kode : '';
-            }).filter(Boolean);
-            label.innerText = labels.join(', ');
-            label.classList.remove('text-gray-400');
-            label.classList.add('text-gray-800');
-        }
-    }
-
-    function filterSdgMusdesOptions(q) {
-        q = q.toLowerCase();
-        const options = document.querySelectorAll('#sdgMusdesOptions > label');
-        options.forEach(opt => {
-            const text = opt.getAttribute('data-sdg-text')?.toLowerCase() || opt.textContent.toLowerCase();
-            opt.style.display = text.includes(q) ? '' : 'none';
-        });
-    }
-
-    // Tutup dropdown SDGs jika klik di luar
-    document.addEventListener('click', function(e) {
-        const wrapper = e.target.closest('#sdgMusdesDropdown') || e.target.closest('[onclick*="toggleSdgMusdesDropdown"]');
-        const dd = document.getElementById('sdgMusdesDropdown');
-        if (!wrapper && dd && !dd.classList.contains('hidden')) {
-            dd.classList.add('hidden');
-        }
-    });
 
     function toggleRtDropdown() { const d = document.getElementById('rtDropdown'); if (d) { d.classList.toggle('hidden'); if (!d.classList.contains('hidden')) { const s = document.getElementById('rtSearch'); if (s) { s.value = ''; filterRtOptions(''); s.focus(); } } } }
     function updateRtLabel() { const ch = document.querySelectorAll('.rt-checkbox:checked'); const rts = Array.from(ch).map(c => c.value); const l = document.getElementById('rtLabel'); if (l) { l.textContent = rts.length ? rts.join(', ') : 'Pilih RT...'; l.classList.toggle('text-gray-400', !rts.length); } const d = document.getElementById('fDusun'); if (d) { const ds = [...new Set(rts.map(r => CONFIG.RT_MAP[r]))].filter(Boolean); d.value = ds.length ? ds.join(', ') : (d.value || STATE.currentUser?.dusun || ''); } }
@@ -3400,19 +3172,15 @@ async function doExportKoordinasi() {
         errEl.classList.add('hidden');
         const u = STATE.currentUser;
         const rts = Array.from(form.querySelectorAll('.rt-checkbox:checked')).map(c => c.value);
-        
         if (!rts.length) { 
             errEl.textContent = 'Pilih minimal 1 RT.'; 
             errEl.classList.remove('hidden'); 
             return; 
         }
-        
-        const isMusdesDesa = document.getElementById('fIsMusdesDesa')?.value === 'true';
         const editId = document.getElementById('fId').value;
         const isEdit = !!editId;
         const rawBiaya = document.getElementById('fBiaya').value;
         const biayaNum = unformatRupiah(rawBiaya);
-        
         const data = {
             id: editId || null, 
             username: u.username, 
@@ -3426,44 +3194,22 @@ async function doExportKoordinasi() {
             volume: parseInt(form.querySelector('#fVolume').value),
             satuan: form.querySelector('#fSatuan').value,
             estimasiBiaya: biayaNum,
-            sdgId: form.querySelector('#fSdgId').value.split(',').filter(Boolean),
             linkProposal: form.querySelector('#fLink').value.trim()
         };
-        
-        // ✅ 2. ATUR LOGIKA STATUS & DATA AWAL
-        if (isMusdesDesa && !isEdit) {
-            // Musdes Desa - biarkan backend atur status
-        } else if (isEdit) {
+        if (isEdit) {
             const ex = cachedUsulan.find(x => x.id === editId);
             data.status = ex ? ex.status : 'draft';
-            
-            // ✅ TAMBAHAN: Kirim info siapa yang edit (untuk cek backend)
-            data.editedBy = u.username;
-            data.editedByRole = u.role;
         } else {
-            // ✅ PERBAIKAN: Tambahkan admdesa
-            if (u.role === 'admdusun') {
-                data.status = 'diajukan';
-            } else if (u.role === 'admdesa') {
-                data.status = 'draft'; // atau 'diajukan' jika langsung
-            } else {
-                data.status = 'draft';
-            }
-            
+            data.status = (u.role === 'admdusun') ? 'diajukan' : 'draft';
             data.rankingDusun = ''; 
             data.rankingDesa = ''; 
             data.rencanaAksi = ''; 
             data.rujukanUsulan = ''; 
             data.catatanKembali = '';
         }
-        
-        // ✅ 3. DYNAMIS ENDPOINT API
-        const apiAction = (isMusdesDesa && !isEdit) ? 'saveUsulanMusdes' : 'saveUsulan';
-        
         setTableLoading(true);
         try {
-            const res = await API.post(apiAction, data);
-            
+            const res = await API.post('saveUsulan', data);
             if (res.success) {
                 const newData = { ...data, ...(res.data || {}) };
                 if (isEdit) {
@@ -3479,20 +3225,15 @@ async function doExportKoordinasi() {
                     c.innerHTML = renderTab();
                     if (STATE.dashboardTab === 'beranda') initCharts();
                 }
-                
-                // ✅ SESUAIKAN PESAN TOAST
-                if (isMusdesDesa && !isEdit) {
-                    showToast('Usulan hasil Musdes berhasil disimpan langsung sebagai Ranked Dusun.', 'success');
-                } else if (isEdit) {
-                    showToast('Usulan berhasil diperbarui', 'success');
-                } else if (u.role === 'admdusun') {
-                    showToast('Usulan berhasil disimpan & otomatis diajukan ke Desa.', 'success');
-                } else if (u.role === 'admdesa') {
-                    showToast('Usulan berhasil disimpan oleh Admin Desa.', 'success');
+                if (u.role === 'admdusun' && !isEdit) {
+                    showToast('Usulan musyawarah berhasil disimpan & otomatis diajukan ke Desa. Cek di menu Monitoring.', 'success');
+                } else if (data.status === 'diajukan') {
+                    showToast('Usulan berhasil disimpan & langsung diajukan. Cek di menu Monitoring.', 'success');
                 } else {
-                    showToast('Usulan berhasil disimpan sebagai draft', 'success');
+                    showToast(isEdit ? 'Usulan berhasil diperbarui' : 'Usulan berhasil disimpan sebagai draft', 'success');
                 }
-            } else {
+            }
+            else {
                 errEl.textContent = res.message || 'Gagal menyimpan'; 
                 errEl.classList.remove('hidden'); 
             }
@@ -3789,33 +3530,19 @@ async function doExportKoordinasi() {
         const sorted = [...list].sort((a, b) => { 
             const ra = parseInt(a.rankingDesa) || 999, rb = parseInt(b.rankingDesa) || 999; 
             if (ra !== rb) return ra - rb; 
+            // Jika rank desa kosong/sama, urutkan berdasarkan rank dusun
             const rda = parseInt(a.rankingDusun) || 999, rdb = parseInt(b.rankingDusun) || 999; 
             if (rda !== rdb) return rda - rdb;
+            // Jika masih sama, urutkan berdasarkan judul
             return (a.judul || '').localeCompare(b.judul || ''); 
         });
         
-        const btns = `<div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-            <!-- KANAN: Tombol Finalisasi Terpilih -->
-            <div class="flex items-center gap-2">
-                <button onclick="bulkProsesDesa()" class="h-10 px-4 flex items-center gap-1.5 btn-success text-xs font-semibold rounded-lg shadow-sm">
-                    <i class="fas fa-check-double"></i>Finalisasi Terpilih
-                </button>
-                <span id="bulkCountDesa" class="bulk-count hidden text-xs text-honey-700 font-semibold ml-1"><span id="bulkNumDesa">0</span> terpilih</span>
-            </div>
-           
-            <!-- KIRI: Tombol Hanya Icon + Tooltip -->
-            <div class="flex items-center gap-2">
-                <button onclick="openFormUsulan('musdes_desa')" class="group relative w-10 h-10 flex items-center justify-center rounded-lg bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 transition-colors">
-                    <i class="fas fa-file-circle-plus text-sm"></i>
-                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Input Usulan Musdes</span>
-                </button>
-                <button onclick="openAjukanKembaliDesaModal()" class="group relative w-10 h-10 flex items-center justify-center rounded-lg bg-amber-500 text-white shadow-sm hover:bg-amber-600 transition-colors">
-                    <i class="fas fa-rotate-left text-sm"></i>
-                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Ajukan Kembali (Tahun Lalu)</span>
-                </button>
-            </div>
+        const btns = `<div class="flex flex-wrap items-center gap-2 mb-3">
+            <button onclick="bulkProsesDesa()" class="px-3 py-1.5 btn-success text-xs rounded-md"><i class="fas fa-check-double mr-1"></i>Finalisasi Terpilih</button>
+            <span id="bulkCountDesa" class="bulk-count hidden text-xs text-honey-700 font-semibold ml-1"><span id="bulkNumDesa">0</span> terpilih</span>
         </div>`;
         
+        // Generate rows dibungkus <tbody> tersendiri
         const tableRows = sorted.length ? sorted.map((i, n) => {
             const kasiList = cachedUsers.filter(ku => ku.role === 'kasikaur');
             let kordHtml = '<option value="">Pilih Kordinator...</option>';
@@ -3829,58 +3556,18 @@ async function doExportKoordinasi() {
                 });
             }
 
-            // ✅ CEK: Apakah ini usulan Musdes Desa yang masih bisa diedit/dihapus?
-            const canEditMusdes = i.isMusdes && (i.status === 'ranked_dusun' || i.status === 'dikembalikan_dusun');
-
-            // ✅ ACTION BUTTONS
-            let actionBtns = `<div class="flex items-center gap-1.5 mt-1">
-                <button onclick="updateMetaDesa('${escapeJs(i.id)}')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors">
-                    <i class="fas fa-save text-xs"></i>
-                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Update Data</span>
-                </button>
-                <button onclick="prosesDesa('${escapeJs(i.id)}','final')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-green-100 text-green-600 hover:bg-green-200 transition-colors">
-                    <i class="fas fa-check-double text-xs"></i>
-                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Verifikasi Final</span>
-                </button>
-                
-                <!-- ✅ DISEMBUNYIKAN JIKA INI USULAN BUATAN ADM DESA (isMusdes) -->
-                ${!i.isMusdes ? `
-                <button onclick="openModalKembalikan('${escapeJs(i.id)}','dikembalikan_dusun')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-amber-100 text-amber-600 hover:bg-amber-200 transition-colors">
-                    <i class="fas fa-undo text-xs"></i>
-                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Kembalikan ke Dusun</span>
-                </button>
-                ` : ''}
-                
-                ${canEditMusdes ? `
-                <!-- Pemisah visual -->
-                <div class="w-px h-5 bg-gray-300 mx-1"></div>
-                <!-- Edit Musdes -->
-                <button onclick="openFormUsulan('${escapeJs(i.id)}')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 hover:bg-indigo-200 transition-colors">
-                    <i class="fas fa-pen text-xs"></i>
-                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Edit Musdes</span>
-                </button>
-                <!-- Hapus Musdes -->
-                <button onclick="deleteUsulanMusdes('${escapeJs(i.id)}', '${escapeJs(i.judul)}')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors">
-                    <i class="fas fa-trash-alt text-xs"></i>
-                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Hapus</span>
-                </button>
-                ` : ''}
-            </div>`;
-
             return `<tbody id="row-desa-${i.id}" class="text-sm">
                         <tr class="main-row cursor-pointer hover:bg-gray-50" onclick="showDetail('${escapeJs(i.id)}')">
                             <td class="text-center border-b" onclick="event.stopPropagation()"><input type="checkbox" class="bulk-check-desa accent-honey-500" data-id="${i.id}" onchange="updateBulkCountDesa()"></td>
                             <td class="text-center text-gray-400 text-xs border-b row-desa-num">${n + 1}</td>
                             <td class="text-center border-b">${statusLabel(i.status)}</td>
                             <td class="font-semibold text-gray-800 border-b">${escapeHtml(i.judul)}</td>
-                            <td class="text-xs text-gray-500 whitespace-nowrap border-b">
-                                ${i.isMusdes ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-full font-semibold text-[10px]"><i class="fas fa-file-circle-plus text-[8px]"></i>Musdes</span>' : escapeHtml(i.username)}
-                            </td>
+                            <td class="text-xs text-gray-500 whitespace-nowrap border-b">${escapeHtml(i.username)}</td>
                             <td class="text-xs text-gray-500 border-b">${escapeHtml(i.dusun)}</td>
                             <td class="text-xs text-gray-500 border-b">${i.rt.join(', ')}</td>
                             <td class="text-xs text-gray-600 border-b">${i.volume} ${escapeHtml(i.satuan)}</td>
                             <td class="text-right text-xs font-semibold text-gray-700 whitespace-nowrap border-b">${formatRupiah(i.estimasiBiaya)}</td>
-                            <td class="text-center border-b"><span class="font-display font-800 text-blue-600">#${i.rankingDusun || '-'}</span></td>
+                            <td class="text-center border-b"><span class="font-display font-800 text-blue-600">#${i.rankingDesa || '-'}</span></td>
                         </tr>
                         <tr class="sub-row">
                             <td colspan="10" class="bg-gray-50/50">
@@ -3898,7 +3585,20 @@ async function doExportKoordinasi() {
                                         <textarea id="rujuk-${i.id}" placeholder="Rujukan ke..." rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" class="w-56 px-2 py-1.5 border rounded-lg text-sm resize-none overflow-hidden ${i.rencanaAksi === 'Non Kewenangan Desa' ? '' : 'hidden'}">${escapeHtml(i.rujukanUsulan || '')}</textarea>
                                         <label class="text-xs font-semibold text-gray-600 mt-2">Kordinator:</label>
                                         <select id="kord-${i.id}" class="px-2 py-1.5 border rounded-lg text-sm bg-white mt-1">${kordHtml}</select>
-                                        ${actionBtns}
+                                        <div class="flex items-center gap-1.5 mt-1">
+                                            <button onclick="updateMetaDesa('${escapeJs(i.id)}')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors">
+                                                <i class="fas fa-save text-xs"></i>
+                                                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Update Data</span>
+                                            </button>
+                                            <button onclick="prosesDesa('${escapeJs(i.id)}','final')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-green-100 text-green-600 hover:bg-green-200 transition-colors">
+                                                <i class="fas fa-check-double text-xs"></i>
+                                                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Verifikasi Final</span>
+                                            </button>
+                                            <button onclick="openModalKembalikan('${escapeJs(i.id)}','dikembalikan_dusun')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-amber-100 text-amber-600 hover:bg-amber-200 transition-colors">
+                                                <i class="fas fa-undo text-xs"></i>
+                                                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Kembalikan ke Dusun</span>
+                                            </button>
+                                        </div>                                
                                     </div>
                                 </div>
                             </td>
@@ -3914,6 +3614,7 @@ async function doExportKoordinasi() {
             </div>
             ${list.length ? btns : ''}
             
+            <!-- SEARCH BAR DESA -->
             <div class="relative">
                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
                 <input type="text" id="searchDesaTable" placeholder="Cari judul usulan, sumber, dusun, RT..." 
@@ -3934,219 +3635,13 @@ async function doExportKoordinasi() {
                             <th class="sticky top-0 z-10 bg-gray-50 w-20 border-b">RT</th>
                             <th class="sticky top-0 z-10 bg-gray-50 w-28 border-b">Volume</th>
                             <th class="sticky top-0 z-10 bg-gray-50 w-32 text-right border-b">Estimasi</th>
-                            <th class="sticky top-0 z-10 bg-gray-50 w-14 text-center border-b">Rank Dusun</th>
+                            <th class="sticky top-0 z-10 bg-gray-50 w-14 text-center border-b">Rank</th>
                         </tr>
                     </thead>
                     ${tableRows || `<tbody class="text-sm"><tr><td colspan="10" class="text-center text-gray-400 py-6">${emptyRow(10, 'Semua usulan sudah diverifikasi')}</td></tr></tbody>`}
                 </table>
             </div>
         </div>`;
-    }
-
-    // ==========================================
-    // MODAL AJUKAN KEMBALI DESA
-    // ==========================================
-    async function openAjukanKembaliDesaModal() {
-        let modal = document.getElementById('modalAjukanKembaliDesa');
-        if (!modal) {
-            modal = document.createElement('div');
-            modal.id = 'modalAjukanKembaliDesa';
-            modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden';
-            modal.innerHTML = `
-                <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl mx-4 max-h-[85vh] flex flex-col" onclick="event.stopPropagation()">
-                    <div class="p-5 border-b border-gray-100 flex justify-between items-center flex-shrink-0">
-                        <div>
-                            <h2 class="text-lg font-bold text-gray-800">
-                                <i class="fas fa-rotate-left text-amber-500 mr-2"></i>Ajukan Kembali Usulan Musdes
-                            </h2>
-                            <p class="text-xs text-gray-400 mt-0.5">Hanya menampilkan usulan musdes yang Anda buat sendiri pada tahun sebelum <span class="font-semibold text-honey-600" id="targetTahunLabel"></span></p>
-                        </div>
-                        <button onclick="closeModalId('modalAjukanKembaliDesa')" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    
-                    <div class="p-5 overflow-y-auto flex-1 space-y-4" id="contentAjukanKembaliDesa">
-                        <div class="flex flex-col sm:flex-row gap-3">
-                            <div class="relative flex-1">
-                                <i class="fas fa-map-marker-alt absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                                <select id="filterDusunLamaDesa" onchange="filterListUsulanLamaDesa()" class="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-honey-500/20 focus:border-honey-500 outline-none transition-all">
-                                    <option value="">Semua Dusun</option>
-                                </select>
-                            </div>
-                            <div class="relative flex-1">
-                                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                                <input type="text" id="searchLamaDesa" oninput="filterListUsulanLamaDesa()" placeholder="Cari judul usulan musdes..." class="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-honey-500/20 focus:border-honey-500 outline-none transition-all">
-                            </div>
-                        </div>
-                        
-                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2.5">
-                            <i class="fas fa-info-circle text-amber-500 mt-0.5 text-sm"></i>
-                            <p class="text-xs text-amber-700 leading-relaxed">Hanya usulan <strong>hasil musyawarah desa (musdes)</strong> yang Anda input sendiri yang ditampilkan di sini. Usulan dari warga atau admin dusun harus diajukan kembali oleh masing-masing pemiliknya.</p>
-                        </div>
-                        
-                        <div id="listUsulanLamaDesa" class="space-y-2">
-                            <div class="text-center py-10 text-gray-400 text-sm"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat data usulan musdes lama...</div>
-                        </div>
-                    </div>
-                    
-                    <div class="p-5 border-t border-gray-100 flex justify-between items-center flex-shrink-0 bg-gray-50/50 rounded-b-2xl">
-                        <div class="text-xs text-gray-500"><span id="countLamaDesa" class="font-bold text-honey-600">0</span> usulan musdes dipilih</div>
-                        <div class="flex gap-2">
-                            <button onclick="closeModalId('modalAjukanKembaliDesa')" class="px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Batal</button>
-                            <button onclick="submitAjukanKembaliDesa()" id="btnSubmitKembaliDesa" disabled class="px-5 py-2.5 text-sm font-semibold text-white bg-amber-500 rounded-lg hover:bg-amber-600 transition-all shadow-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                                <i class="fas fa-rotate-left text-xs"></i> Ajukan Kembali
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) closeModalId('modalAjukanKembaliDesa');
-            });
-        }
-
-        // Reset State Modal
-        document.getElementById('targetTahunLabel').textContent = STATE.tahunAktif;
-        document.getElementById('listUsulanLamaDesa').innerHTML = '<div class="text-center py-10 text-gray-400 text-sm"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat data usulan musdes lama...</div>';
-        document.getElementById('countLamaDesa').textContent = '0';
-        document.getElementById('btnSubmitKembaliDesa').disabled = true;
-        document.getElementById('filterDusunLamaDesa').value = '';
-        document.getElementById('searchLamaDesa').value = '';
-        
-        modal.classList.remove('hidden');
-
-        try {
-            const res = await API.post('getUsulanLamaDesa', { tahunAktif: STATE.tahunAktif });
-            if (res.success) {
-                const dusunSet = new Set(res.data.map(u => u.dusun).filter(Boolean));
-                const filterEl = document.getElementById('filterDusunLamaDesa');
-                filterEl.innerHTML = '<option value="">Semua Dusun</option>' + [...dusunSet].sort().map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
-
-                window._tmpUsulanLamaDesa = res.data;
-                renderListUsulanLamaDesa(res.data);
-            } else {
-                document.getElementById('listUsulanLamaDesa').innerHTML = `<div class="text-center py-10 text-red-400 text-sm">${res.message || 'Gagal memuat data'}</div>`;
-            }
-        } catch (e) {
-            document.getElementById('listUsulanLamaDesa').innerHTML = '<div class="text-center py-10 text-red-400 text-sm">Gagal memuat data. Periksa koneksi internet.</div>';
-        }
-    }
-
-    function renderListUsulanLamaDesa(data) {
-        const container = document.getElementById('listUsulanLamaDesa');
-        if (!data || data.length === 0) {
-            container.innerHTML = `
-                <div class="text-center py-12 text-gray-400 text-sm">
-                    <i class="fas fa-clipboard-list text-4xl mb-3 block text-gray-300"></i>
-                    <p class="font-medium text-gray-500 mb-1">Tidak ada usulan musdes lama</p>
-                    <p class="text-xs">Usulan musdes yang Anda buat pada tahun sebelumnya akan muncul di sini</p>
-                </div>`;
-            return;
-        }
-
-        container.innerHTML = data.map(u => {
-            let badgeClass = 'bg-gray-100 text-gray-600';
-            let badgeText = u.status;
-            let badgeIcon = '';
-            if (u.status === 'final') { badgeClass = 'bg-green-100 text-green-700'; badgeText = 'Final'; badgeIcon = '<i class="fas fa-check-circle mr-1"></i>'; }
-            else if (u.status === 'ranked_dusun') { badgeClass = 'bg-blue-100 text-blue-700'; badgeText = 'Ranked'; badgeIcon = '<i class="fas fa-arrow-up mr-1"></i>'; }
-            else if (u.status === 'dikembalikan_dusun') { badgeClass = 'bg-amber-100 text-amber-700'; badgeText = 'Dikembalikan'; badgeIcon = '<i class="fas fa-undo mr-1"></i>'; }
-            else if (u.status === 'dikembalikan_user') { badgeClass = 'bg-red-100 text-red-700'; badgeText = 'Dikembalikan ke User'; badgeIcon = '<i class="fas fa-undo mr-1"></i>'; }
-
-            return `
-                <label class="flex items-start gap-3 p-3.5 border border-gray-100 rounded-xl hover:bg-amber-50/50 cursor-pointer transition-colors group" data-dusun="${escapeHtml(u.dusun)}" data-judul="${escapeHtml(u.judul.toLowerCase())}">
-                    <input type="checkbox" value="${escapeHtml(u.id)}" class="mt-1 w-4 h-4 accent-amber-500 check-kembali-desa rounded" onchange="updateCountKembaliDesa()">
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 mb-1.5 flex-wrap">
-                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-semibold">${u.tahun}</span>
-                            <span class="text-[10px] px-2 py-0.5 rounded-full ${badgeClass} font-semibold">${badgeIcon}${badgeText}</span>
-                            ${u.rankingDesa ? `<span class="text-xs font-bold text-blue-500"><i class="fas fa-trophy mr-1 text-[10px]"></i>#${u.rankingDesa} Desa</span>` : ''}
-                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-600 font-semibold ml-auto"><i class="fas fa-landmark mr-1"></i>Musdes</span>
-                        </div>
-                        <p class="text-sm font-semibold text-gray-800 truncate group-hover:text-amber-700 transition-colors">${escapeHtml(u.judul)}</p>
-                        <div class="flex items-center gap-4 mt-1.5 text-xs text-gray-400">
-                            <span><i class="fas fa-map-marker-alt mr-1"></i>${escapeHtml(u.dusun)}</span>
-                            ${u.rt && u.rt.length > 0 ? `<span><i class="fas fa-users mr-1"></i>RT ${u.rt.join(', ')}</span>` : ''}
-                            <span class="ml-auto font-semibold text-gray-500">${formatRupiah(u.estimasiBiaya)}</span>
-                        </div>
-                    </div>
-                </label>`;
-        }).join('');
-    }
-
-    function filterListUsulanLamaDesa() {
-        if (!window._tmpUsulanLamaDesa) return;
-        const dusun = document.getElementById('filterDusunLamaDesa').value;
-        const search = document.getElementById('searchLamaDesa').value.toLowerCase();
-        
-        const filtered = window._tmpUsulanLamaDesa.filter(u => {
-            const matchDusun = !dusun || u.dusun === dusun;
-            const matchSearch = !search || u.judul.toLowerCase().includes(search);
-            return matchDusun && matchSearch;
-        });
-        
-        renderListUsulanLamaDesa(filtered);
-    }
-
-    function updateCountKembaliDesa() {
-        const checked = document.querySelectorAll('.check-kembali-desa:checked').length;
-        document.getElementById('countLamaDesa').textContent = checked;
-        document.getElementById('btnSubmitKembaliDesa').disabled = checked === 0;
-    }
-
-    async function submitAjukanKembaliDesa() {
-        const checkedEls = document.querySelectorAll('.check-kembali-desa:checked');
-        const ids = Array.from(checkedEls).map(el => el.value);
-        
-        if (ids.length === 0) {
-            showToast('Pilih minimal 1 usulan musdes untuk diajukan kembali', 'error');
-            return;
-        }
-
-        const btn = document.getElementById('btnSubmitKembaliDesa');
-        const originalText = btn.innerHTML;
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin text-xs"></i> Memproses...';
-
-        try {
-            const res = await API.post('ajukanKembaliDesa', { 
-                ids: ids, 
-                tahunBaru: STATE.tahunAktif 
-            });
-
-            if (res.success) {
-                let msg = res.message || 'Berhasil diajukan kembali';
-                if (res.skipped > 0) {
-                    msg += ` (${res.skipped} usulan dilewati karena status tidak memenuhi syarat)`;
-                }
-                showToast(msg, 'success');
-                
-                closeModalId('modalAjukanKembaliDesa');
-                await fetchUsulan(true);
-                
-                const c = document.getElementById('tabContent');
-                if (c) {
-                    c.innerHTML = renderTab();
-                    if (STATE.dashboardTab === 'beranda') initCharts();
-                }
-            } else {
-                showToast(res.message || 'Gagal mengajukan kembali', 'error');
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-            }
-        } catch (e) {
-            showToast('Gagal mengajukan kembali. Periksa koneksi internet.', 'error');
-            btn.disabled = false;
-            btn.innerHTML = originalText;
-        }
-    }
-
-    function closeModalId(id) {
-        const modal = document.getElementById(id);
-        if (modal) modal.classList.add('hidden');
     }
 
     /* ==========================================
@@ -4195,93 +3690,6 @@ async function doExportKoordinasi() {
             if (numCell && item.style.display !== 'none') {
                 numCell.textContent = num++;
             }
-        });
-    }
-
-    // ==========================================
-    // HAPUS USULAN MUSDES (KHUSUS ADM DESA)
-    // ==========================================
-    async function deleteUsulanMusdes(id, judul) {
-        // Potong judul jika terlalu panjang agar modal tidak terlalu tinggi
-        const shortJudul = judul.length > 60 ? judul.substring(0, 60) + '...' : judul;
-        
-        // Gunakan custom modal konfirmasi
-        const isConfirmed = await showDeleteConfirm(
-            'Hapus Usulan Musdes?', 
-            `Anda akan menghapus usulan:<br><strong>"${shortJudul}"</strong><br><br>Aksi ini tidak dapat dibatalkan.`
-        );
-
-        // Jika user menekan "Batal" atau area luar
-        if (!isConfirmed) return;
-
-        // Lanjutkan proses hapus ke backend...
-        setTableLoading(true);
-        try {
-            const res = await API.post('deleteUsulanMusdes', { id: id });
-            if (res.success) {
-                showToast(res.message || 'Usulan musdes berhasil dihapus', 'success');
-                // Refresh data setelah berhasil hapus
-                await fetchUsulan(true); 
-                const c = document.getElementById('tabContent');
-                if (c) {
-                    c.innerHTML = renderTab();
-                    if (STATE.dashboardTab === 'beranda') initCharts();
-                }
-            } else {
-                showToast(res.message || 'Gagal menghapus usulan', 'error');
-            }
-        } catch (e) {
-            showToast('Gagal menghapus. Periksa koneksi internet.', 'error');
-        } finally {
-            setTableLoading(false);
-        }
-    }
-
-    function showDeleteConfirm(title, message) {
-        return new Promise((resolve) => {
-            // Buat elemen overlay
-            const overlay = document.createElement('div');
-            overlay.className = 'confirm-overlay';
-            overlay.innerHTML = `
-                <div class="confirm-card">
-                    <div class="confirm-icon">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                        </svg>
-                    </div>
-                    <div class="confirm-title">${title}</div>
-                    <div class="confirm-message">${message}</div>
-                    <div class="confirm-actions">
-                        <button class="confirm-btn confirm-btn-cancel" id="btnCancel">Batal</button>
-                        <button class="confirm-btn confirm-btn-delete" id="btnDelete">Ya, Hapus</button>
-                    </div>
-                </div>
-            `;
-
-            document.body.appendChild(overlay);
-
-            // Animasi masuk
-            requestAnimationFrame(() => {
-                overlay.classList.add('active');
-            });
-
-            // Fungsi untuk menutup modal
-            const closeModal = (result) => {
-                overlay.classList.remove('active');
-                setTimeout(() => {
-                    overlay.remove();
-                    resolve(result);
-                }, 200); // Waktu sesuai durasi CSS transition
-            };
-
-            // Event Listener
-            overlay.querySelector('#btnCancel').addEventListener('click', () => closeModal(false));
-            overlay.querySelector('#btnDelete').addEventListener('click', () => closeModal(true));
-            
-            // Tutup jika klik area luar (overlay hitam)
-            overlay.addEventListener('click', (e) => {
-                if (e.target === overlay) closeModal(false);
-            });
         });
     }
 
@@ -4342,28 +3750,7 @@ async function doExportKoordinasi() {
             return rankA - rankB; // Ascending (1 di atas, 2 di bawah)
         });
 
-        // ✅ PERUBAHAN 1: Tombol kiri (hanya icon) dan kanan (submit) dijadikan satu baris
-        const btns = locked ? '' : `
-        <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-            <!-- KIRI: Tombol Submit Terpilih -->
-            <div class="flex items-center gap-2">
-                <button onclick="bulkProsesDusun()" class="h-10 px-4 flex items-center gap-1.5 btn-success text-xs font-semibold rounded-lg shadow-sm">
-                    <i class="fas fa-check-double"></i>Submit Terpilih ke Desa
-                </button>
-                <span id="bulkCount" class="bulk-count hidden text-xs text-honey-700 font-semibold ml-1"><span id="bulkNum">0</span> terpilih</span>
-            </div>
-            <!-- KANAN: Tombol Hanya Icon + Tooltip -->
-            <div class="flex items-center gap-2">
-                <button onclick="openFormUsulan('musyawarah')" class="group relative w-10 h-10 flex items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm hover:bg-blue-700 transition-colors">
-                    <i class="fas fa-file-circle-plus text-sm"></i>
-                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Input Hasil Musyawarah</span>
-                </button>
-                <button onclick="openAjukanKembaliDusunModal()" class="group relative w-10 h-10 flex items-center justify-center rounded-lg bg-forest-600 text-white shadow-sm hover:bg-forest-700 transition-colors">
-                    <i class="fas fa-rotate-left text-sm"></i>
-                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Ajukan Usulan Sebelumnya</span>
-                </button>
-            </div>
-        </div>`;
+        const btns = locked ? '' : `<div class="flex flex-wrap items-center gap-2 mb-3"><button onclick="bulkProsesDusun()" class="px-3 py-1.5 btn-success text-xs rounded-md"><i class="fas fa-check-double mr-1"></i>Submit Terpilih ke Desa</button><span id="bulkCount" class="bulk-count hidden text-xs text-honey-700 font-semibold ml-1"><span id="bulkNum">0</span> terpilih</span></div>`;
         
         const tableRows = list.length ? list.map((i, n) => { 
             const isOwnMusyawarah = i.username === u.username; 
@@ -4453,10 +3840,11 @@ async function doExportKoordinasi() {
                     </tbody>`;
         }).join('') : '';
 
-        // ✅ PERUBAHAN 2: Header Buttons hanya berfungsi sebagai tanda "Lock" jika ditutup
+        // Header buttons
         const headerBtns = locked 
             ? '<span class="px-3 py-1.5 bg-red-100 text-red-700 text-xs font-bold rounded-lg"><i class="fas fa-lock mr-1"></i>Pengimputan Ditutup</span>'
-            : ''; // Dikosongkan karena tombol utama sudah pindah ke baris btns
+            : `<button onclick="openFormUsulan('musyawarah')" class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-blue-700 transition-colors"><i class="fas fa-plus mr-1"></i> Input Hasil Musyawarah</button>
+            <button type="button" onclick="openAjukanKembaliDusunModal()" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg border-2 border-forest-200 text-forest-700 bg-white hover:bg-forest-50 hover:border-forest-300 transition-all shadow-sm"><i class="fas fa-rotate-left text-xs"></i>Ajukan Usulan Sebelumnya</button>`;
 
         return `<div class="space-y-4">
                 ${statsBar(list)}
