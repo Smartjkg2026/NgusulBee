@@ -799,48 +799,6 @@
                 ban.innerHTML = '';
             }
         }
-    
-
-        // === LOGIKA AUTO-INJECT BANNER ===
-        if (STATE.isLocked) {
-            const dl = new Date(activeDeadline);
-            const fmt = dl.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-            
-            const roleName = isAdmDusun ? 'Admin Dusun (Musyawarah & Ranking)' : 'User (Usulan)';
-            const bannerHtml = `<div class="flex items-center gap-3"><div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0"><i class="fas fa-lock text-red-500"></i></div><div><p class="font-display font-bold text-red-800 text-sm">Pengimputan ${roleName} Ditutup</p><p class="text-xs text-red-600 mt-0.5">Batas waktu pengimputan tahun ${STATE.tahunAktif} telah berakhir pada ${fmt}. Tidak dapat melakukan perubahan data.</p></div></div>`;
-            
-            // Jika wadahnya belum ada, BUAT OTOMATIS dan sisipkan ke konten utama
-            if (!ban) {
-                const app = document.getElementById('app');
-                if (app) {
-                    ban = document.createElement('div');
-                    ban.id = 'lockBanner';
-                    
-                    // Cari area konten utama (biasanya ada class overflow-y-auto atau p-6)
-                    const mainContent = app.querySelector('.overflow-y-auto, .flex-1.overflow-y-auto');
-                    
-                    if (mainContent) {
-                        // Sisipkan di paling atas konten utama
-                        mainContent.prepend(ban);
-                    } else {
-                        // Fallback: Sisipkan langsung di dalam #app
-                        app.prepend(ban);
-                    }
-                }
-            }
-            
-            // Isi dan tampilkan bannernya
-            if (ban) {
-                ban.innerHTML = bannerHtml;
-                ban.className = 'bg-red-50 border border-red-200 rounded-xl p-4 mb-4 view-enter';
-            }
-        } else {
-            // Jika tidak terkunci, sembunyikan
-            if (ban) {
-                ban.className = 'hidden';
-                ban.innerHTML = '';
-            }
-        }
     }
 
     function startDeadlineCheck() {
