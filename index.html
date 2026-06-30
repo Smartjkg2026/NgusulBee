@@ -592,7 +592,7 @@
         const cols = {
             user: [
                 { h: 'No', get: (_, i) => i + 1 }, { h: 'Status', get: v => statusText(v.status) },
-                { h: 'Judul Usulan', get: v => v.judul }, { h: 'Sumber', get: v => v.username },
+                { h: 'Judul Usulan', get: v => v.judul }, { h: 'Pengusul', get: v => v.username },
                 { h: 'Kategori', get: v => v.kategori }, { h: 'RT', get: v => Array.isArray(v.rt) ? v.rt.join(', ') : v.rt },
                 { h: 'Volume', get: v => v.volume + ' ' + v.satuan }, { h: 'Estimasi Biaya (Rp)', get: v => v.estimasiBiaya || 0 },
                 { h: 'Ranking Dusun', get: v => v.rankingDusun || '' }, 
@@ -602,7 +602,7 @@
             ],
             admdusun: [
                 { h: 'No', get: (_, i) => i + 1 }, { h: 'Status', get: v => statusText(v.status) },
-                { h: 'Judul Usulan', get: v => v.judul }, { h: 'Sumber', get: v => v.username },
+                { h: 'Judul Usulan', get: v => v.judul }, { h: 'Pengusul', get: v => v.username },
                 { h: 'Kategori', get: v => v.kategori }, { h: 'RT', get: v => Array.isArray(v.rt) ? v.rt.join(', ') : v.rt },
                 { h: 'Volume', get: v => v.volume + ' ' + v.satuan }, { h: 'Estimasi Biaya (Rp)', get: v => v.estimasiBiaya || 0 },
                 { h: 'Ranking Dusun', get: v => v.rankingDusun || '' }, 
@@ -612,7 +612,7 @@
             ],
             admrom: [
                 { h: 'No', get: (_, i) => i + 1 }, { h: 'Status', get: v => statusText(v.status) },
-                { h: 'Judul Usulan', get: v => v.judul }, { h: 'Sumber', get: v => v.username },
+                { h: 'Judul Usulan', get: v => v.judul }, { h: 'Pengusul', get: v => v.username },
                 { h: 'Dusun', get: v => v.dusun }, { h: 'Kategori', get: v => v.kategori },
                 { h: 'RT', get: v => Array.isArray(v.rt) ? v.rt.join(', ') : v.rt },
                 { h: 'Volume', get: v => v.volume + ' ' + v.satuan }, { h: 'Estimasi Biaya (Rp)', get: v => v.estimasiBiaya || 0 },
@@ -624,7 +624,7 @@
                 { h: 'No', get: (_, i) => i + 1 },
                 { h: 'Status', get: v => statusText(v.status) },
                 { h: 'Judul Usulan', get: v => v.judul },
-                { h: 'Sumber', get: v => v.username },
+                { h: 'Pengusul', get: v => v.username },
                 { h: 'Dusun', get: v => v.dusun },
                 { h: 'Kategori', get: v => v.kategori },
                 { h: 'RT', get: v => Array.isArray(v.rt) ? v.rt.join(', ') : v.rt },
@@ -638,7 +638,7 @@
             ],
             admdesa: [
                 { h: 'No', get: (_, i) => i + 1 }, { h: 'Status', get: v => statusText(v.status) },
-                { h: 'Judul Usulan', get: v => v.judul }, { h: 'Sumber', get: v => v.username },
+                { h: 'Judul Usulan', get: v => v.judul }, { h: 'Pengusul', get: v => v.username },
                 { h: 'Dusun', get: v => v.dusun }, { h: 'Kategori', get: v => v.kategori },
                 { h: 'RT', get: v => Array.isArray(v.rt) ? v.rt.join(', ') : v.rt },
                 { h: 'Volume', get: v => v.volume + ' ' + v.satuan }, { h: 'Estimasi Biaya (Rp)', get: v => v.estimasiBiaya || 0 },
@@ -1978,7 +1978,7 @@ async function doExportKoordinasi() {
         { h: 'Rencana Aksi',     get: v => v.rencanaAksi || '-' },
         { h: 'Mendukung SDGs',   get: v => v.sdgId ? (CONFIG.SDGS.find(s => s.id == v.sdgId)?.kode || '-') : '-' },
         { h: 'Kategori',         get: v => v.kategori || '-' },
-        { h: 'Sumber/Pengusul',  get: v => v.username || '-' }
+        { h: 'Pengusul',  get: v => v.username || '-' }
     ];
 
     const baris = list.map((item, idx) => {
@@ -2374,7 +2374,7 @@ async function doExportKoordinasi() {
             <!-- SEARCH BAR MONITORING -->
             <div class="relative">
                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                <input type="text" id="searchMonitorTable" placeholder="Cari judul, sumber, dusun, kategori..." 
+                <input type="text" id="searchMonitorTable" placeholder="Cari judul, Pengusul, dusun, kategori..." 
                        class="w-full pl-9 pr-4 py-2.5 border rounded-lg text-sm bg-gray-50 focus:bg-white" 
                        oninput="filterMonitorTable(this.value)">
             </div>
@@ -2386,7 +2386,7 @@ async function doExportKoordinasi() {
                             <th class="sticky top-0 z-10 bg-gray-50 w-10 text-center border-b">No</th>
                             <th class="sticky top-0 z-10 bg-gray-50 w-40 text-center border-b">Status</th>
                             <th class="sticky top-0 z-10 bg-gray-50 text-left border-b">Judul Usulan</th>
-                            <th class="sticky top-0 z-10 bg-gray-50 w-28 border-b">Sumber</th>
+                            <th class="sticky top-0 z-10 bg-gray-50 w-28 border-b">Pengusul</th>
                             ${colDusun ? '<th class="sticky top-0 z-10 bg-gray-50 w-28 border-b">Dusun</th>' : ''}
                             <th class="sticky top-0 z-10 bg-gray-50 w-28 border-b">Kategori</th>
                             <th class="sticky top-0 z-10 bg-gray-50 w-28 border-b">RT</th>
@@ -3199,7 +3199,7 @@ async function doExportKoordinasi() {
     function showDetail(id) {
         const i = cachedUsulan.find(x => x.id === id);
         if (!i) { showToast('Data tidak ditemukan', 'warning'); return; }
-        openModal(`<div class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this)closeModal()"><div class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl view-enter p-6"><div class="flex justify-between items-start mb-4"><div class="flex-1 min-w-0 mr-3"><div class="mb-2">${statusLabel(i.status)}</div><h3 class="font-display font-700 text-xl leading-tight">${escapeHtml(i.judul)}</h3></div><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-1 flex-shrink-0" aria-label="Tutup"><i class="fas fa-times text-lg"></i></button></div><div class="space-y-3 text-sm"><div class="grid grid-cols-2 gap-3"><div class="bg-gray-50 p-3 rounded-lg"><span class="text-gray-500 text-xs block mb-0.5">Pengusul / Sumber</span><span class="font-semibold">${escapeHtml(i.username)}</span></div><div class="bg-gray-50 p-3 rounded-lg"><span class="text-gray-500 text-xs block mb-0.5">Kategori</span><span class="font-semibold">${escapeHtml(i.kategori)}</span></div></div><div class="bg-gray-50 p-3 rounded-lg"><span class="text-gray-500 text-xs block mb-0.5">RT / Dusun</span><span class="font-semibold">RT ${i.rt.join(', ')} — ${escapeHtml(i.dusun)}</span></div><div class="bg-gray-50 p-3 rounded-lg"><span class="text-gray-500 text-xs block mb-0.5">Deskripsi</span><span class="leading-relaxed">${escapeHtml(i.deskripsi)}</span></div><div class="grid grid-cols-3 gap-2"><div class="bg-gray-50 p-3 rounded-lg text-center"><span class="text-gray-500 text-xs block mb-0.5">Volume</span><span class="font-bold text-honey-700">${i.volume} ${escapeHtml(i.satuan)}</span></div><div class="bg-gray-50 p-3 rounded-lg text-center"><span class="text-gray-500 text-xs block mb-0.5">Estimasi</span><span class="font-bold text-honey-700 text-sm">${formatRupiah(i.estimasiBiaya)}</span></div><div class="bg-gray-50 p-3 rounded-lg text-center"><span class="text-gray-500 text-xs block mb-0.5">Proposal</span>${i.linkProposal ? `<a href="${escapeHtml(i.linkProposal)}" target="_blank" rel="noopener" class="text-blue-500 underline font-semibold text-xs">Lihat</a>` : '<span class="text-gray-400">-</span>'}</div></div>${i.rankingDusun ? `<div class="flex justify-between items-center bg-blue-50 p-3 rounded-lg"><span class="text-blue-700 font-medium">Ranking Dusun</span><span class="font-display font-900 text-xl text-blue-700">#${i.rankingDusun}</span></div>` : ''}${i.sdgId ? `<div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg"><span class="text-gray-600 font-medium">Mendukung SDGs</span><span class="font-semibold text-gray-800">${CONFIG.SDGS.find(s => s.id == i.sdgId)?.kode || ''} - ${CONFIG.SDGS.find(s => s.id == i.sdgId)?.nama || ''}</span></div>` : ''}${i.rankingDesa ? `<div class="flex justify-between items-center bg-forest-50 p-3 rounded-lg"><span class="text-forest-700 font-medium">Ranking Desa</span><span class="font-display font-900 text-xl text-forest-700">#${i.rankingDesa}</span></div>` : ''}${i.rencanaAksi ? `<div class="flex justify-between bg-gray-50 p-3 rounded-lg"><span class="text-gray-500">Rencana Aksi</span><span class="font-semibold">${escapeHtml(i.rencanaAksi)}</span></div>` : ''}${i.rujukanUsulan ? `<div class="flex justify-between bg-gray-50 p-3 rounded-lg"><span class="text-gray-500">Rujukan Ke</span><span class="font-semibold">${escapeHtml(i.rujukanUsulan)}</span></div>` : ''}${i.catatanKembali ? `<div class="bg-red-50 p-3 rounded-lg text-red-700"><i class="fas fa-comment-dots mr-1"></i><b>Catatan:</b><br>${escapeHtml(i.catatanKembali)}</div>` : ''}</div></div></div>`);
+        openModal(`<div class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this)closeModal()"><div class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl view-enter p-6"><div class="flex justify-between items-start mb-4"><div class="flex-1 min-w-0 mr-3"><div class="mb-2">${statusLabel(i.status)}</div><h3 class="font-display font-700 text-xl leading-tight">${escapeHtml(i.judul)}</h3></div><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-1 flex-shrink-0" aria-label="Tutup"><i class="fas fa-times text-lg"></i></button></div><div class="space-y-3 text-sm"><div class="grid grid-cols-2 gap-3"><div class="bg-gray-50 p-3 rounded-lg"><span class="text-gray-500 text-xs block mb-0.5">Pengusul</span><span class="font-semibold">${escapeHtml(i.username)}</span></div><div class="bg-gray-50 p-3 rounded-lg"><span class="text-gray-500 text-xs block mb-0.5">Kategori</span><span class="font-semibold">${escapeHtml(i.kategori)}</span></div></div><div class="bg-gray-50 p-3 rounded-lg"><span class="text-gray-500 text-xs block mb-0.5">RT / Dusun</span><span class="font-semibold">RT ${i.rt.join(', ')} — ${escapeHtml(i.dusun)}</span></div><div class="bg-gray-50 p-3 rounded-lg"><span class="text-gray-500 text-xs block mb-0.5">Deskripsi</span><span class="leading-relaxed">${escapeHtml(i.deskripsi)}</span></div><div class="grid grid-cols-3 gap-2"><div class="bg-gray-50 p-3 rounded-lg text-center"><span class="text-gray-500 text-xs block mb-0.5">Volume</span><span class="font-bold text-honey-700">${i.volume} ${escapeHtml(i.satuan)}</span></div><div class="bg-gray-50 p-3 rounded-lg text-center"><span class="text-gray-500 text-xs block mb-0.5">Estimasi</span><span class="font-bold text-honey-700 text-sm">${formatRupiah(i.estimasiBiaya)}</span></div><div class="bg-gray-50 p-3 rounded-lg text-center"><span class="text-gray-500 text-xs block mb-0.5">Proposal</span>${i.linkProposal ? `<a href="${escapeHtml(i.linkProposal)}" target="_blank" rel="noopener" class="text-blue-500 underline font-semibold text-xs">Lihat</a>` : '<span class="text-gray-400">-</span>'}</div></div>${i.rankingDusun ? `<div class="flex justify-between items-center bg-blue-50 p-3 rounded-lg"><span class="text-blue-700 font-medium">Ranking Dusun</span><span class="font-display font-900 text-xl text-blue-700">#${i.rankingDusun}</span></div>` : ''}${i.sdgId ? `<div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg"><span class="text-gray-600 font-medium">Mendukung SDGs</span><span class="font-semibold text-gray-800">${CONFIG.SDGS.find(s => s.id == i.sdgId)?.kode || ''} - ${CONFIG.SDGS.find(s => s.id == i.sdgId)?.nama || ''}</span></div>` : ''}${i.rankingDesa ? `<div class="flex justify-between items-center bg-forest-50 p-3 rounded-lg"><span class="text-forest-700 font-medium">Ranking Desa</span><span class="font-display font-900 text-xl text-forest-700">#${i.rankingDesa}</span></div>` : ''}${i.rencanaAksi ? `<div class="flex justify-between bg-gray-50 p-3 rounded-lg"><span class="text-gray-500">Rencana Aksi</span><span class="font-semibold">${escapeHtml(i.rencanaAksi)}</span></div>` : ''}${i.rujukanUsulan ? `<div class="flex justify-between bg-gray-50 p-3 rounded-lg"><span class="text-gray-500">Rujukan Ke</span><span class="font-semibold">${escapeHtml(i.rujukanUsulan)}</span></div>` : ''}${i.catatanKembali ? `<div class="bg-red-50 p-3 rounded-lg text-red-700"><i class="fas fa-comment-dots mr-1"></i><b>Catatan:</b><br>${escapeHtml(i.catatanKembali)}</div>` : ''}</div></div></div>`);
     }
 
     window.handleAddUserRoleChange = function(role) {
@@ -3877,7 +3877,7 @@ async function doExportKoordinasi() {
             
             <div class="relative">
                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                <input type="text" id="searchDesaTable" placeholder="Cari judul usulan, sumber, dusun, RT..." 
+                <input type="text" id="searchDesaTable" placeholder="Cari judul usulan, Pengusul, dusun, RT..." 
                        class="w-full pl-9 pr-4 py-2.5 border rounded-lg text-sm bg-gray-50 focus:bg-white" 
                        oninput="filterDesaTable(this.value)">
             </div>
@@ -3890,7 +3890,7 @@ async function doExportKoordinasi() {
                             <th class="sticky top-0 z-10 bg-gray-50 w-10 text-center border-b">No</th>
                             <th class="sticky top-0 z-10 bg-gray-50 w-36 border-b">Status</th>
                             <th class="sticky top-0 z-10 bg-gray-50 text-left border-b">Judul Usulan</th>
-                            <th class="sticky top-0 z-10 bg-gray-50 w-28 border-b">Sumber</th>
+                            <th class="sticky top-0 z-10 bg-gray-50 w-28 border-b">Pengusul</th>
                             <th class="sticky top-0 z-10 bg-gray-50 w-28 border-b">Dusun</th>
                             <th class="sticky top-0 z-10 bg-gray-50 w-20 border-b">RT</th>
                             <th class="sticky top-0 z-10 bg-gray-50 w-28 border-b">Volume</th>
@@ -4431,7 +4431,7 @@ async function doExportKoordinasi() {
                 ${!locked ? btns : ''}
                 <div class="relative">
                     <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                    <input type="text" id="searchDusunTable" placeholder="Cari judul usulan, RT, atau sumber..." class="w-full pl-9 pr-4 py-2.5 border rounded-lg text-sm bg-gray-50 focus:bg-white" oninput="filterDusunTable(this.value)">
+                    <input type="text" id="searchDusunTable" placeholder="Cari judul usulan, RT, atau Pengusul..." class="w-full pl-9 pr-4 py-2.5 border rounded-lg text-sm bg-gray-50 focus:bg-white" oninput="filterDusunTable(this.value)">
                 </div>
                 <div class="tbl-wrap max-h-[75vh] overflow-auto border border-gray-200 rounded-lg">
                     <table class="tbl w-full" id="tableDusunWrap">
@@ -4444,7 +4444,7 @@ async function doExportKoordinasi() {
                                 <th class="sticky top-0 z-10 bg-gray-50 w-20 border-b">RT</th>
                                 <th class="sticky top-0 z-10 bg-gray-50 w-28 border-b">Volume</th>
                                 <th class="sticky top-0 z-10 bg-gray-50 w-32 text-right border-b">Estimasi</th>
-                                <th class="sticky top-0 z-10 bg-gray-50 w-28 text-center border-b">Sumber</th>
+                                <th class="sticky top-0 z-10 bg-gray-50 w-28 text-center border-b">Pengusul</th>
                             </tr>
                         </thead>
                         ${tableRows || `<tbody class="text-sm"><tr><td colspan="8" class="text-center text-gray-400 py-6">${emptyRow(8, 'Tidak ada usulan yang perlu diproses')}</td></tr></tbody>`}
