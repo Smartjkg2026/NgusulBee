@@ -1583,16 +1583,7 @@
                 </div>
                 <nav class="flex-1 py-4 space-y-1 px-3 overflow-y-auto">${tabs.map(t => `<button onclick="switchTab('${t.key}')" class="sidebar-link w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-600 ${STATE.dashboardTab === t.key ? 'active' : ''}" data-tab="${t.key}"><i class="fas ${t.icon} w-5 text-center"></i> ${t.label}</button>`).join('')}</nav>
                 <div class="p-4 border-t">
-                    <div class="flex items-center gap-3 mb-3">
-                    <div class="w-10 h-10 bg-honey-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <i class="fas ${roleIcon(u.role)} text-honey-600"></i>
-                    </div>
-                    <div class="min-w-0">
-                        <!-- Ubah bagian ini: hapus 'truncate', tambahkan 'whitespace-nowrap' -->
-                        <div class="text-sm font-semibold whitespace-nowrap">${escapeHtml(u.nama)}</div>
-                        <div class="text-xs text-gray-500">${roleLabel(u.role)}</div>
-                    </div>
-                </div>
+                <div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 bg-honey-100 rounded-full flex items-center justify-center flex-shrink-0"><i class="fas ${roleIcon(u.role)} text-honey-600"></i></div><div class="min-w-0"><div class="text-sm font-semibold truncate">${escapeHtml(u.nama)}</div><div class="text-xs text-gray-500">${roleLabel(u.role)}</div></div></div>
                     <button onclick="handleLogout()" class="w-full py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors"><i class="fas fa-sign-out-alt mr-1"></i>Keluar</button>
                 </div>
             </aside>
