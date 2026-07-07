@@ -280,7 +280,48 @@
         APP_NAME: 'NgusulBee',
         DESA: 'Desa Jangkang',
         KATEGORI: ['Infrastruktur', 'Pendidikan', 'Kesehatan', 'Ekonomi', 'Sosial', 'Lingkungan'],
-        SATUAN: ['Meter', 'Buah', 'Unit', 'Titik', 'Paket', 'Meter Persegi', 'Kg', 'Lainnya'],
+        SATUAN = [
+            # Satuan Hitungan / Kuantitas (Umum)
+            'Buah', 'Unit', 'Set', 'Pasang', 'Lusin', 'Kodi', 'Gross', 'Rim', 
+            'Keping', 'Lembar', 'Helai', 'Potong', 'Batang', 'Tangkai', 'Butir', 
+            'Bijian', 'Kuntum', 'Untai', 'Lilit', 'Tandan', 'Bunga', 'Ekor', 
+            'Titik', 'Node', 'Slot', 'Kolom', 'Baris', 'Akses', 'Jalur', 'Pintu',
+            
+            # Satuan Kemasan / Paket
+            'Paket', 'Bungkus', 'Karung', 'Dus', 'Box', 'Kardus', 'Peti', 'Drum', 
+            'Galon', 'Jerigen', 'Botol', 'Kaleng', 'Kantong', 'Karpet', 'Roll', 
+            'Gulungan', 'Sisir', 'Ikatan', 'Bundel', 'Bal', 'Kubikasi', 'Kontainer',
+            
+            # Satuan Panjang
+            'Meter', 'Centimeter', 'Milimeter', 'Kilometer', 'Inci', 'Kaki', 'Yard', 'Mil',
+            
+            # Satuan Luas
+            'Meter Persegi', 'Centimeter Persegi', 'Kilometer Persegi', 'Hektar', 'Are', 'Acre',
+            
+            # Satuan Volume
+            'Meter Kubik', 'Centimeter Kubik', 'Liter', 'Mililiter', 'Gallon', 'Barel', 'Kubik',
+            
+            # Satuan Massa / Berat
+            'Kg', 'Gram', 'Miligram', 'Ton', 'Kuintal', 'Ons', 'Pon', 'Karat',
+            
+            # Satuan Waktu
+            'Hari', 'Jam', 'Menit', 'Detik', 'Minggu', 'Bulan', 'Tahun', 'Lama', 'Sesi',
+            
+            # Satuan Listrik & Energi
+            'Watt', 'Kilowatt (kW)', 'Kilowatt Hour (kWh)', 'Volt', 'Ampere', 'Ohm', 
+            'HP (Tenaga Kuda)', 'BTU', 'Kalori', 'Joule',
+            
+            # Satuan Tekanan & Suhu
+            'Pascal', 'Bar', 'PSI', 'Celcius', 'Fahrenheit', 'Kelvin',
+            
+            # Satuan Kecepatan & Aliran
+            'Meter Per Detik', 'Kilometer Per Jam', 'RPM', 'Liter Per Menit', 'Liter Per Detik',
+            
+            # Satuan Digital / IT
+            'Bit', 'Byte', 'Kilobyte (KB)', 'Megabyte (MB)', 'Gigabyte (GB)', 'Terabyte (TB)',
+            
+            # Satuan Lainnya (Abstrak / Jasa)
+            'Lainnya', 'Jasa', 'Lot', 'Kontrak', 'Proyek', 'Oke', 'Titik'],
         TAHUN_LIST: (() => {
             const a = [];
             for (let i = 2025; i <= 2030; i++) a.push(i);
