@@ -276,7 +276,7 @@
        1. KONFIGURASI APLIKASI
        ========================================== */
     const CONFIG = {
-        API_URL: 'https://script.google.com/macros/s/AKfycbx7y9drOfOymIlLIDAKHYPT8EaZt8TxuWG28RPYDgGKQlBpfmO2SeoTSJlgGdSKJEVD6w/exec',
+        API_URL: 'https://script.google.com/macros/s/AKfycbzdXSplMhpi0XwZIzgqDlhyH-jHUDlh56avyyzVpyBpl21btCM7l-Cafur9hmbhWVt4eA/exec',
         APP_NAME: 'NgusulBee',
         DESA: 'Desa Jangkang',
         KATEGORI: ['Infrastruktur', 'Pendidikan', 'Kesehatan', 'Ekonomi', 'Sosial', 'Lingkungan'],
@@ -1750,44 +1750,137 @@
         if (!u) { navigate('login'); return ''; }
         const tabs = getTabs(u.role);
         
-        const navTabs = tabs.filter(t => !t.headerMenu);
+        // ✅ Filter: exclude header menu DAN sub-items dari bottom/nav utama
+        const navTabs = tabs.filter(t => !t.headerMenu && !t.parentTab);
         const headerTabs = tabs.filter(t => t.headerMenu);
         
         if (STATE.dashboardTab === 'beranda') STATE.dashboardTab = tabs[0].key;
+        
+        // ✅ Jika current tab adalah sub-item, pastikan valid
+        const currentTab = tabs.find(t => t.key === STATE.dashboardTab);
+        if (currentTab?.parentTab && !tabs.find(t => t.key === STATE.dashboardTab)) {
+            STATE.dashboardTab = 'beranda';
+        }
+
         const showLock = (u.role === 'user' || u.role === 'admdusun');
 
         const sidebarClass = STATE.isSidebarOpen ? 'translate-x-0' : '-translate-x-full';
-        const mainClass = STATE.isSidebarOpen ? 'lg:ml-56' : 'lg:ml-0'; // ✅ Sidebar lebih kecil
+        const mainClass = STATE.isSidebarOpen ? 'lg:ml-56' : 'lg:ml-0';
         const overlayClass = STATE.isSidebarOpen && window.innerWidth < 1024 ? 'block' : 'hidden';
         const initial = (u.nama || 'U').charAt(0).toUpperCase();
         const activeTab = tabs.find(t => t.key === STATE.dashboardTab);
 
-        // ✅ Bottom Nav Kecil
+        // ✅ Fungsi helper untuk cek apakah tab aktif (termasuk sub-items)
+        const isActiveTab = (tabKey) => {
+            if (STATE.dashboardTab === tabKey) return true;
+            const tab = tabs.find(t => t.key === tabKey);
+            if (tab?.isSubmenuParent) {
+                return tabs.some(t => t.parentTab === tabKey && t.key === STATE.dashboardTab);
+            }
+            return false;
+        };
+
+        // ✅ BOTTOM NAV DENGAN SUBMENU POPUP
         const bottomNavHTML = `
         <nav id="bottomNav" class="fixed bottom-0 left-0 right-0 z-[9999] bg-white/95 backdrop-blur-md border-t border-gray-200 lg:hidden shadow-[0_-2px_4px_-1px_rgba(0,0,0,0.04)] transition-transform duration-300 ease-in-out">
             <div class="flex items-stretch justify-around px-0.5 max-w-lg mx-auto"
-                 style="padding-bottom: max(0.25rem, env(safe-area-inset-bottom)); padding-top: 0.25rem;">
-                ${navTabs.map(t => `
+                style="padding-bottom: max(0.25rem, env(safe-area-inset-bottom)); padding-top: 0.25rem;">
+                ${navTabs.map(t => {
+                    const active = isActiveTab(t.key);
+                    
+                    if (t.isSubmenuParent) {
+                        const subItems = tabs.filter(s => s.parentTab === t.key);
+                        return `
+                        <div class="relative flex-1">
+                            <button onclick="toggleBottomSubmenu(event, '${t.key}')" data-tab="${t.key}"
+                                class="bnav-btn flex flex-col items-center justify-center gap-0 w-full py-1.5 px-1 rounded-lg transition-all duration-150 ${active ? 'text-honey-600 bg-honey-50' : 'text-gray-400 active:text-gray-600 active:bg-gray-50'}">
+                                <i class="fas ${t.icon} text-[14px] leading-none"></i>
+                                <span class="text-[9px] font-semibold leading-tight whitespace-nowrap">${t.mLabel || t.label}</span>
+                                <i class="fas fa-chevron-up text-[7px] ${active ? 'opacity-100' : 'opacity-0'} transition-opacity"></i>
+                            </button>
+                            <div id="bottomSubmenu-${t.key}" class="hidden absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 bg-white rounded-xl border border-gray-200 shadow-xl overflow-hidden z-[10000]">
+                                <div class="px-3 py-2 bg-gray-50 border-b border-gray-100">
+                                    <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">${t.label}</div>
+                                </div>
+                                ${subItems.map(s => `
+                                    <button onclick="switchTab('${s.key}'); closeBottomSubmenu();" 
+                                        class="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-gray-700 hover:bg-gray-50 transition-colors text-left ${STATE.dashboardTab === s.key ? 'bg-honey-50 text-honey-700 font-semibold' : ''}">
+                                        <i class="fas ${s.icon} w-4 text-center text-[10px] ${STATE.dashboardTab === s.key ? 'text-honey-500' : 'text-gray-400'}"></i>
+                                        <span class="leading-tight">${s.label}</span>
+                                    </button>
+                                `).join('')}
+                                <!-- Arrow pointer -->
+                                <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-r border-b border-gray-200 rotate-45"></div>
+                            </div>
+                        </div>`;
+                    }
+                    
+                    return `
                     <button onclick="switchTab('${t.key}')" data-tab="${t.key}"
-                        class="bnav-btn flex flex-col items-center justify-center gap-0 flex-1 py-1.5 px-1 rounded-lg transition-all duration-150 ${STATE.dashboardTab === t.key ? 'text-honey-600 bg-honey-50' : 'text-gray-400 active:text-gray-600 active:bg-gray-50'}">
+                        class="bnav-btn flex flex-col items-center justify-center gap-0 flex-1 py-1.5 px-1 rounded-lg transition-all duration-150 ${active ? 'text-honey-600 bg-honey-50' : 'text-gray-400 active:text-gray-600 active:bg-gray-50'}">
                         <i class="fas ${t.icon} text-[14px] leading-none"></i>
                         <span class="text-[9px] font-semibold leading-tight whitespace-nowrap">${t.mLabel || t.label}</span>
-                    </button>
-                `).join('')}
+                    </button>`;
+                }).join('')}
             </div>
         </nav>`;
 
-        // ✅ Sidebar Nav Kecil
-        const sidebarNavHTML = navTabs.map(t => `
+        // ✅ SIDEBAR NAV DENGAN COLLAPSIBLE SUBMENU
+        const sidebarNavHTML = navTabs.map(t => {
+            const active = isActiveTab(t.key);
+            
+            if (t.isSubmenuParent) {
+                const subItems = tabs.filter(s => s.parentTab === t.key);
+                const isOpen = active; // Auto-open jika sub-item aktif
+                
+                return `
+                <div class="submenu-group">
+                    <button onclick="toggleSubmenu('${t.key}')" 
+                        class="snav-btn sidebar-link w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-xs font-medium text-gray-600 ${active ? 'active' : 'hover:bg-gray-50'}">
+                        <span class="flex items-center gap-2.5 min-w-0">
+                            <i class="fas ${t.icon} w-4 text-center text-[11px] flex-shrink-0"></i> 
+                            <span class="truncate">${t.label}</span>
+                        </span>
+                        <i class="fas fa-chevron-down text-[8px] transition-transform duration-200 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}" id="chevron-${t.key}"></i>
+                    </button>
+                    <div id="submenu-${t.key}" class="overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'}">
+                        <div class="pl-3 py-1 space-y-0.5">
+                            ${subItems.map(s => `
+                                <button onclick="switchTab('${s.key}')" data-tab="${s.key}"
+                                    class="snav-btn sidebar-link w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50 ${STATE.dashboardTab === s.key ? 'active' : ''}">
+                                    <i class="fas ${s.icon} w-3 text-center text-[10px] flex-shrink-0"></i> 
+                                    <span class="truncate">${s.label}</span>
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>`;
+            }
+            
+            return `
             <button onclick="switchTab('${t.key}')" data-tab="${t.key}"
-                class="snav-btn sidebar-link w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-gray-600 ${STATE.dashboardTab === t.key ? 'active' : ''}">
-                <i class="fas ${t.icon} w-4 text-center text-[11px]"></i> ${t.label}
-            </button>`).join('');
+                class="snav-btn sidebar-link w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-gray-600 ${active ? 'active' : 'hover:bg-gray-50'}">
+                <i class="fas ${t.icon} w-4 text-center text-[11px] flex-shrink-0"></i> 
+                <span class="truncate">${t.label}</span>
+            </button>`;
+        }).join('');
+
+        // ✅ Header title dengan breadcrumb untuk sub-menu
+        let headerTitleHTML = '';
+        if (activeTab?.parentTab) {
+            const parent = tabs.find(pt => pt.key === activeTab.parentTab);
+            headerTitleHTML = `
+                <span class="text-gray-400 text-[11px] font-medium hidden sm:inline">${parent?.label}</span>
+                <i class="fas fa-chevron-right text-[8px] text-gray-300 hidden sm:inline"></i>
+                <span class="truncate">${activeTab.label}</span>`;
+        } else {
+            headerTitleHTML = `<span class="truncate">${activeTab?.label || 'Dashboard'}</span>`;
+        }
 
         return `
         <div class="view-enter h-[100dvh] flex flex-col sm:flex-row relative overflow-hidden">
             
-            <!-- ✅ SIDEBAR KECIL -->
+            <!-- ✅ SIDEBAR -->
             <aside id="sidebar" class="sidebar w-56 bg-white border-r flex-col fixed h-full z-50 transform ${sidebarClass} transition-transform duration-300 ease-in-out flex">
                 <div class="p-3.5 border-b flex items-center justify-between">
                     <div class="flex items-center gap-2.5">
@@ -1813,13 +1906,13 @@
             
             <main class="flex-1 flex flex-col min-w-0 h-full ${mainClass} transition-all duration-300">
                 
-                <!-- ✅ HEADER KECIL -->
+                <!-- ✅ HEADER -->
                 <header class="relative z-30 bg-white/80 backdrop-blur-md border-b px-3 md:px-5 py-2 flex items-center justify-between gap-2 flex-shrink-0">
                     <div class="flex items-center gap-2.5 min-w-0 flex-shrink">
                         <button onclick="toggleSidebar()" class="w-8 h-8 items-center justify-center rounded-lg hover:bg-gray-100 text-gray-600 hidden lg:flex flex-shrink-0" aria-label="Menu">
                             <i class="fas fa-bars text-sm"></i>
                         </button>
-                        <h2 id="headerTitle" class="font-display font-bold text-[15px] truncate">${activeTab?.label || 'Dashboard'}</h2>
+                        <h2 id="headerTitle" class="font-display font-bold text-[15px] flex items-center gap-1.5">${headerTitleHTML}</h2>
                     </div>
                     <div class="flex items-center gap-2 flex-shrink-0">
                         ${showLock ? `<span id="lockIndicator" class="text-[9px] px-1.5 py-0.5 rounded-full font-bold bg-gray-100 text-gray-500 flex items-center gap-1 hidden sm:flex"><i class="fas fa-infinity text-[8px]"></i><span class="hidden sm:inline">Tanpa Batas</span></span>` : ''}
@@ -1870,6 +1963,74 @@
         ${bottomNavHTML}`;
     }
 
+    // ==========================================
+    // SUBMENU LOGIC
+    // ==========================================
+
+    /**
+     * Toggle submenu di sidebar (collapsible)
+     */
+    function toggleSubmenu(key) {
+        const el = document.getElementById(`submenu-${key}`);
+        const chevron = document.getElementById(`chevron-${key}`);
+        if (!el) return;
+        
+        const isOpen = el.classList.contains('max-h-48');
+        if (isOpen) {
+            el.classList.remove('max-h-48', 'opacity-100');
+            el.classList.add('max-h-0', 'opacity-0');
+            chevron?.classList.remove('rotate-180');
+        } else {
+            el.classList.remove('max-h-0', 'opacity-0');
+            el.classList.add('max-h-48', 'opacity-100');
+            chevron?.classList.add('rotate-180');
+        }
+    }
+
+    /**
+     * Toggle popup submenu di bottom nav
+     */
+    function toggleBottomSubmenu(event, key) {
+        event.stopPropagation();
+        const el = document.getElementById(`bottomSubmenu-${key}`);
+        if (!el) return;
+        
+        // Tutup submenu lain dulu
+        document.querySelectorAll('[id^="bottomSubmenu-"]').forEach(m => {
+            if (m.id !== `bottomSubmenu-${key}`) m.classList.add('hidden');
+        });
+        
+        el.classList.toggle('hidden');
+    }
+
+    /**
+     * Tutup semua bottom submenu
+     */
+    function closeBottomSubmenu() {
+        document.querySelectorAll('[id^="bottomSubmenu-"]').forEach(m => m.classList.add('hidden'));
+    }
+
+    // Tutup bottom submenu saat klik di luar
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('[id^="bottomSubmenu-"]') && 
+            !e.target.closest('[onclick*="toggleBottomSubmenu"]')) {
+            closeBottomSubmenu();
+        }
+    });
+
+    /**
+     * Buka submenu secara paksa (untuk switchTab)
+     */
+    function openSubmenu(key) {
+        const el = document.getElementById(`submenu-${key}`);
+        const chevron = document.getElementById(`chevron-${key}`);
+        if (el && !el.classList.contains('max-h-48')) {
+            el.classList.remove('max-h-0', 'opacity-0');
+            el.classList.add('max-h-48', 'opacity-100');
+            chevron?.classList.add('rotate-180');
+        }
+    }
+
     function getTabs(r) {
         const tabs = {
             user: [
@@ -1898,6 +2059,13 @@
                 { key: 'beranda',          label: 'Beranda',          icon: 'fa-home',           mLabel: 'Beranda' },
                 { key: 'verifikasi_desa',  label: 'Musyawarah Desa',  icon: 'fa-gavel',          mLabel: 'Musyawarah' },
                 { key: 'monitoring',       label: 'Monitoring',       icon: 'fa-eye',            mLabel: 'Monitor' },
+                // ✅ PARENT MENU DENGAN SUBMENU
+                { key: 'lap_musdes',       label: 'Lap. Musdes',      icon: 'fa-file-lines',     mLabel: 'Musdes', isSubmenuParent: true },
+                // ✅ SUB-MENU ITEMS
+                { key: 'ba_musdes',        label: 'BA Musdes',                          icon: 'fa-file-contract',  parentTab: 'lap_musdes' },
+                { key: 'laporan_prioritas',label: 'Laporan Prioritas Pembangunan Desa', icon: 'fa-ranking-star',  parentTab: 'lap_musdes' },
+                { key: 'laporan_sdgs',     label: 'Laporan Usulan Berdasarkan SDGs Desa',icon: 'fa-bullseye',      parentTab: 'lap_musdes' },
+                // ✅ HEADER MENU
                 { key: 'pengaturan',       label: 'Pengaturan Waktu', icon: 'fa-clock',          headerMenu: true }, 
                 { key: 'users',            label: 'Manajemen User',   icon: 'fa-users-cog',      headerMenu: true },    
                 { key: 'ubahpw',           label: 'Ubah Password',    icon: 'fa-key',            headerMenu: true }
@@ -1910,20 +2078,71 @@
         const tabs = getTabs(STATE.currentUser?.role);
         const tab = tabs.find(t => t.key === key);
 
+        // ✅ Update header title dengan breadcrumb
         const header = document.getElementById('headerTitle');
-        if (header && tab) header.textContent = tab.label;
+        if (header && tab) {
+            if (tab.parentTab) {
+                const parent = tabs.find(pt => pt.key === tab.parentTab);
+                header.innerHTML = `
+                    <span class="text-gray-400 text-[11px] font-medium hidden sm:inline">${parent?.label || ''}</span>
+                    <i class="fas fa-chevron-right text-[8px] text-gray-300 hidden sm:inline"></i>
+                    <span class="truncate">${tab.label}</span>`;
+            } else {
+                header.innerHTML = `<span class="truncate">${tab.label}</span>`;
+            }
+        }
 
+        // ✅ Helper: cek apakah tab atau child-nya aktif
+        const isTabOrChildActive = (tabKey) => {
+            if (key === tabKey) return true;
+            const t = tabs.find(tb => tb.key === tabKey);
+            if (t?.isSubmenuParent) {
+                return tabs.some(tb => tb.parentTab === tabKey && tb.key === key);
+            }
+            return false;
+        };
+
+        // ✅ Update bottom nav
         document.querySelectorAll('.bnav-btn').forEach(btn => {
-            const isActive = btn.dataset.tab === key;
+            const tabKey = btn.dataset.tab;
+            const isActive = isTabOrChildActive(tabKey);
+            
             btn.classList.toggle('text-honey-600', isActive);
             btn.classList.toggle('bg-honey-50', isActive);
             btn.classList.toggle('text-gray-400', !isActive);
             btn.classList.toggle('active:text-gray-600', !isActive);
             btn.classList.toggle('active:bg-gray-50', !isActive);
+            
+            // Toggle chevron visibility untuk parent submenu
+            const chevron = btn.querySelector('.fa-chevron-up');
+            if (chevron) {
+                chevron.classList.toggle('opacity-100', isActive);
+                chevron.classList.toggle('opacity-0', !isActive);
+            }
         });
 
+        // ✅ Update sidebar nav
         document.querySelectorAll('.snav-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.tab === key);
+            const tabKey = btn.dataset.tab;
+            const isActive = isTabOrChildActive(tabKey);
+            btn.classList.toggle('active', isActive);
+        });
+
+        // ✅ Update bottom submenu items highlight
+        document.querySelectorAll('[id^="bottomSubmenu-"] button').forEach(btn => {
+            const onclickAttr = btn.getAttribute('onclick') || '';
+            const match = onclickAttr.match(/switchTab\('([^']+)'\)/);
+            if (match) {
+                const subKey = match[1];
+                btn.classList.toggle('bg-honey-50', subKey === key);
+                btn.classList.toggle('text-honey-700', subKey === key);
+                btn.classList.toggle('font-semibold', subKey === key);
+                const icon = btn.querySelector('i');
+                if (icon) {
+                    icon.classList.toggle('text-honey-500', subKey === key);
+                    icon.classList.toggle('text-gray-400', subKey !== key);
+                }
+            }
         });
     }
 
@@ -2125,7 +2344,7 @@
         </div>`);
     }
 
-    /* ==========================================
+/* ==========================================
     10. KOMPONEN TAB LAINNYA
     ========================================== */
     function renderTab() {
@@ -2154,6 +2373,11 @@
         if (user.role === 'admdesa') {
             if (STATE.dashboardTab === 'verifikasi_desa') return banner + rVerifDesaTable(user, allUsulan.filter(item => item.status === 'ranked_dusun' || item.status === 'dikembalikan_dusun'));
             if (STATE.dashboardTab === 'monitoring') return banner + rMonitorTable(allUsulan.filter(item => item.status === 'final'), 'admdesa');
+            
+            // ✅✅✅ TAMBAHAN BARU (SUB-MENU LAP. MUSDES) ✅✅✅
+            if (STATE.dashboardTab === 'ba_musdes') return banner + rBaMusdes();
+            if (STATE.dashboardTab === 'laporan_prioritas') return banner + rLaporanPrioritas();
+            if (STATE.dashboardTab === 'laporan_sdgs') return banner + rLaporanSDGS();
         }
         if (user.role === 'kasikaur') {
             if (STATE.dashboardTab === 'koordinasi') {
@@ -3183,6 +3407,2191 @@
         });
     }
 
+    // ==========================================
+    // LAPORAN MUSDES - SUB MENU RENDERERS
+    // ==========================================
+    /* ==========================================
+    BA MUSDES (FORM KONFIGURASI + 2 TAB + CETAK A4)
+    - Kop Surat Dipatenkan: Desa Jangkang
+    - Font: Arial
+    - RKP & Du-RKP Tahun bisa di-setting
+    - Layout Tanda Tangan: Kades & BPD sejajar, 5 Wakil Masyarakat di bawah
+    ========================================== */
+    function rBaMusdes() {
+        const tahun = STATE.tahunAktif;
+        const usulanFinal = cachedUsulan.filter(x =>
+            x.tahun == tahun &&
+            (x.status === 'final' || x.status === 'ranked_dusun')
+        ).sort((a, b) => (parseInt(a.rankingDesa) || 999) - (parseInt(b.rankingDesa) || 999));
+
+        const byDusun = {};
+        usulanFinal.forEach(u => {
+            if (!byDusun[u.dusun]) byDusun[u.dusun] = [];
+            byDusun[u.dusun].push(u);
+        });
+        let totalBiaya = usulanFinal.reduce((sum, u) => sum + (parseInt(u.estimasiBiaya) || 0), 0);
+
+        if (!STATE.baForm) {
+            STATE.baForm = {
+                tanggal: new Date().toISOString().slice(0, 10),
+                jamMulai: '13.30', jamSelesai: '16.00', zonaWaktu: 'WIB',
+                tempat: 'Kantor BPD Desa Jangkang', alamat: 'Jl. Raya Dendang Desa Jangkang Belitung Timur 33561',
+                nomorSurat: `05/BA-Musdes/XII/${tahun}`,
+                /* === IDENTITAS DESA (DIPATENKAN) === */
+                namaDesa: 'Jangkang', namaKec: 'Dendang',
+                namaKab: 'Belitung Timur', namaProv: 'Bangka Belitung',
+                /* === RKP & DU-RKP TAHUN (CONFIGURABLE) === */
+                rkpTahun: String(tahun),
+                durkpTahun: String(parseInt(tahun) + 1),
+                /* === PENANDATANGAN === */
+                kadesNama: '', kadesNip: '', bpdNama: '',
+                /* === WAKIL MASYARAKAT (5 ORANG) === */
+                wakilMasyarakat: ['', '', '', '', ''],
+                /* === UNSUR MUSDES === */
+                pemimpinMusyawarah: '', pemimpinAsal: 'Ketua BPD',
+                notulisNama: '', notulisAsal: '',
+                narasumber: [{ nama: '', asal: '' }, { nama: '', asal: '' }, { nama: '', asal: '' }, { nama: '', asal: '' }],
+                metodeKeputusan: 'musyawarah_mufakat',
+                activeTab: 'ringkas', resmiSubTab: 'utama'
+            };
+        }
+        const f = STATE.baForm;
+        // Backward compat
+        if (!f.narasumber || !Array.isArray(f.narasumber)) f.narasumber = [{ nama: '', asal: '' }, { nama: '', asal: '' }, { nama: '', asal: '' }, { nama: '', asal: '' }];
+        while (f.narasumber.length < 4) f.narasumber.push({ nama: '', asal: '' });
+        if (f.jamMulai === undefined) f.jamMulai = '13.30';
+        if (f.jamSelesai === undefined) f.jamSelesai = '16.00';
+        if (f.zonaWaktu === undefined) f.zonaWaktu = 'WIB';
+        if (f.alamat === undefined) f.alamat = 'Jl. Raya Dendang Desa Jangkang Belitung Timur 33561';
+        if (f.pemimpinMusyawarah === undefined) f.pemimpinMusyawarah = '';
+        if (f.pemimpinAsal === undefined) f.pemimpinAsal = 'Ketua BPD';
+        if (f.notulisAsal === undefined) f.notulisAsal = '';
+        if (f.metodeKeputusan === undefined) f.metodeKeputusan = 'musyawarah_mufakat';
+        if (!f.resmiSubTab) f.resmiSubTab = 'utama';
+        if (!f.rkpTahun) f.rkpTahun = String(tahun);
+        if (!f.durkpTahun) f.durkpTahun = String(parseInt(tahun) + 1);
+        /* === Backward compat: wakilMasyarakat string → array 5 === */
+        if (!Array.isArray(f.wakilMasyarakat)) {
+            if (typeof f.wakilMasyarakat === 'string' && f.wakilMasyarakat.trim()) {
+                f.wakilMasyarakat = [f.wakilMasyarakat, '', '', '', ''];
+            } else {
+                f.wakilMasyarakat = ['', '', '', '', ''];
+            }
+        }
+        while (f.wakilMasyarakat.length < 5) f.wakilMasyarakat.push('');
+
+        const noData = usulanFinal.length === 0;
+
+        return `
+        <div class="max-w-5xl mx-auto space-y-4">
+            <!-- ======================== FORM KONFIGURASI ======================== -->
+            <div class="no-print bg-white rounded-xl border p-4 space-y-3">
+                <h2 class="font-display font-bold text-sm text-gray-800 flex items-center gap-2">
+                    <i class="fas fa-sliders text-gray-400 text-xs"></i>Konfigurasi Berita Acara
+                </h2>
+
+                <!-- BARIS 1: Kop + Tanggal + Jam + Zona Waktu -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
+                    <!-- Tanggal + Jam + Zona (span 8 kolom) -->
+                    <div class="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <div>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-0.5">Tanggal</label>
+                            <input type="date" value="${f.tanggal}" class="w-full border rounded-md px-2.5 py-1.5 text-sm" onchange="STATE.baForm.tanggal=this.value; updateBAPreview();">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-0.5">Jam Mulai</label>
+                            <input type="text" value="${f.jamMulai}" placeholder="13.30" class="w-full border rounded-md px-2.5 py-1.5 text-sm" onchange="STATE.baForm.jamMulai=this.value; updateBAPreview();">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-0.5">Jam Selesai</label>
+                            <input type="text" value="${f.jamSelesai}" placeholder="16.00" class="w-full border rounded-md px-2.5 py-1.5 text-sm" onchange="STATE.baForm.jamSelesai=this.value; updateBAPreview();">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-0.5">Zona Waktu</label>
+                            <select class="w-full border rounded-md px-2.5 py-1.5 text-sm" onchange="STATE.baForm.zonaWaktu=this.value; updateBAPreview();">
+                                <option value="WIB" ${f.zonaWaktu === 'WIB' ? 'selected' : ''}>WIB</option>
+                                <option value="WITA" ${f.zonaWaktu === 'WITA' ? 'selected' : ''}>WITA</option>
+                                <option value="WIT" ${f.zonaWaktu === 'WIT' ? 'selected' : ''}>WIT</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BARIS 2: Tempat + No Surat + Metode + RKP/duRKP -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2">
+                    <div class="lg:col-span-2">
+                        <label class="block text-[10px] font-semibold text-gray-500 mb-0.5">Tempat</label>
+                        <input type="text" value="${f.tempat}" class="w-full border rounded-md px-2.5 py-1.5 text-sm" onchange="STATE.baForm.tempat=this.value; updateBAPreview();">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-semibold text-gray-500 mb-0.5">Nomor Surat</label>
+                        <input type="text" value="${f.nomorSurat}" class="w-full border rounded-md px-2.5 py-1.5 text-sm" onchange="STATE.baForm.nomorSurat=this.value; updateBAPreview();">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-semibold text-gray-500 mb-0.5">Metode Keputusan</label>
+                        <select class="w-full border rounded-md px-2.5 py-1.5 text-sm" onchange="STATE.baForm.metodeKeputusan=this.value; updateBAPreview();">
+                            <option value="musyawarah_mufakat" ${f.metodeKeputusan === 'musyawarah_mufakat' ? 'selected' : ''}>Musyawarah Mufakat</option>
+                            <option value="aklamasi" ${f.metodeKeputusan === 'aklamasi' ? 'selected' : ''}>Aklamasi</option>
+                            <option value="voting" ${f.metodeKeputusan === 'voting' ? 'selected' : ''}>Voting</option>
+                            <option value="mufakat_voting" ${f.metodeKeputusan === 'mufakat_voting' ? 'selected' : ''}>Mufakat & Voting</option>
+                        </select>
+                    </div>
+                    <div class="bg-violet-50 border border-violet-200 rounded-md p-1.5">
+                        <label class="block text-[10px] font-semibold text-violet-600 mb-0.5"><i class="fas fa-file-contract mr-1 text-violet-400"></i>RKP Tahun</label>
+                        <input type="text" value="${f.rkpTahun}" placeholder="2026" maxlength="4" class="w-full border border-violet-200 rounded-md px-2 py-1 text-sm font-semibold bg-white" onchange="STATE.baForm.rkpTahun=this.value; updateBAPreview();">
+                    </div>
+                    <div class="bg-violet-50 border border-violet-200 rounded-md p-1.5">
+                        <label class="block text-[10px] font-semibold text-violet-600 mb-0.5"><i class="fas fa-file-lines mr-1 text-violet-400"></i>du-RKP Tahun</label>
+                        <input type="text" value="${f.durkpTahun}" placeholder="2027" maxlength="4" class="w-full border border-violet-200 rounded-md px-2 py-1 text-sm font-semibold bg-white" onchange="STATE.baForm.durkpTahun=this.value; updateBAPreview();">
+                    </div>
+                </div>
+
+                <!-- BARIS 3: Unsur Pelaksana — Pemimpin + Notulis dalam 1 baris -->
+                <div class="bg-blue-50 border border-blue-100 rounded-lg p-2.5">
+                    <div class="flex items-center gap-1.5 mb-2">
+                        <i class="fas fa-users text-blue-500 text-[10px]"></i>
+                        <span class="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Unsur Pelaksana</span>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <div>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-0.5">Pemimpin Musyawarah</label>
+                            <input type="text" value="${f.pemimpinMusyawarah}" placeholder="Nama" class="w-full border rounded-md px-2.5 py-1.5 text-sm bg-white" onchange="STATE.baForm.pemimpinMusyawarah=this.value; updateBAPreview();">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-0.5">Asal Pemimpin</label>
+                            <input type="text" value="${f.pemimpinAsal}" placeholder="Ketua BPD" class="w-full border rounded-md px-2.5 py-1.5 text-sm bg-white" onchange="STATE.baForm.pemimpinAsal=this.value; updateBAPreview();">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-0.5">Notulis</label>
+                            <input type="text" value="${f.notulisNama}" placeholder="Nama" class="w-full border rounded-md px-2.5 py-1.5 text-sm bg-white" onchange="STATE.baForm.notulisNama=this.value; updateBAPreview();">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-0.5">Asal Notulis</label>
+                            <input type="text" value="${f.notulisAsal}" placeholder="Asal" class="w-full border rounded-md px-2.5 py-1.5 text-sm bg-white" onchange="STATE.baForm.notulisAsal=this.value; updateBAPreview();">
+                        </div>
+                    </div>
+
+                    <!-- Narasumber — compact 2 kolom -->
+                    <div class="mt-2 pt-2 border-t border-blue-200">
+                        <span class="text-[10px] font-bold text-blue-500 mb-1.5 block"><i class="fas fa-microphone mr-1"></i>Narasumber</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                            ${f.narasumber.map((n, i) => `
+                            <div class="flex gap-1.5 items-center">
+                                <span class="text-[10px] font-bold text-gray-400 w-3 shrink-0">${i + 1}.</span>
+                                <input type="text" value="${n.nama}" placeholder="Nama" class="flex-1 min-w-0 border rounded-md px-2 py-1 text-xs bg-white" onchange="STATE.baForm.narasumber[${i}].nama=this.value; updateBAPreview();">
+                                <input type="text" value="${n.asal}" placeholder="Asal" class="w-24 shrink-0 border rounded-md px-2 py-1 text-xs bg-white" onchange="STATE.baForm.narasumber[${i}].asal=this.value; updateBAPreview();">
+                            </div>`).join('')}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BARIS 4: Penandatangan — Kades + NIP + BPD dalam 1 baris -->
+                <div class="bg-amber-50 border border-amber-100 rounded-lg p-2.5">
+                    <div class="flex items-center gap-1.5 mb-2">
+                        <i class="fas fa-signature text-amber-500 text-[10px]"></i>
+                        <span class="text-[10px] font-bold text-amber-600 uppercase tracking-wider">Penandatangan</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <div>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-0.5">Kepala Desa</label>
+                            <input type="text" value="${f.kadesNama}" placeholder="Nama Lengkap" class="w-full border rounded-md px-2.5 py-1.5 text-sm bg-white" onchange="STATE.baForm.kadesNama=this.value; updateBAPreview();">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-0.5">NIP Kepala Desa</label>
+                            <input type="text" value="${f.kadesNip}" placeholder="NIP" class="w-full border rounded-md px-2.5 py-1.5 text-sm bg-white" onchange="STATE.baForm.kadesNip=this.value; updateBAPreview();">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-0.5">Ketua BPD</label>
+                            <input type="text" value="${f.bpdNama}" placeholder="Nama Lengkap" class="w-full border rounded-md px-2.5 py-1.5 text-sm bg-white" onchange="STATE.baForm.bpdNama=this.value; updateBAPreview();">
+                        </div>
+                    </div>
+
+                    <!-- Wakil Masyarakat — 5 kolom langsung -->
+                    <div class="mt-2 pt-2 border-t border-amber-200">
+                        <span class="text-[10px] font-bold text-amber-600 mb-1.5 block"><i class="fas fa-people-group mr-1"></i>Wakil Masyarakat (5 orang)</span>
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
+                            ${f.wakilMasyarakat.map((w, i) => `
+                            <div class="relative">
+                                <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400">${i + 1}.</span>
+                                <input type="text" value="${w}" placeholder="Nama" class="w-full border border-amber-200 rounded-md pl-6 pr-2 py-1.5 text-xs bg-white" onchange="STATE.baForm.wakilMasyarakat[${i}]=this.value; updateBAPreview();">
+                            </div>`).join('')}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PENGATURAN DAFTAR HADIR -->
+                <div class="bg-teal-50 border border-teal-100 rounded-lg p-2.5">
+                    <div class="flex items-center gap-1.5 mb-2">
+                        <i class="fas fa-clipboard-list text-teal-500 text-[10px]"></i>
+                        <span class="text-[10px] font-bold text-teal-600 uppercase tracking-wider">Pengaturan Daftar Hadir</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 items-end">
+                        <div>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-0.5">Jumlah Baris Peserta</label>
+                            <input type="number" value="${f.daftarHadirCount || 30}" min="5" max="200" class="w-full border rounded-md px-2.5 py-1.5 text-sm bg-white" onchange="STATE.baForm.daftarHadirCount=parseInt(this.value)||30; updateBAPreview();">
+                            <div class="text-[9px] text-gray-400 mt-0.5">* Ketik angka, preview akan otomatis menyesuaikan (min 5, max 200).</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BARIS 5: Tab + Aksi Simpan/Muat/Word -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-2 border-t">
+                    <div class="flex bg-gray-100 rounded-lg p-0.5">
+                        <button onclick="switchBABTab('ringkas')" id="baTabRingkas" class="px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all ${f.activeTab === 'ringkas' ? 'bg-white text-honey-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}">
+                            <i class="fas fa-file-lines mr-1"></i>BA Ringkas
+                        </button>
+                        <button onclick="switchBABTab('resmi')" id="baTabResmi" class="px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all ${f.activeTab === 'resmi' ? 'bg-white text-honey-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}">
+                            <i class="fas fa-stamp mr-1"></i>BA Resmi
+                        </button>
+                    </div>
+                    <div class="flex gap-2 flex-wrap justify-end">
+                        <button onclick="saveBAConfig()" class="px-3 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-lg shadow transition-colors flex items-center gap-1.5 justify-center">
+                            <i class="fas fa-floppy-disk"></i> Simpan Data
+                        </button>
+                        <button onclick="saveToWord()" ${noData ? 'disabled' : ''} class="px-4 py-2 bg-forest-600 hover:bg-forest-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg shadow transition-colors flex items-center gap-2 justify-center">
+                            <i class="fas fa-file-word"></i> Simpan ke Word
+                        </button>
+                    </div>
+                </div>
+
+            <!-- ======================== AREA PREVIEW ======================== -->
+            <div id="baPrintArea">
+                <div class="text-center py-12 text-gray-400">
+                    <span class="spinner"></span><p class="mt-3 text-sm">Memuat preview...</p>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    /* ==========================================
+    TAB SWITCHING
+    ========================================== */
+    function switchBABTab(tab) {
+        STATE.baForm.activeTab = tab;
+        const r = document.getElementById('baTabRingkas');
+        const e = document.getElementById('baTabResmi');
+        if (r) r.className = `px-4 py-2 rounded-md text-sm font-semibold transition-all ${tab === 'ringkas' ? 'bg-white text-honey-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`;
+        if (e) e.className = `px-4 py-2 rounded-md text-sm font-semibold transition-all ${tab === 'resmi' ? 'bg-white text-honey-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`;
+        updateBAPreview();
+    }
+
+    function switchBASubTab(sub) {
+        STATE.baForm.resmiSubTab = sub;
+        const map = { utama: 'baSubUtama', lampiran1: 'baSubLamp1', lampiran2: 'baSubLamp2' };
+        Object.entries(map).forEach(([key, id]) => {
+            const el = document.getElementById(id);
+            if (el) el.className = `px-3 py-1.5 rounded-md text-[11px] font-semibold transition-all ${key === sub ? 'bg-white text-honey-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`;
+        });
+        updateBAPreview();
+    }
+
+    /* ==========================================
+    UPDATE PREVIEW
+    ========================================== */
+    function updateBAPreview() {
+        const el = document.getElementById('baPrintArea');
+        if (!el) return;
+        const f = STATE.baForm;
+        const tahun = STATE.tahunAktif;
+        const usulanFinal = cachedUsulan.filter(x => x.tahun == tahun && (x.status === 'final' || x.status === 'ranked_dusun')).sort((a, b) => (parseInt(a.rankingDesa) || 999) - (parseInt(b.rankingDesa) || 999));
+        const byDusun = {};
+        usulanFinal.forEach(u => { if (!byDusun[u.dusun]) byDusun[u.dusun] = []; byDusun[u.dusun].push(u); });
+        const totalBiaya = usulanFinal.reduce((s, u) => s + (parseInt(u.estimasiBiaya) || 0), 0);
+
+        if (!usulanFinal.length) {
+            el.innerHTML = `<div class="bg-white rounded-2xl border p-8 text-center text-gray-400 border-dashed border-2">
+                <i class="fas fa-file-circle-xmark text-5xl mb-3 block opacity-30"></i>
+                <p class="font-semibold text-gray-500">Belum Ada Usulan Final</p>
+                <p class="text-xs mt-1">Isi form di atas setelah ada usulan dengan status "Diproses Dusun" atau "Final"</p>
+            </div>`;
+            return;
+        }
+        el.innerHTML = f.activeTab === 'ringkas' ? buildPreviewDraft(f, tahun, usulanFinal, byDusun, totalBiaya) : buildPreviewResmi(f, tahun, usulanFinal, byDusun, totalBiaya);
+        /* Hitung halaman setelah render selesai */
+        setTimeout(weCountPages, 150);
+    }
+
+    /* ==========================================
+    HELPERS
+    ========================================== */
+    function formatMetodeKeputusan(key) {
+        return { musyawarah_mufakat: 'Musyawarah Mufakat', aklamasi: 'Aklamasi', voting: 'Pemungutan Suara/Voting', mufakat_voting: 'Musyawarah Mufakat dan Pemungutan Suara/Voting' }[key] || 'Musyawarah Mufakat';
+    }
+
+    function formatTanggalLengkap(dateStr) {
+        const d = new Date(dateStr + 'T00:00:00');
+        const h = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        const b = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        return { hari: h[d.getDay()], tgl: d.getDate(), bln: b[d.getMonth()], thn: d.getFullYear() };
+    }
+
+    /* ==========================================
+    NARASUMBER ROWS — KOMPAK
+    ========================================== */
+    function buildNarasumberRows(f) {
+        const filled = (f.narasumber || []).filter(n => n.nama.trim());
+        if (filled.length > 0) {
+            return filled.map((n, i) =>
+                `<tr><td style="border:none; padding:0; vertical-align:top; line-height:1.5;">${i + 1}. ${escapeHtml(n.nama)}</td><td style="border:none; padding:0 4pt 0 3pt; vertical-align:top; white-space:nowrap; color:#555;">dari</td><td style="border:none; padding:0; vertical-align:top; line-height:1.5;">${escapeHtml(n.asal || '...................')}</td></tr>`
+            ).join('');
+        }
+        return [1, 2, 3, 4].map(i =>
+            `<tr><td style="border:none; padding:0; line-height:1.5;" colspan="3">${i}. ................... dari ...................</td></tr>`
+        ).join('');
+    }
+
+/* ==========================================
+    PREVIEW: BA RINGKAS
+    ========================================== */
+    function buildPreviewDraft(f, tahun, usulanFinal, byDusun, totalBiaya) {
+        const tglInfo = formatTanggalLengkap(f.tanggal);
+        let tablesHTML = Object.entries(byDusun).map(([dusun, items]) => `
+            <div style="margin-bottom:20pt;">
+                <h5 style="font-weight:bold; font-size:13px; background:#f3f4f6; padding:8px 12px; border-radius:8px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>📌 Dusun ${escapeHtml(dusun)}</span>
+                    <span style="font-size:11px; font-weight:normal; color:#6b7280;">${items.length} usulan</span>
+                </h5>
+                <table style="width:100%; border-collapse:collapse; font-size:11pt;">
+                    <thead style="background:#f9fafb;">
+                        <tr>
+                            <th style="border:1pt solid #e5e7eb; padding:6pt 8pt; text-align:left; font-size:10pt;">No</th>
+                            <th style="border:1pt solid #e5e7eb; padding:6pt 8pt; text-align:left; font-size:10pt;">Usulan</th>
+                            <th style="border:1pt solid #e5e7eb; padding:6pt 8pt; text-align:center; font-size:10pt;">RT</th>
+                            <th style="border:1pt solid #e5e7eb; padding:6pt 8pt; text-align:left; font-size:10pt;">Kategori</th>
+                            <th style="border:1pt solid #e5e7eb; padding:6pt 8pt; text-align:right; font-size:10pt;">Estimasi Biaya</th>
+                            <th style="border:1pt solid #e5e7eb; padding:6pt 8pt; text-align:center; font-size:10pt;">Rank</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${items.map((item, idx) => `<tr>
+                            <td style="border:1pt solid #e5e7eb; padding:5pt 8pt; text-align:center; color:#6b7280;">${idx + 1}</td>
+                            <td style="border:1pt solid #e5e7eb; padding:5pt 8pt; font-weight:500;">${escapeHtml(item.judul)}</td>
+                            <td style="border:1pt solid #e5e7eb; padding:5pt 8pt; text-align:center; color:#6b7280;">${Array.isArray(item.rt) ? item.rt.join(', ') : item.rt || '-'}</td>
+                            <td style="border:1pt solid #e5e7eb; padding:5pt 8pt;">${item.kategori}</td>
+                            <td style="border:1pt solid #e5e7eb; padding:5pt 8pt; text-align:right; font-weight:600;">${formatRupiah(item.estimasiBiaya)}</td>
+                            <td style="border:1pt solid #e5e7eb; padding:5pt 8pt; text-align:center; font-weight:700; color:#d97706;">${item.rankingDesa || '-'}</td>
+                        </tr>`).join('')}
+                        <tr style="background:#f9fafb; font-weight:bold;">
+                            <td colspan="4" style="border:1pt solid #e5e7eb; padding:6pt 8pt; text-align:right;">Subtotal Dusun ${escapeHtml(dusun)}</td>
+                            <td style="border:1pt solid #e5e7eb; padding:6pt 8pt; text-align:right;">${formatRupiah(items.reduce((s, i) => s + (parseInt(i.estimasiBiaya) || 0), 0))}</td>
+                            <td style="border:1pt solid #e5e7eb; padding:6pt 8pt;"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>`).join('');
+
+        return `
+        <!-- TOMBOL CETAK DI LUAR KONTEN PRINTER -->
+        <div class="flex justify-end mb-3 no-print">
+            <button onclick="printDraftPage()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg shadow transition-colors flex items-center gap-2">
+                <i class="fas fa-print"></i> Cetak Halaman Ini
+            </button>
+        </div>
+
+        <!-- KONTEN YANG AKAN DICETAK -->
+        <div id="baDraftContent" class="bg-white rounded-2xl border p-5 md:p-6 space-y-5">
+            <div style="border-bottom:2px solid #e5e7eb; padding-bottom:12px; margin-bottom:16px;">
+                <h2 style="font-size:18px; font-weight:bold; color:#1f2937; margin:0 0 4px 0;">Berita Acara Musyawarah Desa</h2>
+                <p style="font-size:13px; color:#6b7280; margin:0;">RKP Desa Tahun ${f.rkpTahun || '....'} & Du-RKP Desa Tahun ${f.durkpTahun || '....'}</p>
+            </div>
+            
+            <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:12px; padding:16px; margin-bottom:16px;">
+                <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:16px; text-align:center;">
+                    <div><div style="font-size:24px; font-weight:bold; color:#b45309;">${usulanFinal.length}</div><div style="font-size:11px; color:#d97706; font-weight:500;">Total Usulan</div></div>
+                    <div><div style="font-size:24px; font-weight:bold; color:#b45309;">${Object.keys(byDusun).length}</div><div style="font-size:11px; color:#d97706; font-weight:500;">Dusun</div></div>
+                    <div><div style="font-size:18px; font-weight:bold; color:#b45309;">${formatRupiah(totalBiaya)}</div><div style="font-size:11px; color:#d97706; font-weight:500;">Total Estimasi</div></div>
+                    <div><div style="font-size:18px; font-weight:bold; color:#b45309;">${formatRupiah(usulanFinal.length ? Math.round(totalBiaya / usulanFinal.length) : 0)}</div><div style="font-size:11px; color:#d97706; font-weight:500;">Rata-rata</div></div>
+                </div>
+            </div>
+            
+            <div style="font-size:12px; color:#4b5563; margin-bottom:16px; line-height:1.6;">
+                <p style="margin:0 0 4px 0;"><b>Tanggal:</b> ${tglInfo.hari}, ${tglInfo.tgl} ${tglInfo.bln} ${tglInfo.thn} | <b>Jam:</b> ${f.jamMulai || '...'} s/d ${f.jamSelesai || '...'} ${f.zonaWaktu || 'WIB'} | <b>Tempat:</b> ${escapeHtml(f.tempat) || '...'}</p>
+                <p style="margin:0;"><b>Metode:</b> ${formatMetodeKeputusan(f.metodeKeputusan)} | <b>Pemimpin:</b> ${escapeHtml(f.pemimpinMusyawarah) || '...'}</p>
+            </div>
+            
+            ${tablesHTML}
+            
+            <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:12px; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; font-weight:bold; font-size:13px;">
+                <span>TOTAL SELURUH USULAN PRIORITAS</span><span style="color:#b45309;">${formatRupiah(totalBiaya)}</span>
+            </div>
+        </div>`;
+    }
+
+    /* ==========================================
+        PRINT DRAFT PAGE ENGINE (WINDOW POPUP)
+        ========================================== */
+    function printDraftPage() {
+        const contentEl = document.getElementById('baDraftContent');
+        if (!contentEl) {
+            showToast('Konten draft tidak ditemukan.', 'error');
+            return;
+        }
+
+        const content = contentEl.innerHTML;
+
+        const printHTML = `<!DOCTYPE html>
+    <html lang="id">
+    <head>
+    <meta charset="UTF-8">
+    <title>Cetak BA Ringkas - Desa Jangkang</title>
+    <style>
+        @page { size: A4; margin: 15mm; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; color: #000; line-height: 1.4; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1pt solid #e5e7eb; padding: 5pt 8pt; }
+        /* Jaga agar baris tabel tidak terpisah oleh halaman baru */
+        tr { page-break-inside: avoid; } 
+    </style>
+    </head>
+    <body>
+        ${content}
+    </body>
+    </html>`;
+
+        const printWin = window.open('', '_blank', 'width=900,height=700');
+        if (!printWin) {
+            showToast('Pop-up diblokir browser. Izinkan pop-up untuk mencetak.', 'error');
+            return;
+        }
+
+        printWin.document.write(printHTML);
+        printWin.document.close();
+
+        // Cetak langsung setelah konten selesai dimuat
+        printWin.onload = function() {
+            setTimeout(() => { printWin.print(); }, 300);
+        };
+        
+        showToast('Menyiapkan halaman cetak...', 'info');
+    }
+
+/* ==========================================
+    PREVIEW: BA RESMI — READ-ONLY BERSIH
+    ========================================== */
+    function buildPreviewResmi(f, tahun, usulanFinal, byDusun, totalBiaya) {
+        const sub = f.resmiSubTab || 'utama';
+        
+        // PINDAHKAN KE SINI SEBAGAI VARIABEL GLOBAL DI FUNGSI INI
+        const tglInfo = formatTanggalLengkap(f.tanggal);
+
+        /* Bangun konten halaman */
+        let content = '';
+        if (sub === 'utama') content = buildMainBAContent(f, tahun, tglInfo, usulanFinal, byDusun, totalBiaya);
+        else if (sub === 'lampiran1') content = buildLampiranRingkasContent(f, tahun, usulanFinal, byDusun, totalBiaya, tglInfo);
+        else if (sub === 'lampiran2') content = buildLampiranDetailContent(f, tahun, usulanFinal, byDusun, totalBiaya, tglInfo);
+        else if (sub === 'lampiran3') content = buildLampiranSDGsContent(f, tahun, usulanFinal, byDusun, totalBiaya, tglInfo);
+        else if (sub === 'lampiran4') content = buildLampiranDaftarHadirContent(f, tahun, tglInfo);
+
+        /* Sub-tab navigation saja */
+        const subNav = `<div class="no-print flex flex-wrap bg-gray-100 rounded-lg p-1 mb-4 gap-1">
+            <button onclick="switchBASubTab('utama')" id="baSubUtama" class="px-3 py-1.5 rounded-md text-[11px] font-semibold transition-all ${sub === 'utama' ? 'bg-white text-honey-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}">
+                <i class="fas fa-file-contract mr-1"></i>Dokumen Utama
+            </button>
+            <button onclick="switchBASubTab('lampiran1')" id="baSubLamp1" class="px-3 py-1.5 rounded-md text-[11px] font-semibold transition-all ${sub === 'lampiran1' ? 'bg-white text-honey-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}">
+                <i class="fas fa-table-list mr-1"></i>Lampiran I
+            </button>
+            <button onclick="switchBASubTab('lampiran2')" id="baSubLamp2" class="px-3 py-1.5 rounded-md text-[11px] font-semibold transition-all ${sub === 'lampiran2' ? 'bg-white text-honey-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}">
+                <i class="fas fa-list-check mr-1"></i>Lampiran II
+            </button>
+            <button onclick="switchBASubTab('lampiran3')" id="baSubLamp3" class="px-3 py-1.5 rounded-md text-[11px] font-semibold transition-all ${sub === 'lampiran3' ? 'bg-white text-honey-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}">
+                <i class="fas fa-earth-americas mr-1"></i>Lampiran III
+            </button>
+            <button onclick="switchBASubTab('lampiran4')" id="baSubLamp4" class="px-3 py-1.5 rounded-md text-[11px] font-semibold transition-all ${sub === 'lampiran4' ? 'bg-white text-honey-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}">
+                <i class="fas fa-clipboard-list mr-1"></i>Lampiran IV — Hadir
+            </button>
+        </div>`;
+
+        /* Kertas A4 — read only, tanpa pengaturan apapun */
+        const paper = `
+    <div style="background:repeating-conic-gradient(#d5d5d5 0% 25%, #e3e3e3 0% 50%) 50% / 20px 20px;
+                padding:40px 0 60px; position:relative;">
+
+        <!-- Label atas -->
+        <div class="no-print" style="position:absolute; top:12px; left:50%; transform:translateX(-50%);
+             font-family:'Segoe UI',Tahoma,sans-serif; font-size:10px; color:#888;
+             background:rgba(230,230,230,.85); padding:3px 14px; border-radius:20px;
+             letter-spacing:.5px; backdrop-filter:blur(4px); z-index:10; white-space:nowrap;">
+            <i class="fas fa-eye" style="margin-right:4px; opacity:.6;"></i>Preview A4 — 210 × 297 mm
+        </div>
+
+        <!-- Kertas putih -->
+        <div style="width:210mm; margin:0 auto; position:relative; background:#fff;
+                    border:1px solid #c0c0c0; border-radius:1px;
+                    box-shadow:0 1px 3px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.06), 0 12px 36px rgba(0,0,0,.1);">
+
+            <!-- CSS: salinan 1:1 dari printBAPDF() -->
+            <style>
+                #wePaper, #wePaper * { all: revert; }
+                #wePaper * { margin:0; padding:0; box-sizing:content-box; }
+                #wePaper { font-family:Arial,Helvetica,sans-serif; font-size:12pt; color:#000; -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; }
+                #wePaper table { border-collapse:collapse; width:100%; table-layout:auto; }
+                #wePaper th { white-space:nowrap!important; }
+                #wePaper tr { page-break-inside:avoid; page-break-after:auto; }
+                #wePaper thead { display:table-header-group; }
+                #wePaper tfoot { display:table-footer-group; }
+                #wePaper p, #wePaper div { orphans:3; widows:3; }
+                #wePaper img { max-width:88px; height:auto; }
+            </style>
+
+            <!-- Konten read-only -->
+            <div id="wePaper" style="position:relative; z-index:2; background:transparent;
+                        padding:25mm 25mm 25mm 25mm; line-height:1.5;
+                        overflow-wrap:break-word; word-break:break-word;">
+                ${content}
+            </div>
+        </div>
+    </div>`;
+
+        return subNav + paper;
+    }
+
+    /* ==========================================
+    KONTEN: DOKUMEN UTAMA (LENGKAP — PERMENDAGRI 114/2014)
+    ========================================== */
+    function buildMainBAContent(f, tahun, tglInfo, usulanFinal, byDusun, totalBiaya) {
+        const rkpT = f.rkpTahun || '........';
+        const durkpT = f.durkpTahun || '........';
+        const tempat = f.tempat || '...................';
+        const pemimpin = f.pemimpinMusyawarah || '...................';
+        const pemimpinAsal = f.pemimpinAsal || 'Ketua BPD';
+        const notulis = f.notulisNama || '...................';
+        const notulisAsal = f.notulisAsal || '...................';
+        const kades = f.kadesNama || '....................................';
+        const bpd = f.bpdNama || '....................................';
+        const kadesNip = f.kadesNip || '';
+        const wakilArr = Array.isArray(f.wakilMasyarakat) ? [...f.wakilMasyarakat] : ['', '', '', '', ''];
+        while (wakilArr.length < 5) wakilArr.push('');
+
+        /* Hitung jumlah RT unik dari data */
+        const setRT = new Set();
+        usulanFinal.forEach(u => {
+            (Array.isArray(u.rt) ? u.rt : [u.rt]).forEach(r => { if (r) setRT.add(r); });
+        });
+        const jmlRT = setRT.size;
+        const daftarDusun = Object.keys(byDusun);
+        const daftarDusunText = daftarDusun.length > 0
+            ? daftarDusun.map(d => 'Dusun ' + d).join(', ')
+            : 'seluruh dusun';
+
+        return `
+        <!-- JUDUL DOKUMEN -->
+        <div style="text-align:center; margin-bottom:10pt;">
+            <div style="font-size:14pt; font-weight:bold; text-transform:uppercase; letter-spacing:1pt;">BERITA ACARA</div>
+            <div style="font-size:11pt; margin-top:1pt; font-weight:bold;">Nomor: ${escapeHtml(f.nomorSurat || '...................')}</div>
+            <div style="font-size:14pt; font-weight:bold; text-transform:uppercase; margin-top:8pt;">MUSYAWARAH DESA (MUSDES)</div>
+            <div style="font-size:14pt; font-weight:bold; text-transform:uppercase; margin-top:1pt;">TENTANG DESA</div>
+            <div style="font-size:14pt; font-weight:bold; text-transform:uppercase; margin-top:1pt;">PERENCANAAN PEMBANGUNAN DESA</div>
+            <div style="font-size:11pt; font-weight:bold; margin-top:8pt; line-height:1.5;">
+                Dalam Rangka Penyusunan RKP Desa Tahun ${escapeHtml(rkpT)} dan Du-RKP Desa Tahun ${escapeHtml(durkpT)}<br>
+                Desa Jangkang Kecamatan Dendang Kabupaten Belitung Timur Provinsi Kepulauan Bangka Belitung.
+            </div>
+        </div>
+
+        <!-- PARAGRAF PEMBUKA -->
+        <div style="font-size:12pt; text-align:justify; text-indent:40pt; margin-bottom:10pt; line-height:1.6;">
+            Pada hari ini <b>${tglInfo.hari}</b>, tanggal <b>${tglInfo.tgl} ${tglInfo.bln} ${tglInfo.thn}</b>,
+            bertempat di <b>${escapeHtml(tempat)}</b>, telah dilaksanakan Musyawarah Desa (Musdes)
+            Perencanaan Pembangunan Desa Tahunan Desa Jangkang, Kecamatan Dendang,
+            Kabupaten Belitung Timur, Provinsi Kepulauan Bangka Belitung.
+        </div>
+
+        <!-- INFORMASI WAKTU & TEMPAT -->
+        <table style="font-size:12pt; margin-bottom:12pt; width:100%; max-width:480pt;">
+            <tr><td style="vertical-align:top; width:130pt;">Hari / Tanggal</td><td style="vertical-align:top; width:12pt;">:</td><td>${tglInfo.hari}, ${tglInfo.tgl} ${tglInfo.bln} ${tglInfo.thn}</td></tr>
+            <tr><td style="vertical-align:top;">Waktu</td><td style="vertical-align:top;">:</td><td>${escapeHtml(f.jamMulai || '............')} s/d ${escapeHtml(f.jamSelesai || '............')} ${escapeHtml(f.zonaWaktu || 'WIB')}</td></tr>
+            <tr><td style="vertical-align:top;">Tempat</td><td style="vertical-align:top;">:</td><td>${escapeHtml(tempat)}</td></tr>
+        </table>
+
+        <!-- UNSUR YANG HADIR — WAJIB PERMENDAGRI 114 PASAL 56 -->
+        <div style="font-size:12pt; text-align:justify; text-indent:40pt; margin-bottom:8pt; line-height:1.6;">
+            Musyawarah Desa ini dipimpin oleh <b>${escapeHtml(pemimpin)}</b>
+            selaku ${escapeHtml(pemimpinAsal)} dan telah dihadiri oleh Perangkat Desa,
+            Kepala Dusun, serta unsur lain yang terkait dengan Desa sebagaimana tercantum dalam<b><i>daftar hadir terlampir</i></b>.
+        </div>
+
+        <!-- AGENDA MUSYAWARAH — WAJIB PERMENDAGRI 114 -->
+        <div style="font-size:12pt; font-weight:bold; text-transform:uppercase; margin-bottom:8pt;">A. Agenda Musyawarah</div>
+        <div style="font-size:12pt; text-align:justify; text-indent:40pt; margin-bottom:8pt; line-height:1.6;">
+            Musyawarah Desa ini membahas agenda sebagai berikut:
+        </div>
+        <table style="width:100%; border-collapse:collapse; margin-bottom:14pt; font-size:11pt;">
+            <tr style="background:#e0e0e0;">
+                <td style="border:1pt solid #000; padding:5pt 8pt; text-align:center; font-weight:bold; white-space:nowrap;">No</td>
+                <td style="border:1pt solid #000; padding:5pt 8pt; font-weight:bold;">Agenda Musyawarah</td>
+            </tr>
+            <tr><td style="border:1pt solid #000; padding:4pt 8pt; text-align:center;">1</td><td style="border:1pt solid #000; padding:5pt 8pt;">Pembukaan dan penyampaian tujuan Musyawarah Desa</td></tr>
+            <tr><td style="border:1pt solid #000; padding:4pt 8pt; text-align:center;">2</td><td style="border:1pt solid #000; padding:5pt 8pt;">Penyampaian hasil musyawarah dusun (musdus) dari masing-masing dusun mengenai usulan kegiatan pembangunan Desa Jangkang Tahun ${escapeHtml(rkpT)}</td></tr>
+            <tr><td style="border:1pt solid #000; padding:4pt 8pt; text-align:center;">3</td><td style="border:1pt solid #000; padding:5pt 8pt;">Pembahasan, prioritisasi, dan penetapan usulan kegiatan pembangunan desa yang akan dimasukkan dalam RKP Desa Tahun ${escapeHtml(rkpT)}</td></tr>
+            <tr><td style="border:1pt solid #000; padding:4pt 8pt; text-align:center;">4</td><td style="border:1pt solid #000; padding:5pt 8pt;">Penyampaian gambaran rencana kegiatan jangka menengah untuk persiapan Du-RKP Desa Tahun ${escapeHtml(durkpT)}</td></tr>
+            <tr><td style="border:1pt solid #000; padding:4pt 8pt; text-align:center;">5</td><td style="border:1pt solid #000; padding:5pt 8pt;">Pemilihan calon Anggota Tim penyusun RKP Desa Tahun ${escapeHtml(rkpT)} dan Du-RKP Desa Tahun ${escapeHtml(durkpT)}</td></tr>
+            <tr><td style="border:1pt solid #000; padding:4pt 8pt; text-align:center;">6</td><td style="border:1pt solid #000; padding:5pt 8pt;">Penandatanganan Berita Acara Musyawarah Desa (Musdes) Perencanaan Pembangunan Desa Dalam Rangka Penyusunan RKP Desa Tahun ${escapeHtml(rkpT)} dan Du-RKP Desa Tahun ${escapeHtml(durkpT)}, Desa Jangkang Kecamatan Dendang Kabupaten Belitung Timur Provinsi Kepulauan Bangka Belitung.</td></tr>
+            <tr><td style="border:1pt solid #000; padding:4pt 8pt; text-align:center;">7</td><td style="border:1pt solid #000; padding:5pt 8pt;">Penutup</td></tr>
+        </table>
+
+        <!-- MATERI & NARASUMBER -->
+        <div style="font-size:12pt; margin-bottom:8pt; text-align:justify; text-indent:40pt; line-height:1.6;">
+            Materi yang dibahas, serta yang bertindak selaku unsur pimpinan rapat dan narasumber
+            dalam membahas kegiatan Desa Musdes Perencanaan Pembangunan Desa di Desa Jangkang
+            Tahun ${tglInfo.thn} adalah:
+        </div>
+        <table style="width:100%; border-collapse:collapse; font-size:11pt; margin-bottom:14pt;">
+            <thead><tr style="background:#e0e0e0;">
+                <th style="border:1pt solid #000; padding:6pt 10pt; text-align:left; width:55%;">Materi</th>
+                <th style="border:1pt solid #000; padding:6pt 10pt; text-align:left; width:45%;">Unsur Pimpinan Rapat dan Narasumber</th>
+            </tr></thead>
+            <tbody><tr style="vertical-align:top;">
+                <td style="border:1pt solid #000; padding:6pt 10pt;">
+                    <table style="border:none; border-collapse:collapse; width:100%;">
+                        <tr>
+                            <td style="border:none; padding:0; vertical-align:top; width:15pt;">1.</td>
+                            <td style="border:none; padding:0 0 6pt 0; vertical-align:top;">Penyampaian Alur Perencanaan Pembangunan Desa</td>
+                        </tr>
+                        <tr>
+                            <td style="border:none; padding:0; vertical-align:top; width:15pt;">2.</td>
+                            <td style="border:none; padding:0 0 6pt 0; vertical-align:top;">Pembahasan Usulan Hasil Musyawarah Dusun</td>
+                        </tr>
+                        <tr>
+                            <td style="border:none; padding:0; vertical-align:top; width:15pt;">3.</td>
+                            <td style="border:none; padding:0; vertical-align:top;">Penetapan Usulan Prioritas Pembangunan Desa</td>
+                        </tr>
+                    </table>
+                </td>
+                <td style="border:1pt solid #000; padding:5pt 8pt; vertical-align:top;">
+                    <table style="border:none; font-size:11pt; width:100%; line-height:1.45;">
+                        <tr>
+                            <td style="border:none; padding:0; vertical-align:top; white-space:nowrap;">Pemimpin Musyawarah</td>
+                            <td style="border:none; padding:0 4pt; vertical-align:top;">:</td>
+                            <td style="border:none; padding:0; vertical-align:top;"><b>${escapeHtml(pemimpin)}</b> dari ${escapeHtml(pemimpinAsal)}</td>
+                        </tr>
+                        <tr>
+                            <td style="border:none; padding:0; vertical-align:top;">Notulis</td>
+                            <td style="border:none; padding:0 4pt; vertical-align:top;">:</td>
+                            <td style="border:none; padding:0; vertical-align:top;">${escapeHtml(notulis)} dari ${escapeHtml(notulisAsal)}</td>
+                        </tr>
+                        <tr><td style="border:none; padding:3pt 0 1pt 0;" colspan="3"><b style="font-size:10.5pt;">Narasumber:</b></td></tr>
+                        ${buildNarasumberRows(f)}
+                    </table>
+                </td>
+            </tr></tbody>
+        </table>
+
+        <!-- HASIL MUSYAWARAH PER AGENDA — NARASI WAJIB -->
+        <div style="font-size:12pt; font-weight:bold; text-transform:uppercase; margin-bottom:8pt;">B. Hasil Musyawarah</div>
+
+        <div style="font-size:12pt; text-align:justify; text-indent:40pt; margin-bottom:8pt; line-height:1.6;">
+            <b>Agenda 1 — Pembukaan:</b>
+            Musyawarah Desa dibuka oleh ${escapeHtml(pemimpin)} selaku ${escapeHtml(pemimpinAsal)}
+            dengan menyampaikan tujuan pelaksanaan Musdes, yaitu untuk menyusun
+            RKP Desa Tahun ${escapeHtml(rkpT)} dan mempersiapkan Du-RKP Desa Tahun ${escapeHtml(durkpT)}
+            berdasarkan aspirasi masyarakat yang telah dihimpun melalui musyawarah dusun.
+        </div>
+
+        <div style="font-size:12pt; text-align:justify; text-indent:40pt; margin-bottom:8pt; line-height:1.6;">
+            <b>Agenda 2 — Penyampaian Hasil Musdus:</b>
+            Narasumber menyampaikan rekapitulasi hasil musyawarah dusun dari
+            ${daftarDusunText} yang telah dilaksanakan sebelumnya.
+            Total usulan yang masuk dari hasil musdus adalah <b>${usulanFinal.length} usulan</b>
+            dengan total estimasi biaya sebesar <b>${formatRupiah(totalBiaya)}</b>.
+        </div>
+
+        <div style="font-size:12pt; text-align:justify; text-indent:40pt; margin-bottom:8pt; line-height:1.6;">
+            <b>Agenda 3 — Pembahasan dan Prioritisasi:</b>
+            Seluruh peserta musyawarah melakukan pembahasan terhadap ${usulanFinal.length} usulan
+            yang telah disampaikan. Pembahasan mencakup kelayakan teknis, urgensitas, dan
+            dampak terhadap masyarakat. Melalui musyawarah yang demokratis, peserta menyepakati
+            prioritas usulan sebagaimana tercantum dalam <b>Lampiran I</b> (Rekapitulasi Ringkas)
+            dan <b>Lampiran II</b> (Rincian Detail) Berita Acara ini.
+        </div>
+
+        <div style="font-size:12pt; text-align:justify; text-indent:40pt; margin-bottom:8pt; line-height:1.6;">
+            <b>Agenda 4 — Du-RKP Desa:</b>
+            Sebagai persiapan penyusunan Du-RKP Desa Tahun ${escapeHtml(durkpT)},
+            telah disampaikan gambaran awal rencana kegiatan jangka menengah desa yang
+            akan dibahas lebih lanjut pada musyawarah berikutnya.
+        </div>
+
+        <div style="font-size:12pt; text-align:justify; text-indent:40pt; margin-bottom:8pt; line-height:1.6;">
+            <b>Agenda 5 — Pemilihan Anggota Tim Penyusun:</b>
+            Pemilihan calon Anggota Tim penyusun RKP Desa Tahun ${escapeHtml(rkpT)} dan Du-RKP Desa Tahun ${escapeHtml(durkpT)}, 
+            yang nantinya akan dibuat SK penunjukannya.
+        </div>
+
+        <div style="font-size:12pt; text-align:justify; text-indent:40pt; margin-bottom:8pt; line-height:1.6;">
+            <b>Agenda 6 — Penandatanganan Berita Acara:</b>
+            Penandatanganan Berita Acara Musyawarah Desa (Musdes) Perencanaan Pembangunan Desa 
+            Dalam Rangka Penyusunan RKP Desa Tahun ${escapeHtml(rkpT)} dan Du-RKP Desa Tahun ${escapeHtml(durkpT)}, 
+            Oleh Kepala Desa BPD dan Wakil-Wail Masyarakat.
+        </div>
+
+        <div style="font-size:12pt; text-align:justify; text-indent:40pt; margin-bottom:8pt; line-height:1.6;">
+            <b>Agenda 7 — Penutup:</b>
+            Musyawarah Desa ditutup oleh ${escapeHtml(pemimpin)} setelah seluruh agenda
+            terlaksana dengan baik dan hasil musyawarah telah disepakati bersama
+            oleh seluruh peserta.
+        </div>
+
+        <!-- METODE PENGAMBILAN KEPUTUSAN -->
+        <div style="font-size:12pt; font-weight:bold; text-transform:uppercase; margin-bottom:8pt;">C. Metode Pengambilan Keputusan</div>
+        <div style="font-size:12pt; text-align:justify; text-indent:40pt; margin-bottom:14pt; line-height:1.6;">
+            Pengambilan keputusan dalam Musyawarah Desa ini dilakukan melalui
+            <b>${formatMetodeKeputusan(f.metodeKeputusan)}</b> sebagaimana diamanatkan dalam
+            Pasal 27 ayat (2) Permendagri Nomor 114 Tahun 2014 tentang Pedoman Pembangunan Desa,
+            yang menyatakan bahwa pengambilan keputusan dalam musyawarah perencanaan pembangunan
+            desa dilakukan secara demokratis melalui musyawarah mufakat.
+            Seluruh peserta musyawarah telah menyepakati hasil keputusan yang tercantum
+            dalam berita acara ini.
+        </div>
+
+        <!-- PENUTUP -->
+        <div style="font-size:12pt; font-weight:bold; text-transform:uppercase; margin-bottom:8pt;">D. Penutup</div>
+        <div style="font-size:12pt; text-align:justify; text-indent:40pt; margin-bottom:6pt; line-height:1.6;">
+            Demikian Berita Acara Musyawarah Desa ini dibuat dengan sebenar-benarnya
+            untuk dapat dipergunakan sebagaimana mestinya. Apabila di kemudian hari
+            terdapat kekeliruan dalam berita acara ini, akan diadakan perbaikan
+            sebagaimana mestinya.
+        </div>
+        <div style="font-size:12pt; text-align:justify; text-indent:40pt; margin-bottom:6pt; line-height:1.6;">
+            Susunan lampiran Berita Acara ini terdiri dari:
+        </div>
+        <table style="width:100%; border:none; border-collapse:collapse; margin-bottom:14pt; font-size:11pt;">
+            <tr>
+                <td style="border:none; padding:2pt 0; width:24pt; text-align:right; vertical-align:top; padding-right:8pt;">1.</td>
+                <td style="border:none; padding:2pt 0; vertical-align:top;">Lampiran I — Rekapitulasi Usulan Prioritas Per Dusun (Ringkas)</td>
+            </tr>
+            <tr>
+                <td style="border:none; padding:2pt 0; text-align:right; vertical-align:top; padding-right:8pt;">2.</td>
+                <td style="border:none; padding:2pt 0; vertical-align:top;">Lampiran II — Rincian Detail Seluruh Usulan Pembangunan Desa</td>
+            </tr>
+            <tr>
+                <td style="border:none; padding:2pt 0; text-align:right; vertical-align:top; padding-right:8pt;">4.</td>
+                <td style="border:none; padding:2pt 0; vertical-align:top;">Lampiran III — Rekapitulasi Usulan Pembangunan Desa Berdasarkan Tujuan SDGs</td>
+            </tr>
+            <tr>
+                <td style="border:none; padding:2pt 0; text-align:right; vertical-align:top; padding-right:8pt;">4.</td>
+                <td style="border:none; padding:2pt 0; vertical-align:top;">Lampiran IV — Daftar Hadir Peserta Musyawarah Desa</td>
+            </tr>
+        </table>
+
+        <!-- TANDA TANGAN: KADES & BPD SEJAJAR, 5 WAKIL BAWAH -->
+        <div style="margin-top:20pt;">
+            <table style="width:100%; border:none; border-collapse:collapse; font-size:11pt;">
+                <tr style="vertical-align:top;">
+                    <td style="border:none; width:50%; text-align:center; padding:0 10pt 0 0;">
+                        <div style="height:15pt;"></div>
+                        <div style="font-weight:bold;">Kepala Desa Jangkang</div>
+                        <div style="height:65pt;"></div>
+                        <div style="font-weight:bold;">${escapeHtml(kades)}</div>
+                        ${kadesNip ? '<div style="font-size:9pt;">NIP. ' + escapeHtml(kadesNip) + '</div>' : ''}
+                    </td>
+                    <td style="border:none; width:50%; text-align:center; padding:0 0 0 10pt;">
+                        <div>Jangkang, ${tglInfo.tgl} ${tglInfo.bln} ${tglInfo.thn}</div>
+                        <div style="font-weight:bold;">Ketua BPD Desa Jangkang</div>
+                        <div style="height:65pt;"></div>
+                        <div style="font-weight:bold;">${escapeHtml(bpd)}</div>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- 5 WAKIL MASYARAKAT -->
+            <div style="margin-top:20pt; text-align:center; font-size:10pt; font-weight:bold; margin-bottom:6pt;">
+                Wakil Masyarakat,
+            </div>
+            <table style="width:100%; border:none; border-collapse:collapse; font-size:10pt;">
+                <tr style="vertical-align:top;">
+                    ${wakilArr.map(w => `
+                    <td style="border:none; width:20%; text-align:center; padding:0 3pt;">
+                        <div style="height:55pt;"></div>
+                        <div style="font-weight:bold;">${escapeHtml(w || '...................')}</div>
+                    </td>`).join('')}
+                </tr>
+            </table>
+        </div>`;
+    }
+
+/* ==========================================
+    LAMPIRAN I — REKAPITULASI RINGKAS PER DUSUN
+    ========================================== */
+    function buildLampiranRingkasContent(f, tahun, usulanFinal, byDusun, totalBiaya, tglInfo) {
+        const rkpT = f.rkpTahun || '........';
+        const durkpT = f.durkpTahun || '........';
+        
+        /* Variabel Tambahan untuk Tanda Tangan */
+        const kades = f.kadesNama || '....................................';
+        const bpd = f.bpdNama || '....................................';
+        const kadesNip = f.kadesNip || '';
+        
+        // FALLBACK AMAN: Jika tglInfo tidak dikirim, ambil dari f
+        if (!tglInfo || !tglInfo.tgl) tglInfo = f.tglInfo || { tgl: '............', bln: '............', thn: '............' };
+
+        let tabelRows = '';
+        let no = 0;
+
+        Object.entries(byDusun).forEach(([dusun, items]) => {
+            const subTotal = items.reduce((s, i) => s + (parseInt(i.estimasiBiaya) || 0), 0);
+            tabelRows += `
+            <tr style="background:#e8f5e9;">
+                <td colspan="5" style="border:1pt solid #000; padding:5pt 8pt; font-weight:bold; font-size:10pt;">
+                    DUSUN ${escapeHtml(dusun.toUpperCase())} (${items.length} usulan)
+                </td>
+            </tr>`;
+            items.forEach(item => {
+                no++;
+                tabelRows += `
+                <tr>
+                    <td style="border:1pt solid #999; padding:3pt 6pt; text-align:center; font-size:10pt;">${no}</td>
+                    <td style="border:1pt solid #999; padding:3pt 6pt; font-size:10pt;">${escapeHtml(item.judul)}</td>
+                    <td style="border:1pt solid #999; padding:3pt 6pt; text-align:center; font-size:10pt;">${Array.isArray(item.rt) ? item.rt.join(', ') : (item.rt || '-')}</td>
+                    <td style="border:1pt solid #999; padding:3pt 6pt; text-align:center; font-size:10pt;">${item.rankingDesa || '-'}</td>
+                    <td style="border:1pt solid #999; padding:3pt 6pt; text-align:right; font-size:10pt;">${formatRupiah(item.estimasiBiaya)}</td>
+                </tr>`;
+            });
+            tabelRows += `
+            <tr style="background:#f5f5f5; font-weight:bold;">
+                <td colspan="4" style="border:1pt solid #999; padding:4pt 6pt; text-align:right; font-size:10pt;">Subtotal Dusun ${escapeHtml(dusun)}</td>
+                <td style="border:1pt solid #999; padding:4pt 6pt; text-align:right; font-size:10pt;">${formatRupiah(subTotal)}</td>
+            </tr>`;
+        });
+
+        tabelRows += `
+        <tr style="background:#1b5e20; color:#fff; font-weight:bold;">
+            <td colspan="4" style="border:1pt solid #1b5e20; padding:6pt 8pt; text-align:right; font-size:11pt;">TOTAL SELURUH USULAN PRIORITAS</td>
+            <td style="border:1pt solid #1b5e20; padding:6pt 8pt; text-align:right; font-size:11pt;white-space:nowrap;">${formatRupiah(totalBiaya)}</td>
+        </tr>`;
+
+        return `
+        <div style="text-align:center; margin-bottom:14pt;">
+            <div style="font-size:13pt; font-weight:bold; text-transform:uppercase;">LAMPIRAN I</div>
+            <div style="font-size:10pt; margin-top:3pt;">BERITA ACARA MUSYAWARAH DESA DESA JANGKANG</div>
+            <div style="font-size:10pt; margin-top:2pt;">Nomor: ${escapeHtml(f.nomorSurat || '...')}</div>
+            <div style="font-size:12pt; font-weight:bold; margin-top:8pt; text-transform:uppercase;">Rekapitulasi Usulan Prioritas Per Dusun</div>
+            <div style="font-size:9pt; margin-top:3pt;">RKP Desa Tahun ${escapeHtml(rkpT)} &amp; Du-RKP Desa Tahun ${escapeHtml(durkpT)}</div>
+        </div>
+        <table style="width:100%; border-collapse:collapse; margin-bottom:14pt;">
+            <thead>
+                <tr style="background:#2e7d32; color:#fff;">
+                    <td style="border:1pt solid #2e7d32; padding:5pt 6pt; width:8pt; text-align:center; font-weight:bold; font-size:10pt; white-space:nowrap;">No</td>
+                    <td style="border:1pt solid #2e7d32; padding:5pt 6pt; font-weight:bold; font-size:10pt;">Usulan Kegiatan</td>
+                    <td style="border:1pt solid #2e7d32; padding:5pt 6pt; width:28pt; text-align:center; font-weight:bold; font-size:10pt; white-space:nowrap;">RT</td>
+                    <td style="border:1pt solid #2e7d32; padding:5pt 6pt; width:18pt; text-align:center; font-weight:bold; font-size:10pt; white-space:nowrap;">Rank</td>
+                    <td style="border:1pt solid #2e7d32; padding:5pt 6pt; width:70pt; text-align:center; font-weight:bold; font-size:10pt; white-space:nowrap;">Estimasi Biaya</td>
+                </tr>
+            </thead>
+            <tbody>${tabelRows}</tbody>
+        </table>
+
+        <!-- TANDA TANGAN: KADES & BPD SEJAJAR -->
+        <div style="margin-top:20pt;">
+            <table style="width:100%; border:none; border-collapse:collapse; font-size:11pt;">
+                <tr style="vertical-align:top;">
+                    <td style="border:none; width:50%; text-align:center; padding:0 10pt 0 0;">
+                        <div style="height:15pt;"></div>
+                        <div style="font-weight:bold;">Kepala Desa Jangkang</div>
+                        <div style="height:65pt;"></div>
+                        <div style="font-weight:bold;">${escapeHtml(kades)}</div>
+                        ${kadesNip ? '<div style="font-size:9pt;">NIP. ' + escapeHtml(kadesNip) + '</div>' : ''}
+                    </td>
+                    <td style="border:none; width:50%; text-align:center; padding:0 0 0 10pt;">
+                        <div>Jangkang, ${tglInfo.tgl} ${tglInfo.bln} ${tglInfo.thn}</div>
+                        <div style="font-weight:bold;">Ketua BPD Desa Jangkang</div>
+                        <div style="height:65pt;"></div>
+                        <div style="font-weight:bold;">${escapeHtml(bpd)}</div>
+                    </td>
+                </tr>
+            </table>
+        </div>`;
+    }
+
+/* ==========================================
+    LAMPIRAN II — RINCIAN DETAIL
+    ========================================== */
+    function buildLampiranDetailContent(f, tahun, usulanFinal, byDusun, totalBiaya, tglInfo) {
+        const rkpT = f.rkpTahun || '........';
+        const durkpT = f.durkpTahun || '........';
+
+        /* Variabel Tambahan untuk Tanda Tangan */
+        const kades = f.kadesNama || '....................................';
+        const bpd = f.bpdNama || '....................................';
+        const kadesNip = f.kadesNip || '';
+        
+        // FALLBACK AMAN: Jika tglInfo tidak dikirim, ambil dari f
+        if (!tglInfo || !tglInfo.tgl) tglInfo = f.tglInfo || { tgl: '............', bln: '............', thn: '............' };
+
+        let detailRows = '';
+        usulanFinal.forEach((item, idx) => {
+            detailRows += `
+            <tr>
+                <td style="border:1pt solid #999; padding:3pt 5pt; text-align:center; font-size:9pt; vertical-align:top;">${idx + 1}</td>
+                <td style="border:1pt solid #999; padding:3pt 5pt; font-size:9pt; vertical-align:top;">
+                    <b>${escapeHtml(item.judul)}</b><br>
+                    <span style="color:#555; font-size:8pt;">${escapeHtml(item.deskripsi || 'Tidak ada deskripsi')}</span>
+                </td>
+                <td style="border:1pt solid #999; padding:3pt 5pt; text-align:center; font-size:9pt; vertical-align:top;white-space:nowrap;">${escapeHtml(item.dusun || '-')}</td>
+                <td style="border:1pt solid #999; padding:3pt 5pt; text-align:center; font-size:9pt; vertical-align:top;">${Array.isArray(item.rt) ? item.rt.join(', ') : (item.rt || '-')}</td>
+                <td style="border:1pt solid #999; padding:3pt 5pt; text-align:center; font-size:9pt; vertical-align:top;white-space:nowrap;">${escapeHtml(item.kategori || '-')}</td>
+                <td style="border:1pt solid #999; padding:3pt 5pt; text-align:center; font-size:9pt; vertical-align:top;">${item.rankingDesa || '-'}</td>
+                <td style="border:1pt solid #999; padding:3pt 5pt; text-align:right; font-size:9pt; vertical-align:top;">${formatRupiah(item.estimasiBiaya)}</td>
+            </tr>`;
+        });
+
+        return `
+        <div style="text-align:center; margin-bottom:14pt;">
+            <div style="font-size:13pt; font-weight:bold; text-transform:uppercase;">LAMPIRAN II</div>
+            <div style="font-size:10pt; margin-top:3pt;">BERITA ACARA MUSYAWARAH DESA DESA JANGKANG</div>
+            <div style="font-size:10pt; margin-top:2pt;">Nomor: ${escapeHtml(f.nomorSurat || '...')}</div>
+            <div style="font-size:12pt; font-weight:bold; margin-top:8pt; text-transform:uppercase;">Rincian Detail Seluruh Usulan Pembangunan Desa</div>
+            <div style="font-size:9pt; margin-top:3pt;">RKP Desa Tahun ${escapeHtml(rkpT)} &amp; Du-RKP Desa Tahun ${escapeHtml(durkpT)}</div>
+        </div>
+        <table style="width:100%; border-collapse:collapse; margin-bottom:14pt;">
+            <thead>
+                <tr style="background:#1565c0; color:#fff;">
+                    <td style="border:1pt solid #1565c0; padding:4pt 5pt; width:7pt; text-align:center; font-weight:bold; font-size:9pt;white-space:nowrap;">No</td>
+                    <td style="border:1pt solid #1565c0; padding:4pt 5pt; font-weight:bold; font-size:9pt;">Uraian Usulan</td>
+                    <td style="border:1pt solid #1565c0; padding:4pt 5pt; width:22pt; text-align:center; font-weight:bold; font-size:9pt;white-space:nowrap;">Dusun</td>
+                    <td style="border:1pt solid #1565c0; padding:4pt 5pt; width:18pt; text-align:center; font-weight:bold; font-size:9pt;white-space:nowrap;">RT</td>
+                    <td style="border:1pt solid #1565c0; padding:4pt 5pt; width:28pt; text-align:center; font-weight:bold; font-size:9pt;white-space:nowrap;">Kategori</td>
+                    <td style="border:1pt solid #1565c0; padding:4pt 5pt; width:15pt; text-align:center; font-weight:bold; font-size:9pt;white-space:nowrap;">Rank</td>
+                    <td style="border:1pt solid #1565c0; padding:4pt 5pt; width:60pt; text-align:center; font-weight:bold; font-size:9pt;white-space:nowrap;">Estimasi Biaya</td>
+                </tr>
+            </thead>
+            <tbody>
+                ${detailRows}
+                <tr style="background:#0d47a1; color:#fff; font-weight:bold;">
+                    <td colspan="6" style="border:1pt solid #0d47a1; padding:5pt 6pt; text-align:right; font-size:10pt;">TOTAL</td>
+                    <td style="border:1pt solid #0d47a1; padding:5pt 6pt; text-align:right; font-size:10pt;white-space:nowrap;">${formatRupiah(totalBiaya)}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- TANDA TANGAN: KADES & BPD SEJAJAR -->
+        <div style="margin-top:20pt;">
+            <table style="width:100%; border:none; border-collapse:collapse; font-size:11pt;">
+                <tr style="vertical-align:top;">
+                    <td style="border:none; width:50%; text-align:center; padding:0 10pt 0 0;">
+                        <div style="height:15pt;"></div>
+                        <div style="font-weight:bold;">Kepala Desa Jangkang</div>
+                        <div style="height:65pt;"></div>
+                        <div style="font-weight:bold;">${escapeHtml(kades)}</div>
+                        ${kadesNip ? '<div style="font-size:9pt;">NIP. ' + escapeHtml(kadesNip) + '</div>' : ''}
+                    </td>
+                    <td style="border:none; width:50%; text-align:center; padding:0 0 0 10pt;">
+                        <div>Jangkang, ${tglInfo.tgl} ${tglInfo.bln} ${tglInfo.thn}</div>
+                        <div style="font-weight:bold;">Ketua BPD Desa Jangkang</div>
+                        <div style="height:65pt;"></div>
+                        <div style="font-weight:bold;">${escapeHtml(bpd)}</div>
+                    </td>
+                </tr>
+            </table>
+        </div>`;
+    }
+
+/* ==========================================
+    LAMPIRAN III — USULAN BERDASARKAN TUJUAN SDGs
+    ========================================== */
+    function buildLampiranSDGsContent(f, tahun, usulanFinal, byDusun, totalBiaya, tglInfo) {
+        const rkpT = f.rkpTahun || '........';
+        const durkpT = f.durkpTahun || '........';
+
+        /* Variabel Tambahan untuk Tanda Tangan */
+        const kades = f.kadesNama || '....................................';
+        const bpd = f.bpdNama || '....................................';
+        const kadesNip = f.kadesNip || '';
+        
+        // FALLBACK AMAN: Jika tglInfo tidak dikirim, ambil dari f
+        if (!tglInfo || !tglInfo.tgl) tglInfo = f.tglInfo || { tgl: '............', bln: '............', thn: '............' };
+
+        // Mapping Nama Resmi 17 Tujuan SDGs
+        const sdgList = {
+            '1': 'Tanpa Kemiskinan', '2': 'Tanpa Kelaparan', '3': 'Kehidupan Sehat dan Sejahtera',
+            '4': 'Pendidikan Berkualitas', '5': 'Kesetaraan Gender', '6': 'Air Bersih dan Sanitasi Layak',
+            '7': 'Energi Bersih dan Terjangkau', '8': 'Pekerjaan Layak dan Pertumbuhan Ekonomi',
+            '9': 'Industri, Inovasi, dan Infrastruktur', '10': 'Berkurangnya Kesenjangan',
+            '11': 'Kota dan Komunitas Berkelanjutan', '12': 'Konsumsi dan Produksi Bertanggung Jawab',
+            '13': 'Penanganan Perubahan Iklim', '14': 'Kehidupan Bawah Air',
+            '15': 'Kehidupan Daratan', '16': 'Perdamaian, Keadilan, dan Kelembagaan Kuat',
+            '17': 'Kemitraan untuk Mencapai Tujuan'
+        };
+
+        // 1. Filter usulan yang memiliki SDG
+        const usulanSDG = usulanFinal.filter(item => item.sdgId && String(item.sdgId).trim() !== '');
+        let grandTotalSDG = 0;
+
+        // 2. Kelompokkan berdasarkan ID SDG
+        const groupedBySDG = {};
+        usulanSDG.forEach(item => {
+            const sdgs = String(item.sdgId).split(',').map(s => s.trim()).filter(Boolean);
+            sdgs.forEach(sdg => {
+                if (!groupedBySDG[sdg]) {
+                    groupedBySDG[sdg] = { nama: sdgList[sdg] || `Tujuan ${sdg}`, items: [] };
+                }
+                groupedBySDG[sdg].items.push(item);
+            });
+        });
+
+        // 3. Bangun Baris Tabel
+        let tableSections = '';
+        let noGlobal = 1;
+        
+        // Urutkan berdasarkan nomor SDG (1 sampai 17)
+        const sortedSDGs = Object.keys(groupedBySDG).sort((a, b) => parseInt(a) - parseInt(b));
+
+        if (sortedSDGs.length === 0) {
+            tableSections = `<tr><td colspan="5" style="border:1pt solid #999; padding:10pt; text-align:center; font-size:10pt; color:#888;">Tidak ada usulan yang terhubung dengan Tujuan SDGs.</td></tr>`;
+        } else {
+            sortedSDGs.forEach(sdgId => {
+                const group = groupedBySDG[sdgId];
+                let subTotal = group.items.reduce((s, i) => s + (parseInt(i.estimasiBiaya) || 0), 0);
+                grandTotalSDG += subTotal;
+
+                // Header Kelompok SDG
+                tableSections += `
+                <tr style="background:#e8eaf6;">
+                    <td colspan="5" style="border:1pt solid #000; padding:5pt 8pt; font-weight:bold; font-size:10pt;">
+                        SDGs ${sdgId}: ${escapeHtml(group.nama)} (${group.items.length} usulan)
+                    </td>
+                </tr>`;
+                
+                // Detail Usulan dalam SDG tersebut
+                group.items.forEach(item => {
+                    tableSections += `
+                    <tr>
+                        <td style="border:1pt solid #999; padding:3pt 6pt; text-align:center; font-size:9pt;">${noGlobal++}</td>
+                        <td style="border:1pt solid #999; padding:3pt 6pt; font-size:9pt;">
+                            <b>${escapeHtml(item.judul)}</b>
+                            <div style="font-size:8pt; color:#555;">${escapeHtml(item.dusun || '-')} - RT ${Array.isArray(item.rt) ? item.rt.join(', ') : (item.rt || '-')}</div>
+                        </td>
+                        <td style="border:1pt solid #999; padding:3pt 6pt; text-align:center; font-size:9pt;white-space:nowrap;">${escapeHtml(item.kategori || '-')}</td>
+                        <td style="border:1pt solid #999; padding:3pt 6pt; text-align:center; font-size:9pt;">${item.rankingDesa || '-'}</td>
+                        <td style="border:1pt solid #999; padding:3pt 6pt; text-align:right; font-size:9pt;">${formatRupiah(item.estimasiBiaya)}</td>
+                    </tr>`;
+                });
+
+                // Subtotal Per SDG
+                tableSections += `
+                <tr style="background:#f5f5f5; font-weight:bold;">
+                    <td colspan="4" style="border:1pt solid #999; padding:4pt 6pt; text-align:right; font-size:9pt;">Subtotal SDGs ${sdgId}</td>
+                    <td style="border:1pt solid #999; padding:4pt 6pt; text-align:right; font-size:9pt;">${formatRupiah(subTotal)}</td>
+                </tr>`;
+            });
+
+            // Grand Total Keseluruhan
+            tableSections += `
+            <tr style="background:#283593; color:#fff; font-weight:bold;">
+                <td colspan="4" style="border:1pt solid #283593; padding:6pt 8pt; text-align:right; font-size:10pt;">TOTAL SELURUH USULAN TERHUBUNG SDGs</td>
+                <td style="border:1pt solid #283593; padding:6pt 8pt; text-align:right; font-size:10pt;white-space:nowrap;">${formatRupiah(grandTotalSDG)}</td>
+            </tr>`;
+        }
+
+        return `
+        <div style="text-align:center; margin-bottom:14pt;">
+            <div style="font-size:13pt; font-weight:bold; text-transform:uppercase;">LAMPIRAN III</div>
+            <div style="font-size:10pt; margin-top:3pt;">BERITA ACARA MUSYAWARAH DESA DESA JANGKANG</div>
+            <div style="font-size:10pt; margin-top:2pt;">Nomor: ${escapeHtml(f.nomorSurat || '...')}</div>
+            <div style="font-size:12pt; font-weight:bold; margin-top:8pt; text-transform:uppercase;">Rekapitulasi Usulan Pembangunan Desa Berdasarkan Tujuan SDGs</div>
+            <div style="font-size:9pt; margin-top:3pt;">RKP Desa Tahun ${escapeHtml(rkpT)} &amp; Du-RKP Desa Tahun ${escapeHtml(durkpT)}</div>
+        </div>
+        <table style="width:100%; border-collapse:collapse; margin-bottom:14pt;">
+            <thead>
+                <tr style="background:#283593; color:#fff;">
+                    <td style="border:1pt solid #283593; padding:5pt 6pt; width:8pt; text-align:center; font-weight:bold; font-size:9pt;white-space:nowrap;">No</td>
+                    <td style="border:1pt solid #283593; padding:5pt 6pt; font-weight:bold; font-size:9pt;">Uraian Usulan (Dusun/RT)</td>
+                    <td style="border:1pt solid #283593; padding:5pt 6pt; width:28pt; text-align:center; font-weight:bold; font-size:9pt;white-space:nowrap;">Kategori</td>
+                    <td style="border:1pt solid #283593; padding:5pt 6pt; width:18pt; text-align:center; font-weight:bold; font-size:9pt;white-space:nowrap;">Rank</td>
+                    <td style="border:1pt solid #283593; padding:5pt 6pt; width:70pt; text-align:center; font-weight:bold; font-size:9pt;white-space:nowrap;">Estimasi Biaya</td>
+                </tr>
+            </thead>
+            <tbody>
+                ${tableSections}
+            </tbody>
+        </table>
+
+        <!-- TANDA TANGAN: KADES & BPD SEJAJAR -->
+        <div style="margin-top:20pt;">
+            <table style="width:100%; border:none; border-collapse:collapse; font-size:11pt;">
+                <tr style="vertical-align:top;">
+                    <td style="border:none; width:50%; text-align:center; padding:0 10pt 0 0;">
+                        <div style="height:15pt;"></div>
+                        <div style="font-weight:bold;">Kepala Desa Jangkang</div>
+                        <div style="height:65pt;"></div>
+                        <div style="font-weight:bold;">${escapeHtml(kades)}</div>
+                        ${kadesNip ? '<div style="font-size:9pt;">NIP. ' + escapeHtml(kadesNip) + '</div>' : ''}
+                    </td>
+                    <td style="border:none; width:50%; text-align:center; padding:0 0 0 10pt;">
+                        <div>Jangkang, ${tglInfo.tgl} ${tglInfo.bln} ${tglInfo.thn}</div>
+                        <div style="font-weight:bold;">Ketua BPD Desa Jangkang</div>
+                        <div style="height:65pt;"></div>
+                        <div style="font-weight:bold;">${escapeHtml(bpd)}</div>
+                    </td>
+                </tr>
+            </table>
+        </div>`;
+    }
+
+/* ==========================================
+    LAMPIRAN IV — DAFTAR HADIR
+    ========================================== */
+    function buildLampiranDaftarHadirContent(f, tahun, tglInfo) {
+        const rkpT = f.rkpTahun || '........';
+        const durkpT = f.durkpTahun || '........';
+        const tempat = f.tempat || '...................';
+        const kades = f.kadesNama || '....................................';
+        const bpd = f.bpdNama || '....................................';
+        const kadesNip = f.kadesNip || '';
+        
+        // FALLBACK AMAN
+        if (!tglInfo || !tglInfo.tgl) tglInfo = f.tglInfo || { tgl: '............', bln: '............', thn: '............', hari: '............' };
+
+        // Ambil jumlah baris dari state, default 30
+        const rowCount = parseInt(f.daftarHadirCount) || 30;
+
+        // Bangun baris tabel secara otomatis (6 Kolom: No, Nama, L/P, Alamat, Jabatan, TTD)
+        let rows = '';
+        for (let i = 1; i <= rowCount; i++) {
+            rows += `
+            <tr style="height:22pt;">
+                <td style="border:1pt solid #000; padding:0; text-align:center; font-size:10pt; width:8pt;">${i}</td>
+                <td style="border:1pt solid #000; padding:0; font-size:10pt;"></td>
+                <td style="border:1pt solid #000; padding:0; text-align:center; font-size:10pt; width:12pt;"></td>
+                <td style="border:1pt solid #000; padding:0; font-size:10pt;"></td>
+                <td style="border:1pt solid #000; padding:0; font-size:10pt;"></td>
+                <td style="border:1pt solid #000; padding:0; font-size:10pt;"></td>
+            </tr>`;
+        }
+
+        return `
+        <div style="text-align:center; margin-bottom:14pt;">
+            <div style="font-size:13pt; font-weight:bold; text-transform:uppercase;">LAMPIRAN IV</div>
+            <div style="font-size:10pt; margin-top:3pt;">BERITA ACARA MUSYAWARAH DESA DESA JANGKANG</div>
+            <div style="font-size:10pt; margin-top:2pt;">Nomor: ${escapeHtml(f.nomorSurat || '...')}</div>
+            <div style="font-size:12pt; font-weight:bold; margin-top:8pt; text-transform:uppercase;">Daftar Hadir Peserta Musyawarah Desa</div>
+            <div style="font-size:9pt; margin-top:3pt;">RKP Desa Tahun ${escapeHtml(rkpT)} &amp; Du-RKP Desa Tahun ${escapeHtml(durkpT)}</div>
+        </div>
+
+        <!-- INFO WAKTU, TEMPAT (SESUAI REFERENSI) -->
+        <table style="font-size:11pt; margin-bottom:12pt; width:100%; max-width:480pt;">
+            <tr><td style="vertical-align:top; width:120pt;">Hari / Tanggal</td><td style="vertical-align:top; width:10pt;">:</td><td>${tglInfo.hari || '............'}, ${tglInfo.tgl} ${tglInfo.bln} ${tglInfo.thn}</td></tr>
+            <tr><td style="vertical-align:top;">Waktu</td><td style="vertical-align:top;">:</td><td>${escapeHtml(f.jamMulai || '............')} ${escapeHtml(f.zonaWaktu || 'WIB')} S/D Selesai</td></tr>
+            <tr><td style="vertical-align:top;">Tempat</td><td style="vertical-align:top;">:</td><td>${escapeHtml(tempat)}</td></tr>
+        </table>
+
+        <!-- TABEL DAFTAR HADIR (6 KOLOM SESUAI REFERENSI) -->
+        <table style="width:100%; border-collapse:collapse; margin-bottom:14pt;">
+            <thead>
+                <tr style="background:#e0e0e0;">
+                    <th style="border:1pt solid #000; padding:4pt 5pt; font-size:10pt; font-weight:bold; width:8pt;">NO</th>
+                    <th style="border:1pt solid #000; padding:4pt 5pt; font-size:10pt; font-weight:bold;">NAMA</th>
+                    <th style="border:1pt solid #000; padding:4pt 5pt; font-size:10pt; font-weight:bold; width:12pt;">L/P</th>
+                    <th style="border:1pt solid #000; padding:4pt 5pt; font-size:10pt; font-weight:bold;">ALAMAT</th>
+                    <th style="border:1pt solid #000; padding:4pt 5pt; font-size:10pt; font-weight:bold;">JABATAN/UNSUR</th>
+                    <th style="border:1pt solid #000; padding:4pt 5pt; font-size:10pt; font-weight:bold;">TANDA TANGAN</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${rows}
+            </tbody>
+        </table>
+
+        <!-- TANDA TANGAN: KADES & BPD SEJAJAR -->
+        <div style="margin-top:20pt;">
+            <table style="width:100%; border:none; border-collapse:collapse; font-size:11pt;">
+                <tr style="vertical-align:top;">
+                    <td style="border:none; width:50%; text-align:center; padding:0 10pt 0 0;">
+                        <div style="height:15pt;"></div>
+                        <div style="font-weight:bold;">Kepala Desa Jangkang</div>
+                        <div style="height:65pt;"></div>
+                        <div style="font-weight:bold;">${escapeHtml(kades)}</div>
+                        ${kadesNip ? '<div style="font-size:9pt;">NIP. ' + escapeHtml(kadesNip) + '</div>' : ''}
+                    </td>
+                    <td style="border:none; width:50%; text-align:center; padding:0 0 0 10pt;">
+                        <div>Jangkang, ${tglInfo.tgl} ${tglInfo.bln} ${tglInfo.thn}</div>
+                        <div style="font-weight:bold;">Ketua BPD Desa Jangkang</div>
+                        <div style="height:65pt;"></div>
+                        <div style="font-weight:bold;">${escapeHtml(bpd)}</div>
+                    </td>
+                </tr>
+            </table>
+        </div>`;
+    }
+
+    /* ==========================================
+    LAYOUT ENGINE — SLIDER, OVERLAY, HALAMAN
+    ========================================== */
+
+    /* Slider card untuk toolbar tata letak */
+    function weSliderCard(label, key, value, min, max, unit, icon, step) {
+        const dv = (key === 'lineHeight') ? Number(value).toFixed(2) : Math.round(value);
+        return `
+        <div style="display:flex; flex-direction:column; gap:1px;">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+                <span style="font-size:7.5px; color:#6b7280; font-weight:600;">
+                    <i class="fas ${icon}" style="font-size:6px; margin-right:2px; opacity:.5;"></i>${label}
+                </span>
+                <span style="font-size:7.5px; color:#1f2937; font-weight:700;" id="weVal_${key}">${dv}${unit}</span>
+            </div>
+            <input type="range" min="${min}" max="${max}" step="${step}" value="${value}"
+                   style="width:100%; height:3px; -webkit-appearance:none; appearance:none; background:#d1d5db; border-radius:2px; outline:none; cursor:pointer;"
+                   oninput="weUpdateLayout('${key}', this.value, '${unit}')">
+        </div>`;
+    }
+
+    /* Update layout saat slider digeser */
+    function weUpdateLayout(key, value, unit) {
+        if (!STATE.layoutConfig) STATE.layoutConfig = {};
+        const numVal = Number(value);
+        STATE.layoutConfig[key] = numVal;
+
+        /* Update label nilai */
+        const valEl = document.getElementById('weVal_' + key);
+        if (valEl) valEl.textContent = (key === 'lineHeight' ? numVal.toFixed(2) : Math.round(numVal)) + unit;
+
+        /* Update label mini preview */
+        const miniMap = { marginTop:'weMiniTop', marginBottom:'weMiniBottom', marginLeft:'weMiniLeft', marginRight:'weMiniRight', lineHeight:'weMiniLine' };
+        const miniEl = document.getElementById(miniMap[key]);
+        if (miniEl) miniEl.textContent = key === 'lineHeight' ? numVal.toFixed(2) : Math.round(numVal);
+
+        /* Apply ke kertas */
+        const paper = document.getElementById('wePaper');
+        if (paper) {
+            const lc = STATE.layoutConfig;
+            paper.style.paddingTop = (lc.marginTop || 25) + 'mm';
+            paper.style.paddingBottom = (lc.marginBottom || 25) + 'mm';
+            paper.style.paddingLeft = (lc.marginLeft || 25) + 'mm';
+            paper.style.paddingRight = (lc.marginRight || 25) + 'mm';
+            paper.style.lineHeight = lc.lineHeight || 1.5;
+        }
+
+        /* Rebuild overlay */
+        weUpdateOverlay();
+        weCountPages();
+    }
+
+    /* Bangun background overlay garis halaman */
+    function weBuildOverlayBg(lc, showMargins) {
+        const pageH = 297;
+        const top = lc.marginTop || 25;
+        const bot = lc.marginBottom || 25;
+        const contentH = pageH - top - bot;
+        let lines = '';
+        for (let p = 1; p <= 30; p++) {
+            const yPos = top + (contentH * p);
+            lines += `linear-gradient(to bottom, transparent calc(${yPos}mm - 0.2mm), rgba(220,50,50,0.3) calc(${yPos}mm - 0.2mm), rgba(220,50,50,0.3) calc(${yPos}mm + 0.2mm), transparent calc(${yPos}mm + 0.2mm)) 0 0 / 100% 100% no-repeat, `;
+        }
+        return lines.slice(0, -2) || 'none';
+    }
+
+    /* Update overlay setelah margin berubah */
+    function weUpdateOverlay() {
+        const lc = STATE.layoutConfig || {};
+        const overlay = document.getElementById('wePageOverlay');
+        if (!overlay) return;
+
+        const showMargins = overlay.getAttribute('data-margins') === '1';
+        const pageH = 297;
+        const top = lc.marginTop || 25;
+        const bot = lc.marginBottom || 25;
+        const left = lc.marginLeft || 25;
+        const right = lc.marginRight || 25;
+        const contentH = pageH - top - bot;
+
+        /* Garis pemisah halaman merah */
+        let lines = '';
+        for (let p = 1; p <= 30; p++) {
+            const yPos = top + (contentH * p);
+            lines += `linear-gradient(to bottom, transparent calc(${yPos}mm - 0.2mm), rgba(220,50,50,0.3) calc(${yPos}mm - 0.2mm), rgba(220,50,50,0.3) calc(${yPos}mm + 0.2mm), transparent calc(${yPos}mm + 0.2mm)) 0 0 / 100% 100% no-repeat, `;
+        }
+
+        let css = 'position:absolute; inset:0; pointer-events:none; z-index:5; border-radius:1px;';
+        if (showMargins) {
+            css += `border:1px dashed rgba(37,99,235,0.25); `;
+        }
+        css += `background: ${lines.slice(0, -2)};`;
+        overlay.style.cssText = css;
+
+        /* Update mini margin preview */
+        const miniMargin = document.getElementById('weMiniMargin');
+        if (miniMargin) {
+            const scaleX = 42, scaleY = 59;
+            miniMargin.style.inset = `${(top / pageH) * scaleY}px ${(right / 210) * scaleX}px ${(bot / pageH) * scaleY}px ${(left / 210) * scaleX}px`;
+        }
+    }
+
+    /* Toggle tampilan garis margin */
+    function toggleMarginGuide() {
+        const overlay = document.getElementById('wePageOverlay');
+        if (!overlay) return;
+        const cur = overlay.getAttribute('data-margins') === '1';
+        overlay.setAttribute('data-margins', cur ? '0' : '1');
+        weUpdateOverlay();
+    }
+
+    /* Toggle buka/tutup panel pengaturan */
+    function toggleLayoutPanel() {
+        const panel = document.getElementById('weLayoutPanel');
+        const icon = document.getElementById('weToggleIcon');
+        if (!panel) return;
+        if (panel.style.maxHeight === '0px') {
+            panel.style.maxHeight = '500px';
+            panel.style.opacity = '1';
+            if (icon) icon.style.transform = 'rotate(0deg)';
+        } else {
+            panel.style.maxHeight = '0px';
+            panel.style.opacity = '0';
+            if (icon) icon.style.transform = 'rotate(180deg)';
+        }
+    }
+
+    /* Preset layout cepat */
+    function wePreset(type) {
+        const presets = {
+            normal: { marginTop:25, marginBottom:25, marginLeft:25, marginRight:25, lineHeight:1.5 },
+            narrow: { marginTop:15, marginBottom:15, marginLeft:15, marginRight:15, lineHeight:1.4 },
+            wide:   { marginTop:30, marginBottom:30, marginLeft:30, marginRight:30, lineHeight:1.6 }
+        };
+        STATE.layoutConfig = { ...(presets[type] || presets.normal) };
+        Object.entries(STATE.layoutConfig).forEach(([k, v]) => {
+            weUpdateLayout(k, v, k === 'lineHeight' ? '' : 'mm');
+        });
+    }
+
+    /* Reset ke default */
+    function resetLayout() { wePreset('normal'); }
+
+    /* Hitung jumlah halaman A4 */
+    function weCountPages() {
+        const paper = document.getElementById('wePaper');
+        if (!paper) return;
+        const lc = STATE.layoutConfig || {};
+        const MM_TO_PX = 3.7795;
+        const topPx = (lc.marginTop || 25) * MM_TO_PX;
+        const botPx = (lc.marginBottom || 25) * MM_TO_PX;
+        const pageContentPx = (297 * MM_TO_PX) - topPx - botPx;
+        const totalPx = paper.scrollHeight;
+        const pages = Math.max(1, Math.ceil(totalPx / pageContentPx));
+        /* Update semua elemen dengan id wePageCount */
+        document.querySelectorAll('[id="wePageCount"]').forEach(el => {
+            el.textContent = pages + ' hal';
+        });
+    }
+
+/* ==========================================
+    SAVE TO WORD ENGINE (.doc)
+    ========================================== */
+    function saveToWord() {
+        const paper = document.getElementById('wePaper');
+        if (!paper) {
+            showToast('Preview belum siap. Tunggu sebentar...', 'error');
+            return;
+        }
+
+        const lc = STATE.layoutConfig || {};
+        const f = STATE.baForm || {};
+        let content = paper.innerHTML;
+
+        /* ==========================================
+           PREPROCESSOR: ADAPTASI KHUSUS MICROSOFT WORD
+           Agar layout di Word 100% identik dengan Preview
+           ========================================== */
+        
+        // 1. RUANG TANDA TANGAN: Word mengabaikan "height" pada <div> kosong. 
+        // Solusi: Ganti dengan <p> berspasi eksplisit.
+        content = content.replace(
+            /<div style="height:(\d+)pt;"><\/div>/g, 
+            (match, h) => `<p style="margin:0; padding:0; font-size:${h}pt; line-height:${h}pt;">&nbsp;</p>`
+        );
+
+        // 2. WARNA HEADER TABEL: Word mengabaikan "background-color" tanpa properti khusus.
+        // Solusi: Tambahkan "mso-shading" (gray-25 = #e0e0e0).
+        content = content.replace(
+            /style="background:#e0e0e0;"/g, 
+            'style="background:#e0e0e0; mso-shading:gray-25 auto;"'
+        );
+
+        // 3. GARIS BAWAH (UNDERLINE): Tambahkan posisi bawah agar tidak ketimpa di Word.
+        content = content.replace(
+            /text-decoration:underline;/g, 
+            'text-decoration:underline; text-underline-position:below;'
+        );
+
+
+        const wordHTML = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office"
+              xmlns:w="urn:schemas-microsoft-com:office:word"
+              xmlns="http://www.w3.org/TR/REC-html40">
+        <head>
+        <meta charset="UTF-8">
+        <!--[if gte mso 9]>
+        <xml>
+            <w:WordDocument>
+                <w:View>Print</w:View>
+                <w:Zoom>100</w:Zoom>
+                <w:DoNotOptimizeForBrowser/>
+            </w:WordDocument>
+        </xml>
+        <![endif]-->
+        <title>BA Musdes Desa Jangkang - ${escapeHtml(f.nomorSurat || 'Cetak')}</title>
+        <style>
+            /* Pengaturan Halaman Word */
+            @page {
+                size: A4;
+                margin: ${lc.marginTop || 25}mm ${lc.marginRight || 25}mm ${lc.marginBottom || 25}mm ${lc.marginLeft || 25}mm;
+                mso-header-margin: 15mm;
+                mso-footer-margin: 15mm;
+            }
+            
+            /* RESET IDENTIK DENGAN PREVIEW (PENTING!) */
+            * { margin:0; padding:0; box-sizing:content-box; }
+            html, body {
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 12pt;
+                line-height: ${lc.lineHeight || 1.5};
+                color: #000;
+                background: #fff;
+            }
+
+            /* TABEL: GABUNGAN RESET PREVIEW + FIX WORD */
+            table {
+                border-collapse: collapse;
+                border-spacing: 0;
+                mso-table-lspace: 0pt;
+                mso-table-rspace: 0pt;
+                mso-padding-alt: 0cm 5.4pt 0cm 5.4pt;
+            }
+
+            th { white-space: nowrap; }
+            
+            /* HAPUS SPASI PARAGRAF BAWAAN WORD YANG BIKIN JENJANG */
+            td, th {
+                mso-para-margin-top: 0cm;
+                mso-para-margin-bottom: 0cm;
+            }
+            
+            /* Pastikan paragraf spacer tadi tidak kena margin bawaan Word */
+            p {
+                mso-para-margin-top: 0cm;
+                mso-para-margin-bottom: 0cm;
+                mso-line-height-rule:exactly;
+            }
+
+            .no-print { display: none !important; }
+            #wePageOverlay, [id^="wePageOverlay"] { display: none !important; }
+        </style>
+        </head>
+        <body>
+            ${content}
+        </body>
+        </html>`;
+
+        // BOM (\ufeff) menjamin encoding UTF-8 terbaca benar di Word
+        const blob = new Blob(['\ufeff' + wordHTML], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        // Nama file aman (ganti slash dengan strip)
+        a.download = `BA_Musdes_Jangkang_${(f.nomorSurat || 'Doc').replace(/\//g, '-')}.doc`;
+        
+        document.body.appendChild(a);
+        a.click();
+        
+        // Bersihkan memori
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 100);
+
+        showToast('Dokumen berhasil disimpan sebagai Word (.doc)', 'success');
+    }
+
+/**
+     * Laporan Prioritas Pembangunan Desa
+     * ✅ DIPERBAIKI: Menggunakan rankingDesa, Sort, dan Menambahkan Kolom Rujukan
+     */
+    function rLaporanPrioritas() {
+        const tahun = STATE.tahunAktif;
+        const usulanFinal = cachedUsulan.filter(x => 
+            x.tahun == tahun && 
+            (x.status === 'final' || x.status === 'ranked_dusun')
+        // ✅ PERBAIKAN: Sort berdasarkan rankingDesa
+        ).sort((a, b) => (parseInt(a.rankingDesa) || 999) - (parseInt(b.rankingDesa) || 999));
+
+        // Group by kategori
+        const byKategori = {};
+        CONFIG.KATEGORI.forEach(k => byKategori[k] = []);
+        usulanFinal.forEach(u => {
+            if (byKategori[u.kategori]) byKategori[u.kategori].push(u);
+        });
+
+        // Hitung persentase per kategori
+        const totalBiaya = usulanFinal.reduce((sum, u) => sum + (parseInt(u.estimasiBiaya) || 0), 0);
+        
+        const kategoriColors = {
+            'Infrastruktur': 'bg-blue-100 text-blue-700 border-blue-200',
+            'Pemberdayaan': 'bg-green-100 text-green-700 border-green-200',
+            'Pendidikan': 'bg-purple-100 text-purple-700 border-purple-200',
+            'Kesehatan': 'bg-red-100 text-red-700 border-red-200',
+            'Sosial': 'bg-orange-100 text-orange-700 border-orange-200',
+            'Lingkungan': 'bg-teal-100 text-teal-700 border-teal-200'
+        };
+        const kategoriBarColors = ['#3B82F6', '#10B981', '#8B5CF6', '#EF4444', '#F59E0B', '#14B8A6'];
+
+        return `
+        <div class="max-w-6xl mx-auto space-y-5">
+            <!-- Header -->
+            <div class="bg-white rounded-2xl border p-5 md:p-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+                    <div>
+                        <h2 class="font-display font-bold text-lg text-gray-800">Laporan Prioritas Pembangunan Desa</h2>
+                        <p class="text-sm text-gray-500 mt-0.5">Tahun Anggaran ${tahun} · Diurutkan berdasarkan Ranking Desa</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="printLaporanPrioritas()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2">
+                            <i class="fas fa-print"></i> Cetak Laporan Ini
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Konten yang akan dicetak -->
+                <div id="laporanPrioritasContent">
+                    <!-- Ringkasan Visual -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <!-- Progress Bar per Kategori -->
+                        <div class="border rounded-xl p-4">
+                            <h4 class="font-semibold text-sm mb-4 text-gray-700">Distribusi Anggaran per Kategori</h4>
+                            <div class="space-y-3">
+                                ${CONFIG.KATEGORI.map((k, i) => {
+                                    const biaya = byKategori[k].reduce((s, u) => s + (parseInt(u.estimasiBiaya) || 0), 0);
+                                    const pct = totalBiaya > 0 ? (biaya / totalBiaya * 100) : 0;
+                                    return `
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-1">
+                                            <span class="font-medium text-gray-700">${k}</span>
+                                            <span class="text-gray-500">${pct.toFixed(1)}% · ${formatRupiah(biaya)}</span>
+                                        </div>
+                                        <div class="w-full bg-gray-100 rounded-full h-2">
+                                            <div class="h-2 rounded-full transition-all duration-500" style="width: ${pct}%; background-color: ${kategoriBarColors[i]}"></div>
+                                        </div>
+                                    </div>`;
+                                }).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Pie Chart Summary -->
+                        <div class="border rounded-xl p-4">
+                            <h4 class="font-semibold text-sm mb-4 text-gray-700">Ringkasan Prioritas</h4>
+                            <div class="grid grid-cols-2 gap-3">
+                                ${CONFIG.KATEGORI.map((k, i) => {
+                                    const count = byKategori[k].length;
+                                    const biaya = byKategori[k].reduce((s, u) => s + (parseInt(u.estimasiBiaya) || 0), 0);
+                                    return `
+                                    <div class="flex items-center gap-2 p-2 rounded-lg ${count > 0 ? 'bg-gray-50' : 'bg-gray-50 opacity-40'}">
+                                        <div class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${kategoriBarColors[i]}"></div>
+                                        <div class="min-w-0">
+                                            <div class="text-[10px] text-gray-500 truncate">${k}</div>
+                                            <div class="text-xs font-bold text-gray-800">${count} usulan</div>
+                                        </div>
+                                    </div>`;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabel Detail Prioritas -->
+                    <div class="border rounded-xl overflow-hidden">
+                        <div class="bg-gray-50 px-4 py-3 border-b">
+                            <h4 class="font-semibold text-sm text-gray-700">Daftar Prioritas Pembangunan Desa</h4>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs">
+                                <thead class="bg-gray-50 border-b">
+                                    <tr>
+                                        <th class="px-3 py-2.5 text-center font-semibold text-gray-600 w-16">Rank Desa</th>
+                                        <th class="px-3 py-2.5 text-left font-semibold text-gray-600">Usulan Pembangunan</th>
+                                        <th class="px-3 py-2.5 text-left font-semibold text-gray-600 w-20">Dusun</th>
+                                        <th class="px-3 py-2.5 text-center font-semibold text-gray-600 w-24">Kategori</th>
+                                        <th class="px-3 py-2.5 text-right font-semibold text-gray-600 w-32">Estimasi Biaya</th>
+                                        <!-- ✅ PENAMBAHAN: Kolom Rencana Aksi & Rujukan -->
+                                        <th class="px-3 py-2.5 text-left font-semibold text-gray-600 w-48">Rencana Aksi & Rujukan</th>
+                                        <th class="px-3 py-2.5 text-right font-semibold text-gray-600 w-16">%</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    ${usulanFinal.map((item, idx) => {
+                                        const pct = totalBiaya > 0 ? (parseInt(item.estimasiBiaya) || 0) / totalBiaya * 100 : 0;
+                                        const colorClass = kategoriColors[item.kategori] || 'bg-gray-100 text-gray-700 border-gray-200';
+                                        
+                                        // ✅ LOGIKA RUJUKAN BERDASARKAN RANK DESA
+                                        let rujukanHTML = '<span class="text-gray-300">-</span>';
+                                        if (item.rencanaAksi) {
+                                            const aksiColor = item.rencanaAksi === 'Kewenangan Desa' ? 'bg-forest-100 text-forest-700' : 'bg-amber-100 text-amber-700';
+                                            rujukanHTML = `<span class="inline-block px-2 py-0.5 rounded-full font-bold whitespace-normal break-words ${aksiColor}">${escapeHtml(item.rencanaAksi)}</span>`;
+                                            
+                                            if (item.rujukanUsulan) {
+                                                rujukanHTML += `<br><span class="text-[10px] text-gray-500 italic">→ Rujukan: ${escapeHtml(item.rujukanUsulan)}</span>`;
+                                            }
+                                        }
+
+                                        return `
+                                        <tr class="hover:bg-gray-50 cursor-pointer" onclick="showDetail('${escapeJs(item.id)}')">
+                                            <td class="px-3 py-2.5 text-center">
+                                                <span class="inline-flex items-center justify-center w-7 h-7 rounded-full ${idx < 3 ? 'bg-honey-500 text-white' : 'bg-gray-200 text-gray-600'} text-[10px] font-bold">${item.rankingDesa || '-'}</span>
+                                            </td>
+                                            <td class="px-3 py-2.5 font-medium text-gray-800 whitespace-normal break-words leading-snug">${escapeHtml(item.judul)}</td>
+                                            <td class="px-3 py-2.5 text-gray-500 whitespace-nowrap">${escapeHtml(item.dusun)}</td>
+                                            <td class="px-3 py-2.5 text-center">
+                                                <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-medium border ${colorClass}">${item.kategori}</span>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-right font-semibold whitespace-nowrap tabular-nums">${formatRupiah(item.estimasiBiaya)}</td>
+                                            <td class="px-3 py-2.5 whitespace-normal break-words">${rujukanHTML}</td>
+                                            <td class="px-3 py-2.5 text-right text-gray-500 tabular-nums">${pct.toFixed(1)}%</td>
+                                        </tr>`;
+                                    }).join('')}
+                                    ${usulanFinal.length === 0 ? `
+                                        <tr>
+                                            <td colspan="7" class="px-4 py-12 text-center text-gray-400">
+                                                <i class="fas fa-inbox text-3xl mb-2 block"></i>
+                                                Belum ada usulan yang diprioritaskan
+                                            </td>
+                                        </tr>
+                                    ` : ''}
+                                </tbody>
+                                ${usulanFinal.length > 0 ? `
+                                <tfoot class="bg-honey-50 border-t-2 border-honey-200">
+                                    <tr class="font-bold text-sm">
+                                        <td colspan="5" class="px-3 py-3 text-right text-honey-800">TOTAL PRIORITAS PEMBANGUNAN DESA</td>
+                                        <td class="px-3 py-3 text-center text-honey-600">100%</td>
+                                        <td class="px-3 py-3 text-right text-honey-600">100%</td>
+                                    </tr>
+                                </tfoot>
+                                ` : ''}
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    /* ==========================================
+        PRINT LAPORAN PRIORITAS (WINDOW POPUP)
+        ========================================== */
+    function printLaporanPrioritas() {
+        const contentEl = document.getElementById('laporanPrioritasContent');
+        if (!contentEl) {
+            showToast('Konten laporan tidak ditemukan.', 'error');
+            return;
+        }
+
+        // Ganti warna Tailwind menjadi warna inline agar tampil saat dicetak
+        let content = contentEl.innerHTML;
+        content = content.replace(/bg-honey-500/g, 'background-color:#d97706; color:#fff;');
+        content = content.replace(/bg-honey-50/g, 'background-color:#fffbeb;');
+        content = content.replace(/bg-honey-600/g, 'background-color:#b45309; color:#fff;');
+        content = content.replace(/bg-forest-100 text-forest-700/g, 'background-color:#d1fae5; color:#065f46;');
+        content = content.replace(/bg-amber-100 text-amber-700/g, 'background-color:#fef3c7; color:#92400e;');
+        content = content.replace(/bg-gray-50/g, 'background-color:#f9fafb;');
+        content = content.replace(/bg-gray-100/g, 'background-color:#f3f4f6;');
+        content = content.replace(/bg-gray-200 text-gray-600/g, 'background-color:#e5e7eb; color:#4b5563;');
+        content = content.replace(/bg-blue-100 text-blue-700/g, 'background-color:#dbeafe; color:#1d4ed8;');
+        content = content.replace(/bg-green-100 text-green-700/g, 'background-color:#d1fae5; color:#047857;');
+        content = content.replace(/bg-purple-100 text-purple-700/g, 'background-color:#ede9fe; color:#6d28d9;');
+        content = content.replace(/bg-red-100 text-red-700/g, 'background-color:#fee2e2; color:#b91c1c;');
+        content = content.replace(/bg-orange-100 text-orange-700/g, 'background-color:#ffedd5; color:#c2410c;');
+        content = content.replace(/bg-teal-100 text-teal-700/g, 'background-color:#ccfbf1; color:#0f766e;');
+        content = content.replace(/text-honey-800/g, 'color:#92400e;');
+        content = content.replace(/text-honey-600/g, 'color:#d97706;');
+        content = content.replace(/border-honey-200/g, 'border-color:#fde68a;');
+        content = content.replace(/border-blue-200/g, 'border-color:#bfdbfe;');
+        content = content.replace(/border-green-200/g, 'border-color:#a7f3d0;');
+        content = content.replace(/border-purple-200/g, 'border-color:#ddd6fe;');
+        content = content.replace(/border-red-200/g, 'border-color:#fecaca;');
+        content = content.replace(/border-orange-200/g, 'border-color:#fed7aa;');
+        content = content.replace(/border-teal-200/g, 'border-color:#99f6e4;');
+        content = content.replace(/border-gray-200/g, 'border-color:#e5e7eb;');
+
+        const printHTML = `<!DOCTYPE html>
+    <html lang="id">
+    <head>
+    <meta charset="UTF-8">
+    <title>Laporan Prioritas - Desa Jangkang</title>
+    <style>
+        @page { size: A4; margin: 15mm; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color: #000; line-height: 1.4; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1pt solid #e5e7eb; padding: 5pt 8pt; }
+        tr { page-break-inside: avoid; }
+        .inline-block { display: inline-block; }
+        .inline-flex { display: inline-flex; align-items: center; justify-content: center; }
+        .whitespace-normal { white-space: normal; }
+        .whitespace-nowrap { white-space: nowrap; }
+        .break-words { word-break: break-word; overflow-wrap: break-word; }
+        .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-left { text-align: left; }
+        .font-bold, .font-semibold { font-weight: bold; }
+        .rounded-full { border-radius: 50%; }
+        .rounded-lg { border-radius: 8px; }
+        .rounded-xl { border-radius: 12px; }
+        .italic { font-style: italic; }
+        .grid { display: grid; gap: 16px; }
+        .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+        .w-3, .w-7 { display: inline-block; }
+        .w-3 { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+        .w-7 { width: 28px; height: 28px; line-height: 28px; text-align:center; font-size: 10px; font-weight: bold; }
+        .h-2 { height: 8px; }
+        .p-2, .p-4 { padding: 8px; }
+        .p-4 { padding: 16px; }
+        .mb-1, .mb-3, .mb-4, .mb-5, .mb-6 { margin-bottom: 4px; }
+        .mb-3 { margin-bottom: 12px; }
+        .mb-4 { margin-bottom: 16px; }
+        .mb-5 { margin-bottom: 20px; }
+        .mb-6 { margin-bottom: 24px; }
+        .gap-2, .gap-3 { display: flex; align-items: center; gap: 8px; }
+        .gap-3 { gap: 12px; }
+        .flex { display: flex; }
+        .justify-between { justify-content: space-between; }
+        .items-center { align-items: center; }
+        .text-\[10px\] { font-size: 9pt; }
+        .text-xs { font-size: 10pt; }
+        .text-sm { font-size: 11pt; }
+        .min-w-0 { min-width: 0; }
+        .leading-snug { line-height: 1.3; }
+        .tabular-nums { font-variant-numeric: tabular-nums; }
+        .opacity-40 { opacity: 0.4; }
+    </style>
+    </head>
+    <body>
+        <div style="margin-bottom:16px; border-bottom:2px solid #000; padding-bottom:8px;">
+            <h2 style="font-size:16pt; font-weight:bold; margin-bottom:4px;">Laporan Prioritas Pembangunan Desa Jangkang</h2>
+            <p style="font-size:11pt; color:#555;">Tahun Anggaran ${STATE.tahunAktif} · Diurutkan berdasarkan Ranking Desa</p>
+        </div>
+        ${content}
+    </body>
+    </html>`;
+
+        const printWin = window.open('', '_blank', 'width=900,height=700');
+        if (!printWin) {
+            showToast('Pop-up diblokir browser. Izinkan pop-up untuk mencetak.', 'error');
+            return;
+        }
+
+        printWin.document.write(printHTML);
+        printWin.document.close();
+
+        printWin.onload = function() {
+            setTimeout(() => { printWin.print(); }, 300);
+        };
+        
+        showToast('Menyiapkan laporan untuk dicetak...', 'info');
+    }
+
+ /**
+     * Laporan Usulan Berdasarkan SDGs Desa
+     */
+    function rLaporanSDGS() {
+        const tahun = STATE.tahunAktif;
+        const usulanFinal = cachedUsulan.filter(x => 
+            x.tahun == tahun && 
+            (x.status === 'final' || x.status === 'ranked_dusun')
+        );
+
+        // SDGs Desa mapping
+        const sdgsList = [
+            { no: 1,  nama: 'Desa Tanpa Kemiskinan',          icon: 'fa-hand-holding-heart', color: '#E5243B' },
+            { no: 2,  nama: 'Desa Tanpa Kelaparan',           icon: 'fa-utensils',           color: '#DDA63A' },
+            { no: 3,  nama: 'Desa Sehat dan Sejahtera',       icon: 'fa-heartbeat',          color: '#4C9F38' },
+            { no: 4,  nama: 'Pendidikan Desa Berkualitas',    icon: 'fa-graduation-cap',     color: '#C5192D' },
+            { no: 5,  nama: 'Keterlibatan Perempuan Desa',    icon: 'fa-female',             color: '#FF3A21' },
+            { no: 6,  nama: 'Desa Layak Air Bersih dan Sanitasi', icon: 'fa-tint',           color: '#26BDE2' },
+            { no: 7,  nama: 'Desa Berenergi Bersih dan Terbarukan', icon: 'fa-solar-panel',  color: '#FCC30B' },
+            { no: 8,  nama: 'Pertumbuhan Ekonomi Desa Merata', icon: 'fa-chart-line',       color: '#A21942' },
+            { no: 9,  nama: 'Infrastruktur dan Inovasi Desa', icon: 'fa-road',               color: '#FD6925' },
+            { no: 10, nama: 'Desa Tanpa Kesenjangan',         icon: 'fa-balance-scale',      color: '#DD1367' },
+            { no: 11, nama: 'Kawasan Pemukiman Desa Aman dan Nyaman', icon: 'fa-home',      color: '#FD9D24' },
+            { no: 12, nama: 'Konsumsi dan Produksi Desa Sadar Lingkungan', icon: 'fa-recycle', color: '#BF8B2E' },
+            { no: 13, nama: 'Desa Tanggap Perubahan Iklim',   icon: 'fa-cloud-sun',          color: '#3F7E44' },
+            { no: 14, nama: 'Ekosistem Desa Lestari',         icon: 'fa-fish',               color: '#0A97D9' },
+            { no: 15, nama: 'Desa Peduli Lingkungan',         icon: 'fa-tree',               color: '#56C02B' },
+            { no: 16, nama: 'Desa Damai dan Berkeadilan',     icon: 'fa-dove',               color: '#00689D' },
+            { no: 17, nama: 'Kemitraan untuk Pembangunan Desa', icon: 'fa-handshake',        color: '#19486A' },
+            { no: 18, nama: 'Kelembagaan Desa Dinamis dan Budaya Desa Berkembang', icon: 'fa-landmark', color: '#89CFF0' }
+        ];
+
+        // Simple mapping kategori ke SDGs (bisa disesuaikan)
+        const kategoriToSDGS = {
+            'Infrastruktur': [6, 7, 9, 11],
+            'Pemberdayaan':  [1, 2, 5, 8, 10, 17],
+            'Pendidikan':    [4, 8],
+            'Kesehatan':     [3],
+            'Sosial':        [5, 10, 16, 18],
+            'Lingkungan':    [12, 13, 14, 15]
+        };
+
+        // Hitung per SDGs
+        const sdgsData = sdgsList.map(sdgs => {
+            const relatedUsulan = usulanFinal.filter(u => {
+                const mappedSDGS = kategoriToSDGS[u.kategori] || [];
+                return mappedSDGS.includes(sdgs.no);
+            });
+            return {
+                ...sdgs,
+                count: relatedUsulan.length,
+                totalBiaya: relatedUsulan.reduce((s, u) => s + (parseInt(u.estimasiBiaya) || 0), 0),
+                usulan: relatedUsulan
+            };
+        }).filter(s => s.count > 0);
+
+        const totalBiaya = usulanFinal.reduce((s, u) => s + (parseInt(u.estimasiBiaya) || 0), 0);
+
+        return `
+        <div class="max-w-5xl mx-auto space-y-5">
+            <!-- Header -->
+            <div class="bg-white rounded-2xl border p-5 md:p-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+                    <div>
+                        <h2 class="font-display font-bold text-lg text-gray-800">Laporan Usulan Berdasarkan SDGs Desa</h2>
+                        <p class="text-sm text-gray-500 mt-0.5">Tahun Anggaran ${tahun} · ${sdgsData.length} dari 18 Tujuan SDGs</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="printLaporanSDGS()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2">
+                            <i class="fas fa-print"></i> Cetak Laporan Ini
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Konten yang akan dicetak -->
+                <div id="laporanSDGSContent">
+                    <!-- SDGs Grid -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6">
+                        ${sdgsList.map(sdgs => {
+                            const data = sdgsData.find(s => s.no === sdgs.no);
+                            const hasData = data && data.count > 0;
+                            const pct = totalBiaya > 0 && hasData ? (data.totalBiaya / totalBiaya * 100) : 0;
+                            
+                            return `
+                            <div onclick="${hasData ? `showSdgsDetail(${sdgs.no})` : ''}" 
+                                class="relative border rounded-xl p-3 transition-all duration-200 ${hasData ? 'cursor-pointer hover:shadow-md hover:-translate-y-0.5' : 'opacity-30'}"
+                                style="border-color: ${hasData ? sdgs.color + '40' : '#e5e7eb'}">
+                                ${hasData ? `<div class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold" style="background-color: ${sdgs.color}">${data.count}</div>` : ''}
+                                <div class="flex items-start gap-2">
+                                    <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background-color: ${sdgs.color}20">
+                                        <i class="fas ${sdgs.icon} text-xs" style="color: ${sdgs.color}"></i>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <div class="text-[10px] font-bold" style="color: ${sdgs.color}">SDGs ${sdgs.no}</div>
+                                        <div class="text-[10px] text-gray-600 leading-tight mt-0.5">${sdgs.nama}</div>
+                                        ${hasData ? `
+                                        <div class="text-[9px] text-gray-400 mt-1">${formatRupiah(data.totalBiaya)} (${pct.toFixed(1)}%)</div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            </div>`;
+                        }).join('')}
+                    </div>
+
+                    <!-- Detail Tabel SDGs yang memiliki data -->
+                    ${sdgsData.length > 0 ? `
+                    <div class="border rounded-xl overflow-hidden">
+                        <div class="bg-gray-50 px-4 py-3 border-b">
+                            <h4 class="font-semibold text-sm text-gray-700">Ringkasan SDGs yang Tercapai</h4>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs">
+                                <thead class="bg-gray-50 border-b">
+                                    <tr>
+                                        <th class="px-3 py-2.5 text-center font-semibold text-gray-600 w-16">SDGs</th>
+                                        <th class="px-3 py-2.5 text-left font-semibold text-gray-600">Tujuan Pembangunan</th>
+                                        <th class="px-3 py-2.5 text-center font-semibold text-gray-600 w-20">Jumlah</th>
+                                        <th class="px-3 py-2.5 text-right font-semibold text-gray-600 w-32">Total Biaya</th>
+                                        <th class="px-3 py-2.5 text-center font-semibold text-gray-600 w-20">Proporsi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    ${sdgsData.map(sdgs => {
+                                        const pct = totalBiaya > 0 ? (sdgs.totalBiaya / totalBiaya * 100) : 0;
+                                        return `
+                                        <tr class="hover:bg-gray-50 cursor-pointer" onclick="showSdgsDetail(${sdgs.no})">
+                                            <td class="px-3 py-2.5 text-center">
+                                                <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg text-white text-[10px] font-bold" style="background-color: ${sdgs.color}">${sdgs.no}</span>
+                                            </td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2">
+                                                    <i class="fas ${sdgs.icon} text-gray-400"></i>
+                                                    <span class="font-medium text-gray-800">${sdgs.nama}</span>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-center font-semibold">${sdgs.count} usulan</td>
+                                            <td class="px-3 py-2.5 text-right font-semibold">${formatRupiah(sdgs.totalBiaya)}</td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2 justify-end">
+                                                    <div class="w-16 bg-gray-100 rounded-full h-1.5">
+                                                        <div class="h-1.5 rounded-full" style="width: ${pct}%; background-color: ${sdgs.color}"></div>
+                                                    </div>
+                                                    <span class="text-gray-500 w-10 text-right">${pct.toFixed(0)}%</span>
+                                                </div>
+                                            </td>
+                                        </tr>`;
+                                    }).join('')}
+                                </tbody>
+                                <tfoot class="bg-gray-50 border-t-2 border-gray-200">
+                                    <tr class="font-bold text-sm">
+                                        <td colspan="2" class="px-3 py-3 text-right text-gray-800">TOTAL</td>
+                                        <td class="px-3 py-3 text-center">${usulanFinal.length} usulan</td>
+                                        <td class="px-3 py-3 text-right">${formatRupiah(totalBiaya)}</td>
+                                        <td class="px-3 py-3 text-center text-gray-500">100%</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    ` : `
+                    <div class="text-center py-12 text-gray-400 border rounded-xl">
+                        <i class="fas fa-bullseye text-4xl mb-3 block"></i>
+                        <p>Belum ada data usulan untuk ditampilkan</p>
+                    </div>
+                    `}
+                </div>
+            </div>
+        </div>`;
+    }
+
+    /* ==========================================
+        PRINT LAPORAN SDGs (WINDOW POPUP)
+        ========================================== */
+    function printLaporanSDGS() {
+        const contentEl = document.getElementById('laporanSDGSContent');
+        if (!contentEl) {
+            showToast('Konten laporan SDGs tidak ditemukan.', 'error');
+            return;
+        }
+
+        // Bersihkan class yang tidak relevan untuk cetak (hover, cursor, transisi)
+        let content = contentEl.innerHTML;
+        content = content.replace(/hover:shadow-md hover:-translate-y-0.5/g, '');
+        content = content.replace(/cursor-pointer/g, '');
+        content = content.replace(/transition-all duration-200/g, '');
+
+        const printHTML = `<!DOCTYPE html>
+    <html lang="id">
+    <head>
+    <meta charset="UTF-8">
+    <title>Laporan SDGs - Desa Jangkang</title>
+    <style>
+        @page { size: A4; margin: 15mm; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color: #000; line-height: 1.4; }
+        
+        /* GRID SYSTEM */
+        .grid { display: grid; gap: 10px; }
+        .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+        .sm_grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+        .md_grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+        @media (max-width: 640px) { .sm_grid-cols-3 { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 768px) { .md_grid-cols-4 { grid-template-columns: repeat(2, 1fr); } }
+
+        /* LAYOUT & SPACING */
+        .flex { display: flex; }
+        .inline-flex { display: inline-flex; align-items: center; justify-content: center; }
+        .items-center, .items-start { align-items: center; }
+        .items-start { align-items: flex-start; }
+        .justify-center { justify-content: center; }
+        .justify-end { justify-content: flex-end; }
+        .gap-2, .gap-3 { gap: 8px; }
+        .gap-3 { gap: 12px; }
+        .min-w-0 { min-width: 0; }
+        .flex-shrink-0 { flex-shrink: 0; }
+        
+        /* BORDERS & RADIUS */
+        .border { border: 1px solid #e5e7eb; }
+        .rounded-xl { border-radius: 12px; }
+        .rounded-lg { border-radius: 8px; }
+        .rounded-full { border-radius: 50%; }
+        
+        /* PADDING & MARGIN */
+        .p-3 { padding: 12px; }
+        .mb-6 { margin-bottom: 24px; }
+        .mt-0\.5 { margin-top: 2px; }
+        .mt-1 { margin-top: 4px; }
+        .px-3 { padding-left: 12px; padding-right: 12px; }
+        .px-4 { padding-left: 16px; padding-right: 16px; }
+        .py-2\.5 { padding-top: 10px; padding-bottom: 10px; }
+        .py-3 { padding-top: 12px; padding-bottom: 12px; }
+        
+        /* TYPOGRAPHY */
+        .text-xs { font-size: 10pt; }
+        .text-sm { font-size: 11pt; }
+        .text-\[10px\] { font-size: 9pt; }
+        .text-\[9px\] { font-size: 8pt; }
+        .font-bold, .font-semibold, .font-medium { font-weight: bold; }
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .text-right { text-align: right; }
+        .text-gray-400 { color: #9ca3af; }
+        .text-gray-500 { color: #6b7280; }
+        .text-gray-600 { color: #4b5563; }
+        .text-gray-800 { color: #1f2937; }
+        .text-white { color: #ffffff; }
+        .leading-tight { line-height: 1.25; }
+        .whitespace-nowrap { white-space: nowrap; }
+        .opacity-30 { opacity: 0.3; }
+        
+        /* TABLE */
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #e5e7eb; padding: 5pt 8pt; }
+        .bg-gray-50 { background-color: #f9fafb; }
+        .bg-gray-100 { background-color: #f3f4f6; }
+        .divide-y > * + * { border-top: 1px solid #f3f4f6; }
+        .overflow-x-auto { overflow-x: auto; }
+        tr { page-break-inside: avoid; }
+
+        /* BADGES & SHAPES */
+        .w-5, .w-7, .w-8, .w-16 { display: inline-block; text-align: center; }
+        .w-5 { width: 20px; height: 20px; line-height: 20px; font-size: 8pt; border-radius: 50%; }
+        .w-7 { width: 28px; height: 28px; line-height: 28px; font-size: 10pt; border-radius: 8px; }
+        .w-8 { width: 32px; height: 32px; line-height: 32px; border-radius: 8px; }
+        .w-16 { width: 64px; }
+        .h-1\.5, .h-5 { display: inline-block; }
+        .h-1\.5 { height: 6px; width: 100%; border-radius: 999px; }
+        .h-5 { width: 20px; height: 20px; line-height: 20px; font-size: 8pt; border-radius: 50%; }
+        
+        /* POSITIONING */
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .-top-1\.5 { top: -6px; }
+        .-right-1\.5 { right: -6px; }
+    </style>
+    </head>
+    <body>
+        <div style="margin-bottom:16px; border-bottom:2px solid #000; padding-bottom:8px;">
+            <h2 style="font-size:16pt; font-weight:bold; margin-bottom:4px;">Laporan Usulan Berdasarkan SDGs Desa Jangkang</h2>
+            <p style="font-size:11pt; color:#555;">Tahun Anggaran ${STATE.tahunAktif}</p>
+        </div>
+        ${content}
+    </body>
+    </html>`;
+
+        const printWin = window.open('', '_blank', 'width=900,height=700');
+        if (!printWin) {
+            showToast('Pop-up diblokir browser. Izinkan pop-up untuk mencetak.', 'error');
+            return;
+        }
+
+        printWin.document.write(printHTML);
+        printWin.document.close();
+
+        printWin.onload = function() {
+            setTimeout(() => { printWin.print(); }, 300);
+        };
+        
+        showToast('Menyiapkan laporan SDGs untuk dicetak...', 'info');
+    }
+
+    /**
+     * Modal detail SDGs
+     */
+    function showSdgsDetail(sdgsNo) {
+        const tahun = STATE.tahunAktif;
+        const sdgsList = [
+            { no: 1,  nama: 'Desa Tanpa Kemiskinan',          icon: 'fa-hand-holding-heart', color: '#E5243B' },
+            { no: 2,  nama: 'Desa Tanpa Kelaparan',           icon: 'fa-utensils',           color: '#DDA63A' },
+            { no: 3,  nama: 'Desa Sehat dan Sejahtera',       icon: 'fa-heartbeat',          color: '#4C9F38' },
+            { no: 4,  nama: 'Pendidikan Desa Berkualitas',    icon: 'fa-graduation-cap',     color: '#C5192D' },
+            { no: 5,  nama: 'Keterlibatan Perempuan Desa',    icon: 'fa-female',             color: '#FF3A21' },
+            { no: 6,  nama: 'Desa Layak Air Bersih dan Sanitasi', icon: 'fa-tint',           color: '#26BDE2' },
+            { no: 7,  nama: 'Desa Berenergi Bersih dan Terbarukan', icon: 'fa-solar-panel',  color: '#FCC30B' },
+            { no: 8,  nama: 'Pertumbuhan Ekonomi Desa Merata', icon: 'fa-chart-line',       color: '#A21942' },
+            { no: 9,  nama: 'Infrastruktur dan Inovasi Desa', icon: 'fa-road',               color: '#FD6925' },
+            { no: 10, nama: 'Desa Tanpa Kesenjangan',         icon: 'fa-balance-scale',      color: '#DD1367' },
+            { no: 11, nama: 'Kawasan Pemukiman Desa Aman dan Nyaman', icon: 'fa-home',      color: '#FD9D24' },
+            { no: 12, nama: 'Konsumsi dan Produksi Desa Sadar Lingkungan', icon: 'fa-recycle', color: '#BF8B2E' },
+            { no: 13, nama: 'Desa Tanggap Perubahan Iklim',   icon: 'fa-cloud-sun',          color: '#3F7E44' },
+            { no: 14, nama: 'Ekosistem Desa Lestari',         icon: 'fa-fish',               color: '#0A97D9' },
+            { no: 15, nama: 'Desa Peduli Lingkungan',         icon: 'fa-tree',               color: '#56C02B' },
+            { no: 16, nama: 'Desa Damai dan Berkeadilan',     icon: 'fa-dove',               color: '#00689D' },
+            { no: 17, nama: 'Kemitraan untuk Pembangunan Desa', icon: 'fa-handshake',        color: '#19486A' },
+            { no: 18, nama: 'Kelembagaan Desa Dinamis dan Budaya Desa Berkembang', icon: 'fa-landmark', color: '#89CFF0' }
+        ];
+        
+        const kategoriToSDGS = {
+            'Infrastruktur': [6, 7, 9, 11],
+            'Pemberdayaan':  [1, 2, 5, 8, 10, 17],
+            'Pendidikan':    [4, 8],
+            'Kesehatan':     [3],
+            'Sosial':        [5, 10, 16, 18],
+            'Lingkungan':    [12, 13, 14, 15]
+        };
+
+        const sdgs = sdgsList.find(s => s.no === sdgsNo);
+        if (!sdgs) return;
+
+        const relatedUsulan = cachedUsulan.filter(u => {
+            const mappedSDGS = kategoriToSDGS[u.kategori] || [];
+            return mappedSDGS.includes(sdgsNo) && u.tahun == tahun && (u.status === 'final' || u.status === 'ranked_dusun');
+        });
+
+        const totalBiaya = relatedUsulan.reduce((s, u) => s + (parseInt(u.estimasiBiaya) || 0), 0);
+
+        openModal(`
+        <div class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this)closeModal()">
+            <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto shadow-2xl view-enter">
+                <div class="sticky top-0 bg-white border-b px-5 py-4 flex items-center justify-between z-10">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background-color: ${sdgs.color}20">
+                            <i class="fas ${sdgs.icon}" style="color: ${sdgs.color}"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold" style="color: ${sdgs.color}">SDGs ${sdgs.no}</div>
+                            <div class="font-display font-bold text-sm">${sdgs.nama}</div>
+                        </div>
+                    </div>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-1" aria-label="Tutup"><i class="fas fa-times text-lg"></i></button>
+                </div>
+                <div class="p-5">
+                    <div class="flex gap-4 mb-4">
+                        <div class="bg-gray-50 rounded-lg px-4 py-2 text-center">
+                            <div class="text-lg font-bold text-gray-800">${relatedUsulan.length}</div>
+                            <div class="text-[10px] text-gray-500">Usulan</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg px-4 py-2 text-center">
+                            <div class="text-lg font-bold text-gray-800">${formatRupiah(totalBiaya)}</div>
+                            <div class="text-[10px] text-gray-500">Total Biaya</div>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto border rounded-xl">
+                        <table class="w-full text-xs">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-3 py-2 text-left font-semibold text-gray-600 w-10">No</th>
+                                    <th class="px-3 py-2 text-left font-semibold text-gray-600">Judul Usulan</th>
+                                    <th class="px-3 py-2 text-left font-semibold text-gray-600 w-20">Dusun</th>
+                                    <th class="px-3 py-2 text-left font-semibold text-gray-600 w-24">Kategori</th>
+                                    <th class="px-3 py-2 text-right font-semibold text-gray-600 w-28">Estimasi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                ${relatedUsulan.map((u, i) => `
+                                    <tr class="hover:bg-gray-50 cursor-pointer" onclick="closeModal(); setTimeout(()=>showDetail('${escapeJs(u.id)}'),200)">
+                                        <td class="px-3 py-2 text-gray-500">${i + 1}</td>
+                                        <td class="px-3 py-2 font-medium text-gray-800">${escapeHtml(u.judul)}</td>
+                                        <td class="px-3 py-2 text-gray-500">${escapeHtml(u.dusun)}</td>
+                                        <td class="px-3 py-2"><span class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-medium">${u.kategori}</span></td>
+                                        <td class="px-3 py-2 text-right font-semibold">${formatRupiah(u.estimasiBiaya)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>`);
+    }
+
+    // ✅ Placeholder export functions (sesuaikan dengan library yang digunakan)
+    function exportBaMusdes() { showToast('Fitur export PDF sedang dalam pengembangan', 'info'); }
+    function exportLaporanPrioritas() { showToast('Fitur export Excel sedang dalam pengembangan', 'info'); }
+    function exportLaporanSDGS() { showToast('Fitur export PDF sedang dalam pengembangan', 'info'); }
+
     function rPengaturan() {
         const dlUser = STATE.deadlineUser || '';
         const dlAdmDusun = STATE.deadlineAdmDusun || '';
@@ -3316,6 +5725,81 @@
                 </div>
             </div>
         </div>`;
+    }
+
+/* ==========================================
+    LOCAL STORAGE: SAVE & LOAD KONFIGURASI BA
+    ========================================== */
+    const BA_STORAGE_KEY = 'baConfig_Jangkang_v1';
+
+    function saveBAConfig() {
+        if (typeof STATE === 'undefined' || !STATE.baForm) {
+            showToast('Tidak ada data form untuk disimpan.', 'error');
+            return;
+        }
+        
+        // Ambil hanya data konfigurasi (tidak termasuk data usulan yang berat)
+        const dataToSave = {
+            tanggal: STATE.baForm.tanggal || '',
+            jamMulai: STATE.baForm.jamMulai || '',
+            jamSelesai: STATE.baForm.jamSelesai || '',
+            zonaWaktu: STATE.baForm.zonaWaktu || 'WIB',
+            tempat: STATE.baForm.tempat || '',
+            nomorSurat: STATE.baForm.nomorSurat || '',
+            metodeKeputusan: STATE.baForm.metodeKeputusan || 'musyawarah_mufakat',
+            rkpTahun: STATE.baForm.rkpTahun || '',
+            durkpTahun: STATE.baForm.durkpTahun || '',
+            pemimpinMusyawarah: STATE.baForm.pemimpinMusyawarah || '',
+            pemimpinAsal: STATE.baForm.pemimpinAsal || 'Ketua BPD',
+            notulisNama: STATE.baForm.notulisNama || '',
+            notulisAsal: STATE.baForm.notulisAsal || '',
+            narasumber: STATE.baForm.narasumber || [{nama:'', asal:''}, {nama:'', asal:''}],
+            kadesNama: STATE.baForm.kadesNama || '',
+            kadesNip: STATE.baForm.kadesNip || '',
+            bpdNama: STATE.baForm.bpdNama || '',
+            wakilMasyarakat: STATE.baForm.wakilMasyarakat || ['', '', '', '', '']
+        };
+
+        try {
+            localStorage.setItem(BA_STORAGE_KEY, JSON.stringify(dataToSave));
+            showToast('Data konfigurasi berhasil disimpan!', 'success');
+        } catch (e) {
+            console.error(e);
+            showToast('Gagal menyimpan data (Storage penuh).', 'error');
+        }
+    }
+
+    function loadBAConfig() {
+        try {
+            const savedData = localStorage.getItem(BA_STORAGE_KEY);
+            if (!savedData) {
+                showToast('Belum ada data konfigurasi tersimpan.', 'info');
+                return;
+            }
+
+            const parsedData = JSON.parse(savedData);
+            
+            // Update STATE.baForm
+            if (typeof STATE !== 'undefined' && STATE.baForm) {
+                Object.assign(STATE.baForm, parsedData);
+                
+                // Render ulang form agar input-value di HTML ikut berubah
+                // GANTI "renderApp()" dengan nama fungsi render utama Anda jika berbeda
+                if (typeof renderApp === 'function') {
+                    renderApp();
+                } else if (typeof renderBASection === 'function') {
+                    renderBASection();
+                } else {
+                    // Fallback: refresh halaman jika fungsi render tidak ditemukan
+                    window.location.reload();
+                }
+                
+                showToast('Data konfigurasi berhasil dimuat!', 'success');
+            }
+        } catch (e) {
+            console.error(e);
+            showToast('Gagal membaca data tersimpan.', 'error');
+        }
     }
 
 
@@ -4437,7 +6921,25 @@
     function navigate(v) { STATE.currentView = v; render(); }
 
     async function switchTab(tab) {
+        const tabs = getTabs(STATE.currentUser?.role);
+        let currentTab = tabs.find(t => t.key === tab);
+        let parentTab = null;
+
+        // ✅ 1. Jika klik parent submenu, arahkan ke sub-tab pertama
+        if (currentTab?.isSubmenuParent) {
+            const firstSub = tabs.find(t => t.parentTab === tab);
+            if (firstSub) {
+                tab = firstSub.key;
+                currentTab = firstSub;
+                parentTab = tabs.find(t => t.key === currentTab.parentTab);
+            }
+        } else if (currentTab?.parentTab) {
+            // ✅ 2. Jika klik sub-tab, simpan parent-nya untuk keperluan UI
+            parentTab = tabs.find(t => t.key === currentTab.parentTab);
+        }
+
         STATE.dashboardTab = tab;
+        
         const sb = document.getElementById('sidebar');
         const ov = document.getElementById('sidebarOverlay');
         
@@ -4446,31 +6948,54 @@
             toggleSidebar(); 
         }
 
-        // Update warna sidebar (Kode lama Anda, tetap dipertahankan)
-        document.querySelectorAll('.sidebar-link').forEach(el => { el.classList.toggle('active', el.dataset.tab === tab); });
-
-        // ✅ UPDATE BARU 1: Ganti tulisan Header sesuai tab yang diklik
-        const tabs = getTabs(STATE.currentUser?.role);
-        const currentTab = tabs.find(t => t.key === tab);
-        const headerEl = document.getElementById('headerTitle');
-        if (headerEl && currentTab) {
-            headerEl.textContent = currentTab.label;
+        // ✅ 3. Buka parent submenu di sidebar jika sedang di sub-tab
+        if (parentTab) {
+            openSubmenu(parentTab.key);
         }
 
-        // ✅ UPDATE BARU 2: Ganti warna Bottom Nav saat di-klik di smartphone
+        // ✅ 4. Update warna sidebar (Mendukung Parent & Child)
+        document.querySelectorAll('.sidebar-link').forEach(el => {
+            const isActive = el.dataset.tab === tab || el.dataset.tab === parentTab?.key;
+            el.classList.toggle('active', isActive);
+        });
+
+        // ✅ 5. Update Header dengan Breadcrumb (Parent > Child)
+        const headerEl = document.getElementById('headerTitle');
+        if (headerEl && currentTab) {
+            if (parentTab) {
+                headerEl.innerHTML = `
+                    <span class="text-gray-400 text-[11px] font-medium hidden sm:inline">${parentTab.label}</span>
+                    <i class="fas fa-chevron-right text-[8px] text-gray-300 hidden sm:inline"></i>
+                    <span class="truncate">${currentTab.label}</span>`;
+            } else {
+                headerEl.innerHTML = `<span class="truncate">${currentTab.label}</span>`;
+            }
+        }
+
+        // ✅ 6. Update warna Bottom Nav (Mendukung highlight Parent saat Child aktif)
         document.querySelectorAll('.bnav-btn').forEach(btn => {
-            const isActive = btn.dataset.tab === tab;
-            // Bersihkan kelas warna terlebih dahulu
+            const btnKey = btn.dataset.tab;
+            const isActive = btnKey === tab || btnKey === parentTab?.key;
+            
             btn.classList.remove('text-honey-600', 'bg-honey-50', 'text-gray-400', 'active:text-gray-600', 'active:bg-gray-50');
-            // Set warna berdasarkan status aktif/tidak
             if (isActive) {
                 btn.classList.add('text-honey-600', 'bg-honey-50');
             } else {
                 btn.classList.add('text-gray-400', 'active:text-gray-600', 'active:bg-gray-50');
             }
+
+            // Toggle chevron untuk parent submenu
+            const chevron = btn.querySelector('.fa-chevron-up');
+            if (chevron) {
+                chevron.classList.toggle('opacity-100', isActive);
+                chevron.classList.toggle('opacity-0', !isActive);
+            }
         });
 
-        // --- KODE FETCH & RENDER ANDA DI BAWAH INI TIDAK DIUBAH SAMA SEKALI ---
+        // Tutup bottom popup submenu
+        closeBottomSubmenu();
+
+        // --- KODE FETCH & RENDER ANDA (TIDAK DIUBAH SAMA SEKALI) ---
         const c = document.getElementById('tabContent');
         const needsDataFetch = cachedUsulan.length === 0 || cachedUsulan[0].tahun != STATE.tahunAktif;
         let fetchPromises = [];
