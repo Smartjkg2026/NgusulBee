@@ -276,7 +276,7 @@
        1. KONFIGURASI APLIKASI
        ========================================== */
     const CONFIG = {
-        API_URL: 'https://script.google.com/macros/s/AKfycbzdXSplMhpi0XwZIzgqDlhyH-jHUDlh56avyyzVpyBpl21btCM7l-Cafur9hmbhWVt4eA/exec',
+        API_URL: 'https://script.google.com/macros/s/AKfycbxBkcYOmyU0_YCbLV-Za1tHHC9NCNOiqIlkIvwcGYW7y9iD-6O5ojdtrPoz5WwhKGTNoA/exec',
         APP_NAME: 'NgusulBee',
         DESA: 'Desa Jangkang',
         KATEGORI: ['Infrastruktur', 'Pendidikan', 'Kesehatan', 'Ekonomi', 'Sosial', 'Lingkungan'],
@@ -849,11 +849,11 @@
     }
 
     function saveSession() {
-        if (STATE.currentUser) localStorage.setItem('ngusulbee_session', JSON.stringify({ user: STATE.currentUser, tahun: STATE.tahunAktif }));
+        if (STATE.currentUser) localStorage.setItem('_session', JSON.stringify({ user: STATE.currentUser, tahun: STATE.tahunAktif }));
     }
 
     function clearSession() {
-        localStorage.removeItem('ngusulbee_session');
+        localStorage.removeItem('_session');
         STATE.currentUser = null;
         STATE.dashboardTab = 'beranda';
         cachedUsulan = [];
@@ -1482,8 +1482,8 @@
         return `<div class="view-enter min-h-screen flex flex-col">
             <nav class="relative z-10 flex items-center justify-between px-5 md:px-8 py-4 max-w-6xl mx-auto w-full">
                 <div class="flex items-center gap-3">
-                    <img src="Logo.png" alt="NgusulBee" class="w-10 h-10 object-contain">
-                    <span class="font-display font-800 text-lg text-honey-700 tracking-tight">NgusulBee</span>
+                    <img src="Logo.png" alt="" class="w-10 h-10 object-contain">
+                    <span class="font-display font-800 text-lg text-honey-700 tracking-tight"></span>
                 </div>
                 <div class="flex gap-2 sm:gap-3"><button onclick="navigate('register')" class="px-4 sm:px-5 py-2 text-sm font-semibold text-honey-700 hover:bg-honey-50 rounded-lg transition-colors">Daftar</button><button onclick="navigate('login')" class="px-4 sm:px-5 py-2 text-sm font-semibold text-white bg-honey-500 hover:bg-honey-600 rounded-lg shadow transition-colors">Masuk</button></div>
             </nav>
@@ -1497,7 +1497,7 @@
                         <div><span class="inline-block px-3 py-1 bg-honey-100 text-honey-700 text-xs font-bold rounded-full mb-4">${CONFIG.DESA}</span><h1 class="font-display font-900 text-4xl md:text-5xl leading-[1.1] tracking-tight">Suara Warga,<br><span class="text-honey-500">Pembangunan Nyata</span></h1></div>
                         <p class="text-base md:text-lg text-gray-600 leading-relaxed max-w-md">Platform musyawarah perencanaan pembangunan desa yang transparan dan akuntabel.</p>
                         <div class="flex flex-wrap gap-3"><button onclick="navigate('login')" class="px-7 py-3.5 bg-honey-500 text-white font-display font-700 rounded-xl shadow-lg hover:bg-honey-600 hover:shadow-xl transition-all">Mulai Sekarang <i class="fas fa-arrow-right ml-2"></i></button></div>
-                        <a href="SlideNgusulbee.html" class="px-7 py-3.5 bg-transparent border-2 border-cyan-600 text-cyan-600 font-display font-700 rounded-xl shadow-lg hover:bg-cyan-50 hover:shadow-xl transition-all inline-flex items-center gap-2"><i class="fas fa-desktop text-red-500 text-xl"></i> Presentasi</a>
+                        <a href="Slide.html" class="px-7 py-3.5 bg-transparent border-2 border-cyan-600 text-cyan-600 font-display font-700 rounded-xl shadow-lg hover:bg-cyan-50 hover:shadow-xl transition-all inline-flex items-center gap-2"><i class="fas fa-desktop text-red-500 text-xl"></i> Presentasi</a>
                         <a href="tutorial.html" class="px-7 py-3.5 bg-transparent border-2 border-cyan-600 text-cyan-600 font-display font-700 rounded-xl shadow-lg hover:bg-cyan-50 hover:shadow-xl transition-all inline-flex items-center gap-2"><i class="fas fa-play text-red-500 text-xl"></i></i> Totorial</a>
                         
                         <!-- ✅ STATISTIK (DENGAN ANIMASI HOVER) -->
