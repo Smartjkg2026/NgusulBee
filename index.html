@@ -849,11 +849,11 @@
     }
 
     function saveSession() {
-        if (STATE.currentUser) localStorage.setItem('_session', JSON.stringify({ user: STATE.currentUser, tahun: STATE.tahunAktif }));
+        if (STATE.currentUser) localStorage.setItem('ngusulbee_session', JSON.stringify({ user: STATE.currentUser, tahun: STATE.tahunAktif }));
     }
 
     function clearSession() {
-        localStorage.removeItem('_session');
+        localStorage.removeItem('ngusulbee_session');
         STATE.currentUser = null;
         STATE.dashboardTab = 'beranda';
         cachedUsulan = [];
@@ -1482,8 +1482,8 @@
         return `<div class="view-enter min-h-screen flex flex-col">
             <nav class="relative z-10 flex items-center justify-between px-5 md:px-8 py-4 max-w-6xl mx-auto w-full">
                 <div class="flex items-center gap-3">
-                    <img src="Logo.png" alt="" class="w-10 h-10 object-contain">
-                    <span class="font-display font-800 text-lg text-honey-700 tracking-tight"></span>
+                    <img src="Logo.png" alt="NgusulBee" class="w-10 h-10 object-contain">
+                    <span class="font-display font-800 text-lg text-honey-700 tracking-tight">NgusulBee</span>
                 </div>
                 <div class="flex gap-2 sm:gap-3"><button onclick="navigate('register')" class="px-4 sm:px-5 py-2 text-sm font-semibold text-honey-700 hover:bg-honey-50 rounded-lg transition-colors">Daftar</button><button onclick="navigate('login')" class="px-4 sm:px-5 py-2 text-sm font-semibold text-white bg-honey-500 hover:bg-honey-600 rounded-lg shadow transition-colors">Masuk</button></div>
             </nav>
@@ -1497,7 +1497,7 @@
                         <div><span class="inline-block px-3 py-1 bg-honey-100 text-honey-700 text-xs font-bold rounded-full mb-4">${CONFIG.DESA}</span><h1 class="font-display font-900 text-4xl md:text-5xl leading-[1.1] tracking-tight">Suara Warga,<br><span class="text-honey-500">Pembangunan Nyata</span></h1></div>
                         <p class="text-base md:text-lg text-gray-600 leading-relaxed max-w-md">Platform musyawarah perencanaan pembangunan desa yang transparan dan akuntabel.</p>
                         <div class="flex flex-wrap gap-3"><button onclick="navigate('login')" class="px-7 py-3.5 bg-honey-500 text-white font-display font-700 rounded-xl shadow-lg hover:bg-honey-600 hover:shadow-xl transition-all">Mulai Sekarang <i class="fas fa-arrow-right ml-2"></i></button></div>
-                        <a href="Slide.html" class="px-7 py-3.5 bg-transparent border-2 border-cyan-600 text-cyan-600 font-display font-700 rounded-xl shadow-lg hover:bg-cyan-50 hover:shadow-xl transition-all inline-flex items-center gap-2"><i class="fas fa-desktop text-red-500 text-xl"></i> Presentasi</a>
+                        <a href="SlideNgusulbee.html" class="px-7 py-3.5 bg-transparent border-2 border-cyan-600 text-cyan-600 font-display font-700 rounded-xl shadow-lg hover:bg-cyan-50 hover:shadow-xl transition-all inline-flex items-center gap-2"><i class="fas fa-desktop text-red-500 text-xl"></i> Presentasi</a>
                         <a href="tutorial.html" class="px-7 py-3.5 bg-transparent border-2 border-cyan-600 text-cyan-600 font-display font-700 rounded-xl shadow-lg hover:bg-cyan-50 hover:shadow-xl transition-all inline-flex items-center gap-2"><i class="fas fa-play text-red-500 text-xl"></i></i> Totorial</a>
                         
                         <!-- ✅ STATISTIK (DENGAN ANIMASI HOVER) -->
@@ -7620,8 +7620,8 @@
     }
 
     /* ==========================================
-        TABEL VERIFIKASI DESA (HANYA MODE TABEL)
-        ========================================== */
+    TABEL VERIFIKASI DESA (HANYA MODE TABEL)
+    ========================================== */
     function rVerifDesaTable(u, list) {
         // ✅ URUTKAN AWAL BERDASARKAN RANK DESA
         const sorted = [...list].sort((a, b) => {
@@ -7663,11 +7663,11 @@
                 const kordHtml = buildKordHtml(item.kordinator);
                 const canEditMusdes = item.isMusdes && (item.status === 'ranked_dusun' || item.status === 'dikembalikan_dusun');
                 const itemId = escapeJs(item.id);
-                // ✅ FIX: Cek Array sebelum .join()
                 const rtDisplay = Array.isArray(item.rt) ? item.rt.join(', ') : (item.rt || '-');
 
                 let actionBtns = `<div class="flex items-center gap-1.5 mt-1">
-                    <button onclick="event.stopPropagation(); updateMetaDesa('${itemId}')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors">
+                    <!-- ✅ PERBAIKAN: Gunakan handleUpdateDesa -->
+                    <button onclick="event.stopPropagation(); handleUpdateDesa('${itemId}')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors">
                         <i class="fas fa-save text-xs"></i>
                         <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[10px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Update</span>
                     </button>
@@ -7698,7 +7698,8 @@
                     <div class="flex flex-col sm:flex-row sm:items-center gap-x-4 gap-y-2">
                         <div class="flex items-center gap-2">
                             <label class="text-xs font-semibold text-gray-600 whitespace-nowrap">Rank Desa:</label>
-                            <input type="number" min="1" placeholder="#" value="${item.rankingDesa}" class="w-20 px-2 py-1.5 border rounded-lg text-sm text-center" id="rankd-${item.id}" oninput="sortDesaTable()">
+                            <!-- ✅ PERBAIKAN: Hapus oninput sort, tambahkan data-original & onblur -->
+                            <input type="number" min="1" placeholder="#" value="${item.rankingDesa}" class="w-20 px-2 py-1.5 border rounded-lg text-sm text-center focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all" id="rankd-${item.id}" data-original="${item.rankingDesa}" onblur="highlightChangedRank(this)">
                         </div>
                         <div class="flex items-center gap-2">
                             <label class="text-xs font-semibold text-gray-600 whitespace-nowrap">Rencana Aksi:</label>
@@ -7842,6 +7843,25 @@
             /* ── INTERAKSI BARIS ── */
             #tableDesaWrap tbody tr { transition: background-color 0.15s ease; }
             #tableDesaWrap tbody tr:hover > td.td-cell { background-color: #f9fafb; }
+
+            /* ✅ TAMBAHAN: Highlight untuk ranking yang berubah */
+            #tableDesaWrap .rank-changed { 
+                background-color: #fef3c7 !important; 
+                border-color: #f59e0b !important;
+                animation: rankPulse 1.5s ease-in-out;
+            }
+            @keyframes rankPulse {
+                0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+                50% { box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2); }
+            }
+            
+            /* ✅ TAMBAHAN: Animasi baris saat sort */
+            #tableDesaWrap tbody[id^="row-desa-"] {
+                transition: transform 0.3s ease, opacity 0.3s ease;
+            }
+            #tableDesaWrap tbody.sorting {
+                opacity: 0.7;
+            }
             
             /* ── SCROLLBAR KLASIK ── */
             .tbl-inner {
@@ -7857,80 +7877,36 @@
             .tbl-inner::-webkit-scrollbar-thumb:hover { background: #64748b; }
             .tbl-inner::-webkit-scrollbar-corner { background: #e2e8f0; }
 
-            /* ✅ FIX: CSS UNTUK MODAL KONFIRMASI HAPUS */
+            /* ── CSS UNTUK MODAL KONFIRMASI ── */
             .confirm-overlay {
-                position: fixed;
-                inset: 0;
-                z-index: 9999;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: rgba(0, 0, 0, 0.5);
-                backdrop-filter: blur(4px);
-                opacity: 0;
-                transition: opacity 0.2s ease;
+                position: fixed; inset: 0; z-index: 9999;
+                display: flex; align-items: center; justify-content: center;
+                background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px);
+                opacity: 0; transition: opacity 0.2s ease;
             }
             .confirm-overlay.active { opacity: 1; }
             .confirm-card {
-                background: white;
-                border-radius: 1rem;
-                padding: 1.5rem;
-                max-width: 400px;
-                width: calc(100% - 2rem);
+                background: white; border-radius: 1rem; padding: 1.5rem;
+                max-width: 400px; width: calc(100% - 2rem);
                 box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-                text-align: center;
-                transform: scale(0.95);
-                transition: transform 0.2s ease;
+                text-align: center; transform: scale(0.95); transition: transform 0.2s ease;
             }
             .confirm-overlay.active .confirm-card { transform: scale(1); }
             .confirm-icon {
-                width: 3.5rem;
-                height: 3.5rem;
-                margin: 0 auto 1rem;
-                border-radius: 50%;
-                background: #fef2f2;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: #ef4444;
+                width: 3.5rem; height: 3.5rem; margin: 0 auto 1rem;
+                border-radius: 50%; display: flex; align-items: center; justify-content: center;
             }
-            .confirm-icon svg { width: 1.5rem; height: 1.5rem; }
-            .confirm-title {
-                font-size: 1.1rem;
-                font-weight: 700;
-                color: #1f2937;
-                margin-bottom: 0.5rem;
-            }
-            .confirm-message {
-                font-size: 0.85rem;
-                color: #6b7280;
-                line-height: 1.6;
-                margin-bottom: 1.5rem;
-            }
-            .confirm-actions {
-                display: flex;
-                gap: 0.75rem;
-                justify-content: center;
-            }
+            .confirm-title { font-size: 1.1rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; }
+            .confirm-message { font-size: 0.85rem; color: #6b7280; line-height: 1.6; margin-bottom: 1.5rem; }
+            .confirm-actions { display: flex; gap: 0.75rem; justify-content: center; }
             .confirm-btn {
-                padding: 0.625rem 1.25rem;
-                border-radius: 0.5rem;
-                font-size: 0.875rem;
-                font-weight: 600;
-                cursor: pointer;
-                transition: all 0.15s ease;
-                border: none;
+                padding: 0.625rem 1.25rem; border-radius: 0.5rem;
+                font-size: 0.875rem; font-weight: 600; cursor: pointer;
+                transition: all 0.15s ease; border: none;
             }
-            .confirm-btn-cancel {
-                background: white;
-                color: #374151;
-                border: 1px solid #d1d5db;
-            }
+            .confirm-btn-cancel { background: white; color: #374151; border: 1px solid #d1d5db; }
             .confirm-btn-cancel:hover { background: #f9fafb; }
-            .confirm-btn-delete {
-                background: #ef4444;
-                color: white;
-            }
+            .confirm-btn-delete { background: #ef4444; color: white; }
             .confirm-btn-delete:hover { background: #dc2626; }
         </style>
 
@@ -7940,7 +7916,8 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
                     <h3 class="font-display font-bold text-xl">Musyawarah & Verifikasi Desa</h3>
-                    <p class="text-xs text-gray-400 mt-0.5">Beri peringkat desa, tentukan kewenangan, lalu verifikasi final.</p>
+                    <!-- ✅ PERBAIKAN: Ubah hint agar user tahu harus klik Update -->
+                    <p class="text-xs text-gray-400 mt-0.5">Beri peringkat desa, tentukan kewenangan, lalu klik <b>Update</b> untuk menyortir otomatis.</p>
                 </div>
             </div>
 
@@ -7993,8 +7970,15 @@
 
 
     /* ==========================================
-    ✅ FIX: FUNGSI-FUNGSI YANG SEBELUMNYA TIDAK ADA
+    FUNGSI-FUNGSI HELPER DESA
     ========================================== */
+
+    // ✅ BARU: Wrapper function yang sort setelah update berhasil
+    async function handleUpdateDesa(itemId) {
+        await updateMetaDesa(itemId);
+        sortDesaTable();
+        clearRankHighlights(itemId);
+    }
 
     // ─── UPDATE META DESA (Rank, Aksi, Rujukan, Kordinator) ───
     async function updateMetaDesa(id) {
@@ -8011,7 +7995,6 @@
             kordinator: kordinator ? kordinator.value : ''
         };
 
-        // Validasi: Jika rencana aksi "Non Kewenangan" wajib isi rujukan
         if (data.rencanaAksi === 'Non Kewenangan Desa' && !data.rujukanUsulan.trim()) {
             showToast('Rujukan wajib diisi untuk "Non Kewenangan Desa"', 'warning');
             if (rujukan) rujukan.focus();
@@ -8023,7 +8006,6 @@
             const res = await API.post('updateMetaDesa', data);
             if (res.success) {
                 showToast('Data usulan berhasil diperbarui', 'success');
-                // Update cache lokal
                 const item = cachedUsulan.find(u => u.id === id);
                 if (item) {
                     item.rankingDesa = data.rankingDesa;
@@ -8031,7 +8013,7 @@
                     item.rujukanUsulan = data.rujukanUsulan;
                     item.kordinator = data.kordinator;
                 }
-                sortDesaTable();
+                // ❌ HAPUS: sortDesaTable() dipindah ke handleUpdateDesa agar tidak dobel
             } else {
                 showToast(res.message || 'Gagal memperbarui data', 'error');
             }
@@ -8046,15 +8028,13 @@
     async function prosesDesa(id, status) {
         const rankInput = document.getElementById('rankd-' + id);
         
-        // Validasi ranking desa wajib diisi
         if (rankInput && !rankInput.value.trim()) {
             showToast('Isi ranking desa terlebih dahulu sebelum memfinalisasi', 'warning');
             rankInput.focus();
             return;
         }
 
-        // Simpan meta dulu jika ada perubahan
-        await updateMetaDesa(id);
+        await handleUpdateDesa(id);
 
         setTableLoading(true);
         try {
@@ -8077,7 +8057,7 @@
         }
     }
 
-    // ─── BULK PROSES DESA (Finalisasi Banyak Usulan) ───
+    // ─── BULK PROSES DESA ───
     async function bulkProsesDesa() {
         const checkedEls = document.querySelectorAll('.bulk-check-desa:checked');
         
@@ -8089,7 +8069,6 @@
         const validIds = [];
         const invalidRows = [];
 
-        // 1. Validasi: Pastikan semua yang dipilih punya ranking
         checkedEls.forEach(cb => {
             const id = cb.dataset.id;
             const rankInput = document.getElementById('rankd-' + id);
@@ -8097,7 +8076,7 @@
                 validIds.push(id);
             } else {
                 invalidRows.push(id);
-                cb.checked = false; // Uncheck yang tidak valid
+                cb.checked = false;
             }
         });
 
@@ -8108,7 +8087,6 @@
 
         if (validIds.length === 0) return;
 
-        // ✅ FIX 2: Gunakan modal konfirmasi yang tepat (BUKAN showDeleteConfirm)
         const isConfirmed = await showActionConfirm(
             'Finalisasi Usulan Terpilih?',
             `Anda akan memfinalisasi <strong>${validIds.length} usulan</strong>.<br><br>Data rank, rencana aksi, dan kordinator yang baru diisi di tabel akan langsung disimpan.`,
@@ -8119,7 +8097,6 @@
 
         setTableLoading(true);
         try {
-            // ✅ FIX 3: Simpan meta (rank, aksi, rujukan, kordinator) untuk SEMUA id yang dipilih SEBELUM finalisasi
             for (let i = 0; i < validIds.length; i++) {
                 const id = validIds[i];
                 const rankDesa = document.getElementById('rankd-' + id);
@@ -8135,17 +8112,13 @@
                     kordinator: kordinator ? kordinator.value : ''
                 };
 
-                // Kirim update meta di background (tanpa blocking/notif per item)
                 API.post('updateMetaDesa', meta).catch(err => console.error('Gagal update meta untuk', id, err));
             }
 
-            // Kirim permintaan finalisasi bulk
             const res = await API.post('bulkProsesDesa', { ids: validIds, status: 'final' });
             if (res.success) {
                 let msg = res.message || `${validIds.length} usulan berhasil difinalisasi`;
-                if (res.skipped > 0) {
-                    msg += ` (${res.skipped} usulan dilewati)`;
-                }
+                if (res.skipped > 0) msg += ` (${res.skipped} usulan dilewati)`;
                 showToast(msg, 'success');
                 await fetchUsulan(true);
                 const c = document.getElementById('tabContent');
@@ -8163,9 +8136,7 @@
         }
     }
 
-    // ==========================================
-    // MODAL KONFIRMASI AKSI UMUM (BUKAN HAPUS)
-    // ==========================================
+    // ─── MODAL KONFIRMASI AKSI UMUM ───
     function showActionConfirm(title, message, btnText) {
         return new Promise((resolve) => {
             const overlay = document.createElement('div');
@@ -8185,28 +8156,20 @@
             `;
 
             document.body.appendChild(overlay);
-
-            requestAnimationFrame(() => {
-                overlay.classList.add('active');
-            });
+            requestAnimationFrame(() => overlay.classList.add('active'));
 
             const closeModal = (result) => {
                 overlay.classList.remove('active');
-                setTimeout(() => {
-                    overlay.remove();
-                    resolve(result);
-                }, 200);
+                setTimeout(() => { overlay.remove(); resolve(result); }, 200);
             };
 
             overlay.querySelector('#btnCancelAction').addEventListener('click', () => closeModal(false));
             overlay.querySelector('#btnConfirmAction').addEventListener('click', () => closeModal(true));
-            overlay.addEventListener('click', (e) => {
-                if (e.target === overlay) closeModal(false);
-            });
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(false); });
         });
     }
 
-    // ─── SET TABLE LOADING (Overlay spinner) ───
+    // ─── SET TABLE LOADING ───
     function setTableLoading(isLoading) {
         let loader = document.getElementById('tableLoader');
         if (!loader) {
@@ -8220,12 +8183,8 @@
                 </div>`;
             document.body.appendChild(loader);
         }
-        
-        if (isLoading) {
-            loader.classList.remove('hidden');
-        } else {
-            loader.classList.add('hidden');
-        }
+        if (isLoading) { loader.classList.remove('hidden'); } 
+        else { loader.classList.add('hidden'); }
     }
 
 
@@ -8233,27 +8192,34 @@
     FILTER & SORTIR DESA TABLE
     ========================================== */
 
-    // ✅ FIX: Hanya satu definisi filterDesaTable (hapus duplikat)
+    // ✅ PERBAIKAN: Hanya filter, TIDAK sort otomatis
     function filterDesaTable(q) {
         q = q.toLowerCase();
-        // ✅ FIX: Gunakan selector spesifik #tableDesaWrap
         const tbodies = document.querySelectorAll('#tableDesaWrap tbody[id^="row-desa-"]');
         
+        let num = 1;
         tbodies.forEach(tbody => {
             const text = tbody.textContent.toLowerCase();
-            tbody.style.display = text.includes(q) ? '' : 'none';
+            if (text.includes(q)) { 
+                tbody.style.display = ''; 
+                const nc = tbody.querySelector('.row-desa-num'); 
+                if (nc) nc.textContent = num++; 
+            } else { 
+                tbody.style.display = 'none'; 
+            }
         });
-        
-        // Perbarui nomor urut sesuai urutan baru
-        sortDesaTable(); 
+        // ❌ HAPUS: Tidak sort otomatis saat search
     }
 
+    // ✅ PERBAIKAN: Sort dengan animasi halus & presisi ID
     function sortDesaTable() {
         const table = document.getElementById('tableDesaWrap');
         if (!table) return;
         
-        // Ambil semua baris usulan (bukan empty row)
         const items = Array.from(table.querySelectorAll('tbody[id^="row-desa-"]'));
+        
+        // Tandai sedang sorting untuk animasi
+        items.forEach(item => item.classList.add('sorting'));
         
         // Pisahkan visible dan hidden
         const visibleItems = items.filter(item => item.style.display !== 'none');
@@ -8261,27 +8227,33 @@
         
         // Urutkan hanya yang visible berdasarkan rank input
         visibleItems.sort((a, b) => {
-            const rankAInput = a.querySelector('input[type="number"]');
-            const rankBInput = b.querySelector('input[type="number"]');
+            const idA = a.id.replace('row-desa-', '');
+            const idB = b.id.replace('row-desa-', '');
+            const elA = document.getElementById('rankd-' + idA);
+            const elB = document.getElementById('rankd-' + idB);
             
-            const valA = parseInt(rankAInput?.value) || 999;
-            const valB = parseInt(rankBInput?.value) || 999;
+            const valA = parseInt(elA ? elA.value : '') || 999;
+            const valB = parseInt(elB ? elB.value : '') || 999;
             
-            if (valA === valB) return 0;
             return valA - valB;
         });
         
-        // Rebuild: visible dulu, lalu hidden di akhir
+        // Gabungkan: visible dulu, lalu hidden di akhir
         const orderedItems = [...visibleItems, ...hiddenItems];
         
-        // Pindahkan posisi elemen di DOM
-        orderedItems.forEach(item => table.appendChild(item));
-        
-        // Update nomor urut HANYA untuk yang visible
-        let num = 1;
-        visibleItems.forEach(item => {
-            const numCell = item.querySelector('.row-desa-num');
-            if (numCell) numCell.textContent = num++;
+        // Reorder dengan sedikit delay untuk animasi halus
+        requestAnimationFrame(() => {
+            orderedItems.forEach(item => {
+                table.appendChild(item);
+                item.classList.remove('sorting');
+            });
+            
+            // Update nomor urut HANYA untuk yang visible
+            let num = 1;
+            visibleItems.forEach(item => {
+                const numCell = item.querySelector('.row-desa-num');
+                if (numCell) numCell.textContent = num++;
+            });
         });
     }
 
@@ -8631,7 +8603,7 @@
         return normalizedIds.some(id => String(id) === String(sdgId));
     }
 
-    /* ==========================================
+/* ==========================================
     TABEL VERIFIKASI DUSUN (HANYA MODE TABEL)
     ========================================== */
     function rVerifDusunTable(u, list) {
@@ -8680,7 +8652,8 @@
                 const sdgOptions = buildSdgOptions(sdgIds, itemId);
                 
                 let actionBtns = '';
-                actionBtns += `<button onclick="event.stopPropagation(); updateMetaDusun('${itemId}')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"><i class="fas fa-save text-xs"></i><span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[10px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Update</span></button>`;
+                // ✅ PERBAIKAN: Gunakan handleUpdateDusun yang akan sort setelah update
+                actionBtns += `<button onclick="event.stopPropagation(); handleUpdateDusun('${itemId}')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"><i class="fas fa-save text-xs"></i><span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[10px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Update</span></button>`;
                 actionBtns += `<button onclick="event.stopPropagation(); prosesDusun('${itemId}','ranked_dusun')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-green-100 text-green-600 hover:bg-green-200 transition-colors"><i class="fas fa-paper-plane text-xs"></i><span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[10px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Submit</span></button>`;
                 if (isDiajukan && !isOwnMusyawarah) actionBtns += `<button onclick="event.stopPropagation(); openModalKembalikan('${itemId}','dikembalikan_user')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors"><i class="fas fa-undo text-xs"></i><span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[10px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Kembalikan</span></button>`;
                 if (isDikembalikan && isOwnMusyawarah) actionBtns += `<button onclick="event.stopPropagation(); openFormUsulan('${itemId}')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 hover:bg-indigo-200 transition-colors"><i class="fas fa-pen text-xs"></i><span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[10px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Edit Usulan</span></button>`;
@@ -8691,14 +8664,14 @@
                 
                 const catatanHtml = isDikembalikan ? `<div class="flex items-start gap-2 text-xs text-amber-700 bg-amber-50 rounded-lg p-3"><i class="fas fa-comment-dots mt-0.5 flex-shrink-0"></i><div><b class="block mb-0.5">Catatan Pemerintah Desa:</b>${escapeHtml(i.catatanKembali)}</div></div>` : '';
                 
-                // Form fleksibel mengikuti lebar jendela
                 const subContent = locked 
                     ? '<div class="text-xs text-red-500 font-medium"><i class="fas fa-lock mr-1"></i>Pengimputan ditutup.</div>'
                     : `<div class="flex flex-col gap-3">
                             <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
                                 <div class="flex items-center gap-2">
                                     <label class="text-xs font-semibold text-gray-600 whitespace-nowrap">Ranking:</label>
-                                    <input type="number" min="1" placeholder="#" value="${i.rankingDusun}" class="w-20 px-2 py-1.5 border rounded-lg text-sm text-center" id="rank-${i.id}" oninput="sortDusunTable()">
+                                    <!-- ✅ PERBAIKAN: Hapus oninput, tambahkan onblur untuk highlight perubahan -->
+                                    <input type="number" min="1" placeholder="#" value="${i.rankingDusun}" class="w-20 px-2 py-1.5 border rounded-lg text-sm text-center focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all" id="rank-${i.id}" data-original="${i.rankingDusun}" onblur="highlightChangedRank(this)">
                                 </div>
                                 <div class="flex items-center gap-1.5">${actionBtns}</div>
                             </div>
@@ -8780,7 +8753,7 @@
             #tableDusunWrap thead { font-size: clamp(0.65rem, 0.95vw, 0.75rem); }
             #tableDusunWrap .td-judul { font-size: clamp(0.75rem, 1.3vw, 0.95rem); font-weight: 600; }
 
-            /* ── FLUID SPACING (PADDING OTOMATIS MENGIKUT LAYAR) ── */
+            /* ── FLUID SPACING ── */
             #tableDusunWrap th, 
             #tableDusunWrap td.td-cell { 
                 padding: clamp(0.4rem, 0.8vw, 0.65rem) clamp(0.5rem, 1vw, 0.75rem); 
@@ -8792,7 +8765,7 @@
             #tableDusunWrap th:last-child,
             #tableDusunWrap td.td-cell:last-child { border-right: none; }
 
-            /* ── SUB-ROW (BOTTOM CONTENT) FLEKSIBEL ── */
+            /* ── SUB-ROW ── */
             #tableDusunWrap td.sub-cell { 
                 padding: 0; 
                 border-bottom: 1px solid #e5e7eb; 
@@ -8823,7 +8796,26 @@
             #tableDusunWrap tbody tr { transition: background-color 0.15s ease; }
             #tableDusunWrap tbody tr:hover > td.td-cell { background-color: #f9fafb; }
             
-            /* ── SCROLLBAR KLASIK ── */
+            /* ✅ TAMBAHAN: Highlight untuk ranking yang berubah */
+            #tableDusunWrap .rank-changed { 
+                background-color: #fef3c7 !important; 
+                border-color: #f59e0b !important;
+                animation: rankPulse 1.5s ease-in-out;
+            }
+            @keyframes rankPulse {
+                0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+                50% { box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2); }
+            }
+            
+            /* ✅ TAMBAHAN: Animasi baris saat sort */
+            #tableDusunWrap tbody[id^="row-"] {
+                transition: transform 0.3s ease, opacity 0.3s ease;
+            }
+            #tableDusunWrap tbody.sorting {
+                opacity: 0.7;
+            }
+
+            /* ── SCROLLBAR ── */
             .tbl-inner {
                 scrollbar-gutter: stable; 
                 overflow-x: auto; 
@@ -8843,7 +8835,7 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
                     <h3 class="font-display font-bold text-xl">Verifikasi & Input Dusun</h3>
-                    <p class="text-xs text-gray-400 mt-0.5">Beri peringkat lalu submit ke Desa. Klik baris untuk detail.</p>
+                    <p class="text-xs text-gray-400 mt-0.5">Beri peringkat lalu klik <b>Update</b> untuk menyortir otomatis.</p>
                 </div>
                 ${locked ? `<div class="flex items-center gap-2">${headerBtnsHTML}</div>` : ''}
             </div>
@@ -8854,7 +8846,6 @@
                 <input type="text" id="searchDusunTable" placeholder="Cari judul usulan, RT, atau Pengusul..." class="w-full pl-10 pr-4 py-2.5 border rounded-lg text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-forest-200 focus:border-forest-400 transition-all" oninput="filterDusunTable(this.value)">
             </div>
             
-            <!-- TABEL VIEW -->
             <div class="container mx-auto px-2 sm:px-4 md:px-6 xl:max-w-[1600px]">
                 <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                     <div class="tbl-inner h-[500px] scroll-smooth">
@@ -8892,6 +8883,46 @@
     /* ==========================================
     FITUR SEARCH, SORTIR & BULK (HANYA TABEL)
     ========================================== */
+    
+    // ✅ BARU: Highlight input jika ranking berubah
+    function highlightChangedRank(input) {
+        const original = input.getAttribute('data-original');
+        if (input.value !== original) {
+            input.classList.add('rank-changed');
+        } else {
+            input.classList.remove('rank-changed');
+        }
+    }
+
+    // ✅ BARU: Wrapper function yang sort setelah update berhasil
+    function handleUpdateDusun(itemId) {
+        const result = updateMetaDusun(itemId);
+        
+        // Handle both sync and async updateMetaDusun
+        if (result && typeof result.then === 'function') {
+            // Async - wait for promise to resolve
+            result.then(() => {
+                sortDusunTable();
+                clearRankHighlights(itemId);
+            }).catch((err) => {
+                console.warn('Update failed, skip sorting:', err);
+            });
+        } else {
+            // Sync - sort immediately after
+            sortDusunTable();
+            clearRankHighlights(itemId);
+        }
+    }
+
+    // ✅ BARU: Hapus highlight setelah sort
+    function clearRankHighlights(itemId) {
+        const input = document.getElementById('rank-' + itemId);
+        if (input) {
+            input.classList.remove('rank-changed');
+            input.setAttribute('data-original', input.value);
+        }
+    }
+
     function filterDusunTable(q) {
         q = q.toLowerCase();
         const tbodies = document.querySelectorAll('#tableDusunWrap tbody[id^="row-"]');
@@ -8906,14 +8937,20 @@
                 tbody.style.display = 'none'; 
             }
         });
-        sortDusunTable(); 
+        // ❌ HAPUS: Tidak sort otomatis saat search
+        // sortDusunTable(); 
     }
 
+    // ✅ PERBAIKAN: Sort dengan animasi halus
     function sortDusunTable() {
         const table = document.getElementById('tableDusunWrap');
         if (!table) return;
         
         const items = Array.from(table.querySelectorAll('tbody[id^="row-"]'));
+        
+        // Tandai sedang sorting
+        items.forEach(item => item.classList.add('sorting'));
+        
         items.sort((a, b) => {
             const idA = a.id.replace('row-', ''), idB = b.id.replace('row-', '');
             const elA = document.getElementById('rank-' + idA);
@@ -8923,11 +8960,19 @@
             return valA - valB; 
         });
         
-        items.forEach(item => table.appendChild(item));
-        let num = 1;
-        items.forEach(item => { 
-            const nc = item.querySelector('.row-dusun-num'); 
-            if (nc && item.style.display !== 'none') nc.textContent = num++; 
+        // Reorder dengan sedikit delay untuk animasi
+        requestAnimationFrame(() => {
+            items.forEach(item => {
+                table.appendChild(item);
+                item.classList.remove('sorting');
+            });
+            
+            // Update nomor urut
+            let num = 1;
+            items.forEach(item => { 
+                const nc = item.querySelector('.row-dusun-num'); 
+                if (nc && item.style.display !== 'none') nc.textContent = num++; 
+            });
         });
     }
 
