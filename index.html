@@ -297,23 +297,23 @@
             '025': 'Dusun Air Asam', '026': 'Dusun Air Asam', '027': 'Dusun Air Asam'
         },
         SDGS: [
-            { id:1,  kode:'SDGs 1',  nama:'Tanpa Kemiskinan',                                warna:'#E5243B' },
-            { id:2,  kode:'SDGs 2',  nama:'Tanpa Kelaparan',                                warna:'#DDA63A' },
-            { id:3,  kode:'SDGs 3',  nama:'Kehidupan Sehat dan Sejahtera',                   warna:'#4C9F38' },
-            { id:4,  kode:'SDGs 4',  nama:'Pendidikan Berkualitas',                          warna:'#C5192D' },
-            { id:5,  kode:'SDGs 5',  nama:'Kesetaraan Gender',                               warna:'#FF3A21' },
-            { id:6,  kode:'SDGs 6',  nama:'Air Bersih dan Sanitasi',                         warna:'#26BDE2' },
-            { id:7,  kode:'SDGs 7',  nama:'Energi Bersih dan Terjangkau',                    warna:'#FCC30B' },
-            { id:8,  kode:'SDGs 8',  nama:'Pekerjaan Layak dan Pertumbuhan Ekonomi',          warna:'#A21942' },
-            { id:9,  kode:'SDGs 9',  nama:'Industri, Inovasi, dan Infrastruktur',             warna:'#FD6925' },
-            { id:10, kode:'SDGs 10', nama:'Berkurangnya Kesenjangan',                        warna:'#DD1367' },
-            { id:11, kode:'SDGs 11', nama:'Kota dan Permukiman yang Berkelanjutan',           warna:'#FD9D24' },
-            { id:12, kode:'SDGs 12', nama:'Konsumsi dan Produksi yang Bertanggung Jawab',     warna:'#BF8B2E' },
-            { id:13, kode:'SDGs 13', nama:'Penanganan Perubahan Iklim',                      warna:'#3F7E44' },
-            { id:14, kode:'SDGs 14', nama:'Kehidupan Bawah Air',                             warna:'#0A97D9' },
-            { id:15, kode:'SDGs 15', nama:'Kehidupan Daratan',                               warna:'#56C02B' },
-            { id:16, kode:'SDGs 16', nama:'Perdamaian, Keadilan, dan Kelembagaan yang Kuat',  warna:'#00689D' },
-            { id:17, kode:'SDGs 17', nama:'Kemitraan untuk Mencapai Tujuan Pembangunan',      warna:'#19486A' }
+            { id:1,  kode:'SDGs 1',  nama:'Desa Tanpa Kemiskinan',                     warna:'#E5243B' },
+            { id:2,  kode:'SDGs 2',  nama:'Desa Tanpa Kelaparan',                      warna:'#DDA63A' },
+            { id:3,  kode:'SDGs 3',  nama:'Desa Sehat dan Sejahtera',                  warna:'#4C9F38' },
+            { id:4,  kode:'SDGs 4',  nama:'Pendidikan Desa Berkualitas',               warna:'#C5192D' },
+            { id:5,  kode:'SDGs 5',  nama:'Keterlibatan Perempuan Desa',               warna:'#FF3A21' },
+            { id:6,  kode:'SDGs 6',  nama:'Desa dengan Air Minum dan Sanitasi Aman',   warna:'#26BDE2' },
+            { id:7,  kode:'SDGs 7',  nama:'Desa Berenergi Bersih dan Terbarukan',      warna:'#FCC30B' },
+            { id:8,  kode:'SDGs 8',  nama:'Pertumbuhan Ekonomi Desa Merata',           warna:'#A21942' },
+            { id:9,  kode:'SDGs 9',  nama:'Infrastruktur dan Inovasi Desa Sesuai Kebutuhan', warna:'#FD6925' },
+            { id:10, kode:'SDGs 10', nama:'Desa Tanpa Kesenjangan',                    warna:'#DD1367' },
+            { id:11, kode:'SDGs 11', nama:'Permukiman Desa Aman dan Nyaman',           warna:'#FD9D24' },
+            { id:12, kode:'SDGs 12', nama:'Konsumsi dan Produksi Desa Sadar Lingkungan', warna:'#BF8B2E' },
+            { id:13, kode:'SDGs 13', nama:'Desa Tanggap Perubahan Iklim',              warna:'#3F7E44' },
+            { id:14, kode:'SDGs 14', nama:'Desa Peduli Lingkungan Laut',               warna:'#0A97D9' },
+            { id:15, kode:'SDGs 15', nama:'Desa Peduli Lingkungan Darat',              warna:'#56C02B' },
+            { id:16, kode:'SDGs 16', nama:'Desa Damai Berkeadilan',                    warna:'#00689D' },
+            { id:17, kode:'SDGs 17', nama:'Kemitraan untuk Pembangunan Desa',          warna:'#19486A' }
         ],
          PASS_REGEX: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
         INACTIVITY_TIMEOUT: 30 * 60 * 1000
@@ -4400,16 +4400,25 @@
         // FALLBACK AMAN: Jika tglInfo tidak dikirim, ambil dari f
         if (!tglInfo || !tglInfo.tgl) tglInfo = f.tglInfo || { tgl: '............', bln: '............', thn: '............' };
 
-        // Mapping Nama Resmi 17 Tujuan SDGs
+        // Mapping Nama Resmi 17 Tujuan SDGs Desa
         const sdgList = {
-            '1': 'Tanpa Kemiskinan', '2': 'Tanpa Kelaparan', '3': 'Kehidupan Sehat dan Sejahtera',
-            '4': 'Pendidikan Berkualitas', '5': 'Kesetaraan Gender', '6': 'Air Bersih dan Sanitasi Layak',
-            '7': 'Energi Bersih dan Terjangkau', '8': 'Pekerjaan Layak dan Pertumbuhan Ekonomi',
-            '9': 'Industri, Inovasi, dan Infrastruktur', '10': 'Berkurangnya Kesenjangan',
-            '11': 'Kota dan Komunitas Berkelanjutan', '12': 'Konsumsi dan Produksi Bertanggung Jawab',
-            '13': 'Penanganan Perubahan Iklim', '14': 'Kehidupan Bawah Air',
-            '15': 'Kehidupan Daratan', '16': 'Perdamaian, Keadilan, dan Kelembagaan Kuat',
-            '17': 'Kemitraan untuk Mencapai Tujuan'
+            '1': 'Desa Tanpa Kemiskinan',
+            '2': 'Desa Tanpa Kelaparan',
+            '3': 'Desa Sehat dan Sejahtera',
+            '4': 'Pendidikan Desa Berkualitas',
+            '5': 'Keterlibatan Perempuan Desa',
+            '6': 'Desa dengan Air Minum dan Sanitasi Aman',
+            '7': 'Desa Berenergi Bersih dan Terbarukan',
+            '8': 'Pertumbuhan Ekonomi Desa Merata',
+            '9': 'Infrastruktur dan Inovasi Desa Sesuai Kebutuhan',
+            '10': 'Desa Tanpa Kesenjangan',
+            '11': 'Permukiman Desa Aman dan Nyaman',
+            '12': 'Konsumsi dan Produksi Desa Sadar Lingkungan',
+            '13': 'Desa Tanggap Perubahan Iklim',
+            '14': 'Desa Peduli Lingkungan Laut',
+            '15': 'Desa Peduli Lingkungan Darat',
+            '16': 'Desa Damai Berkeadilan',
+            '17': 'Kemitraan untuk Pembangunan Desa'
         };
 
         // 1. Filter usulan yang memiliki SDG
@@ -5196,37 +5205,36 @@
             (x.status === 'final' || x.status === 'ranked_dusun')
         );
 
-        // SDGs Desa mapping
+        // SDGs Desa mapping (17 tujuan resmi)
         const sdgsList = [
-            { no: 1,  nama: 'Desa Tanpa Kemiskinan',          icon: 'fa-hand-holding-heart', color: '#E5243B' },
-            { no: 2,  nama: 'Desa Tanpa Kelaparan',           icon: 'fa-utensils',           color: '#DDA63A' },
-            { no: 3,  nama: 'Desa Sehat dan Sejahtera',       icon: 'fa-heartbeat',          color: '#4C9F38' },
-            { no: 4,  nama: 'Pendidikan Desa Berkualitas',    icon: 'fa-graduation-cap',     color: '#C5192D' },
-            { no: 5,  nama: 'Keterlibatan Perempuan Desa',    icon: 'fa-female',             color: '#FF3A21' },
-            { no: 6,  nama: 'Desa Layak Air Bersih dan Sanitasi', icon: 'fa-tint',           color: '#26BDE2' },
-            { no: 7,  nama: 'Desa Berenergi Bersih dan Terbarukan', icon: 'fa-solar-panel',  color: '#FCC30B' },
-            { no: 8,  nama: 'Pertumbuhan Ekonomi Desa Merata', icon: 'fa-chart-line',       color: '#A21942' },
-            { no: 9,  nama: 'Infrastruktur dan Inovasi Desa', icon: 'fa-road',               color: '#FD6925' },
-            { no: 10, nama: 'Desa Tanpa Kesenjangan',         icon: 'fa-balance-scale',      color: '#DD1367' },
-            { no: 11, nama: 'Kawasan Pemukiman Desa Aman dan Nyaman', icon: 'fa-home',      color: '#FD9D24' },
-            { no: 12, nama: 'Konsumsi dan Produksi Desa Sadar Lingkungan', icon: 'fa-recycle', color: '#BF8B2E' },
-            { no: 13, nama: 'Desa Tanggap Perubahan Iklim',   icon: 'fa-cloud-sun',          color: '#3F7E44' },
-            { no: 14, nama: 'Ekosistem Desa Lestari',         icon: 'fa-fish',               color: '#0A97D9' },
-            { no: 15, nama: 'Desa Peduli Lingkungan',         icon: 'fa-tree',               color: '#56C02B' },
-            { no: 16, nama: 'Desa Damai dan Berkeadilan',     icon: 'fa-dove',               color: '#00689D' },
-            { no: 17, nama: 'Kemitraan untuk Pembangunan Desa', icon: 'fa-handshake',        color: '#19486A' },
-            { no: 18, nama: 'Kelembagaan Desa Dinamis dan Budaya Desa Berkembang', icon: 'fa-landmark', color: '#89CFF0' }
+            { no: 1,  nama: 'Desa Tanpa Kemiskinan',                  icon: 'fa-hand-holding-heart', color: '#E5243B' },
+            { no: 2,  nama: 'Desa Tanpa Kelaparan',                   icon: 'fa-utensils',           color: '#DDA63A' },
+            { no: 3,  nama: 'Desa Sehat dan Sejahtera',               icon: 'fa-heartbeat',          color: '#4C9F38' },
+            { no: 4,  nama: 'Pendidikan Desa Berkualitas',            icon: 'fa-graduation-cap',     color: '#C5192D' },
+            { no: 5,  nama: 'Keterlibatan Perempuan Desa',            icon: 'fa-venus',              color: '#FF3A21' },
+            { no: 6,  nama: 'Desa dengan Air Minum dan Sanitasi Aman', icon: 'fa-tint',             color: '#26BDE2' },
+            { no: 7,  nama: 'Desa Berenergi Bersih dan Terbarukan',   icon: 'fa-solar-panel',        color: '#FCC30B' },
+            { no: 8,  nama: 'Pertumbuhan Ekonomi Desa Merata',        icon: 'fa-chart-line',         color: '#A21942' },
+            { no: 9,  nama: 'Infrastruktur dan Inovasi Desa Sesuai Kebutuhan', icon: 'fa-road',     color: '#FD6925' },
+            { no: 10, nama: 'Desa Tanpa Kesenjangan',                 icon: 'fa-balance-scale',      color: '#DD1367' },
+            { no: 11, nama: 'Permukiman Desa Aman dan Nyaman',        icon: 'fa-home',               color: '#FD9D24' },
+            { no: 12, nama: 'Konsumsi dan Produksi Desa Sadar Lingkungan', icon: 'fa-recycle',      color: '#BF8B2E' },
+            { no: 13, nama: 'Desa Tanggap Perubahan Iklim',           icon: 'fa-cloud-sun',          color: '#3F7E44' },
+            { no: 14, nama: 'Desa Peduli Lingkungan Laut',            icon: 'fa-fish',               color: '#0A97D9' },
+            { no: 15, nama: 'Desa Peduli Lingkungan Darat',           icon: 'fa-tree',               color: '#56C02B' },
+            { no: 16, nama: 'Desa Damai Berkeadilan',                 icon: 'fa-dove',               color: '#00689D' },
+            { no: 17, nama: 'Kemitraan untuk Pembangunan Desa',       icon: 'fa-handshake',          color: '#19486A' }
         ];
 
-        // Simple mapping kategori ke SDGs (bisa disesuaikan)
-        const kategoriToSDGS = {
-            'Infrastruktur': [6, 7, 9, 11],
-            'Pemberdayaan':  [1, 2, 5, 8, 10, 17],
-            'Pendidikan':    [4, 8],
-            'Kesehatan':     [3],
-            'Sosial':        [5, 10, 16, 18],
-            'Lingkungan':    [12, 13, 14, 15]
-        };
+            // Mapping kategori ke SDGs Desa (disesuaikan)
+            const kategoriToSDGS = {
+                'Infrastruktur': [6, 7, 9, 11],              // Air bersih, energi, infrastruktur, permukiman
+                'Ekonomi':       [1, 2, 8, 17],              // Kemiskinan, kelaparan, ekonomi desa, kemitraan
+                'Pendidikan':    [4],                        // Pendidikan desa berkualitas
+                'Kesehatan':     [3],                        // Desa sehat dan sejahtera
+                'Sosial':        [5, 10, 16],                // Perempuan desa, kesenjangan, damai berkeadilan
+                'Lingkungan':    [12, 13, 14, 15]            // Konsumsi/produksi, iklim, laut, darat
+            };
 
         // Hitung per SDGs
         const sdgsData = sdgsList.map(sdgs => {
@@ -5488,38 +5496,37 @@
     }
 
     /**
-     * Modal detail SDGs
+     * Modal detail SDGs Desa
      */
     function showSdgsDetail(sdgsNo) {
         const tahun = STATE.tahunAktif;
         const sdgsList = [
-            { no: 1,  nama: 'Desa Tanpa Kemiskinan',          icon: 'fa-hand-holding-heart', color: '#E5243B' },
-            { no: 2,  nama: 'Desa Tanpa Kelaparan',           icon: 'fa-utensils',           color: '#DDA63A' },
-            { no: 3,  nama: 'Desa Sehat dan Sejahtera',       icon: 'fa-heartbeat',          color: '#4C9F38' },
-            { no: 4,  nama: 'Pendidikan Desa Berkualitas',    icon: 'fa-graduation-cap',     color: '#C5192D' },
-            { no: 5,  nama: 'Keterlibatan Perempuan Desa',    icon: 'fa-female',             color: '#FF3A21' },
-            { no: 6,  nama: 'Desa Layak Air Bersih dan Sanitasi', icon: 'fa-tint',           color: '#26BDE2' },
-            { no: 7,  nama: 'Desa Berenergi Bersih dan Terbarukan', icon: 'fa-solar-panel',  color: '#FCC30B' },
-            { no: 8,  nama: 'Pertumbuhan Ekonomi Desa Merata', icon: 'fa-chart-line',       color: '#A21942' },
-            { no: 9,  nama: 'Infrastruktur dan Inovasi Desa', icon: 'fa-road',               color: '#FD6925' },
-            { no: 10, nama: 'Desa Tanpa Kesenjangan',         icon: 'fa-balance-scale',      color: '#DD1367' },
-            { no: 11, nama: 'Kawasan Pemukiman Desa Aman dan Nyaman', icon: 'fa-home',      color: '#FD9D24' },
-            { no: 12, nama: 'Konsumsi dan Produksi Desa Sadar Lingkungan', icon: 'fa-recycle', color: '#BF8B2E' },
-            { no: 13, nama: 'Desa Tanggap Perubahan Iklim',   icon: 'fa-cloud-sun',          color: '#3F7E44' },
-            { no: 14, nama: 'Ekosistem Desa Lestari',         icon: 'fa-fish',               color: '#0A97D9' },
-            { no: 15, nama: 'Desa Peduli Lingkungan',         icon: 'fa-tree',               color: '#56C02B' },
-            { no: 16, nama: 'Desa Damai dan Berkeadilan',     icon: 'fa-dove',               color: '#00689D' },
-            { no: 17, nama: 'Kemitraan untuk Pembangunan Desa', icon: 'fa-handshake',        color: '#19486A' },
-            { no: 18, nama: 'Kelembagaan Desa Dinamis dan Budaya Desa Berkembang', icon: 'fa-landmark', color: '#89CFF0' }
+            { no: 1,  nama: 'Desa Tanpa Kemiskinan',                  icon: 'fa-hand-holding-heart', color: '#E5243B' },
+            { no: 2,  nama: 'Desa Tanpa Kelaparan',                   icon: 'fa-utensils',           color: '#DDA63A' },
+            { no: 3,  nama: 'Desa Sehat dan Sejahtera',               icon: 'fa-heartbeat',          color: '#4C9F38' },
+            { no: 4,  nama: 'Pendidikan Desa Berkualitas',            icon: 'fa-graduation-cap',     color: '#C5192D' },
+            { no: 5,  nama: 'Keterlibatan Perempuan Desa',            icon: 'fa-venus',              color: '#FF3A21' },
+            { no: 6,  nama: 'Desa dengan Air Minum dan Sanitasi Aman', icon: 'fa-tint',             color: '#26BDE2' },
+            { no: 7,  nama: 'Desa Berenergi Bersih dan Terbarukan',   icon: 'fa-solar-panel',        color: '#FCC30B' },
+            { no: 8,  nama: 'Pertumbuhan Ekonomi Desa Merata',        icon: 'fa-chart-line',         color: '#A21942' },
+            { no: 9,  nama: 'Infrastruktur dan Inovasi Desa Sesuai Kebutuhan', icon: 'fa-road',     color: '#FD6925' },
+            { no: 10, nama: 'Desa Tanpa Kesenjangan',                 icon: 'fa-balance-scale',      color: '#DD1367' },
+            { no: 11, nama: 'Permukiman Desa Aman dan Nyaman',        icon: 'fa-home',               color: '#FD9D24' },
+            { no: 12, nama: 'Konsumsi dan Produksi Desa Sadar Lingkungan', icon: 'fa-recycle',      color: '#BF8B2E' },
+            { no: 13, nama: 'Desa Tanggap Perubahan Iklim',           icon: 'fa-cloud-sun',          color: '#3F7E44' },
+            { no: 14, nama: 'Desa Peduli Lingkungan Laut',            icon: 'fa-fish',               color: '#0A97D9' },
+            { no: 15, nama: 'Desa Peduli Lingkungan Darat',           icon: 'fa-tree',               color: '#56C02B' },
+            { no: 16, nama: 'Desa Damai Berkeadilan',                 icon: 'fa-dove',               color: '#00689D' },
+            { no: 17, nama: 'Kemitraan untuk Pembangunan Desa',       icon: 'fa-handshake',          color: '#19486A' }
         ];
         
         const kategoriToSDGS = {
-            'Infrastruktur': [6, 7, 9, 11],
-            'Pemberdayaan':  [1, 2, 5, 8, 10, 17],
-            'Pendidikan':    [4, 8],
-            'Kesehatan':     [3],
-            'Sosial':        [5, 10, 16, 18],
-            'Lingkungan':    [12, 13, 14, 15]
+            'Infrastruktur': [6, 7, 9, 11],       // Air bersih, energi, infrastruktur, permukiman
+            'Ekonomi':       [1, 2, 8, 17],       // Kemiskinan, kelaparan, ekonomi desa, kemitraan
+            'Pendidikan':    [4],                 // Pendidikan desa berkualitas
+            'Kesehatan':     [3],                 // Desa sehat dan sejahtera
+            'Sosial':        [5, 10, 16],         // Perempuan desa, kesenjangan, damai berkeadilan
+            'Lingkungan':    [12, 13, 14, 15]     // Konsumsi/produksi, iklim, laut, darat
         };
 
         const sdgs = sdgsList.find(s => s.no === sdgsNo);
