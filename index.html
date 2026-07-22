@@ -5195,7 +5195,7 @@
         showToast('Menyiapkan laporan untuk dicetak...', 'info');
     }
 
- /**
+    /**
      * Laporan Usulan Berdasarkan SDGs Desa
      */
     function rLaporanSDGS() {
@@ -5226,21 +5226,40 @@
             { no: 17, nama: 'Kemitraan untuk Pembangunan Desa',       icon: 'fa-handshake',          color: '#19486A' }
         ];
 
-            // Mapping kategori ke SDGs Desa (disesuaikan)
-            const kategoriToSDGS = {
-                'Infrastruktur': [6, 7, 9, 11],              // Air bersih, energi, infrastruktur, permukiman
-                'Ekonomi':       [1, 2, 8, 17],              // Kemiskinan, kelaparan, ekonomi desa, kemitraan
-                'Pendidikan':    [4],                        // Pendidikan desa berkualitas
-                'Kesehatan':     [3],                        // Desa sehat dan sejahtera
-                'Sosial':        [5, 10, 16],                // Perempuan desa, kesenjangan, damai berkeadilan
-                'Lingkungan':    [12, 13, 14, 15]            // Konsumsi/produksi, iklim, laut, darat
-            };
+        // Parsing field sdgId (mendukung: array, string koma, string tunggal, number)
+        function parseSdgId(usulan) {
+            const val = usulan.sdgId;
+            if (val === null || val === undefined || val === '') return [];
+
+            // Array: [6, 9, 11]
+            if (Array.isArray(val)) {
+                return val.map(s => parseInt(s)).filter(s => !isNaN(s) && s >= 1 && s <= 17);
+            }
+
+            // String koma: "6,9,11" atau "6, 9, 11"
+            if (typeof val === 'string' && val.includes(',')) {
+                return val.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s) && s >= 1 && s <= 17);
+            }
+
+            // String tunggal: "6"
+            if (typeof val === 'string') {
+                const num = parseInt(val.trim());
+                return (!isNaN(num) && num >= 1 && num <= 17) ? [num] : [];
+            }
+
+            // Number: 6
+            if (typeof val === 'number') {
+                return (val >= 1 && val <= 17) ? [val] : [];
+            }
+
+            return [];
+        }
 
         // Hitung per SDGs
         const sdgsData = sdgsList.map(sdgs => {
             const relatedUsulan = usulanFinal.filter(u => {
-                const mappedSDGS = kategoriToSDGS[u.kategori] || [];
-                return mappedSDGS.includes(sdgs.no);
+                const ids = parseSdgId(u);
+                return ids.includes(sdgs.no);
             });
             return {
                 ...sdgs,
@@ -5259,7 +5278,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
                     <div>
                         <h2 class="font-display font-bold text-lg text-gray-800">Laporan Usulan Berdasarkan SDGs Desa</h2>
-                        <p class="text-sm text-gray-500 mt-0.5">Tahun Anggaran ${tahun} · ${sdgsData.length} dari 18 Tujuan SDGs</p>
+                        <p class="text-sm text-gray-500 mt-0.5">Tahun Anggaran ${tahun} · ${sdgsData.length} dari 17 Tujuan SDGs</p>
                     </div>
                     <div class="flex gap-2">
                         <button onclick="printLaporanSDGS()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2">
@@ -5356,7 +5375,7 @@
                     ` : `
                     <div class="text-center py-12 text-gray-400 border rounded-xl">
                         <i class="fas fa-bullseye text-4xl mb-3 block"></i>
-                        <p>Belum ada data usulan untuk ditampilkan</p>
+                        <p>Belum ada data usulan dengan pilihan SDGs untuk ditampilkan</p>
                     </div>
                     `}
                 </div>
@@ -5374,7 +5393,6 @@
             return;
         }
 
-        // Bersihkan class yang tidak relevan untuk cetak (hover, cursor, transisi)
         let content = contentEl.innerHTML;
         content = content.replace(/hover:shadow-md hover:-translate-y-0.5/g, '');
         content = content.replace(/cursor-pointer/g, '');
@@ -5389,16 +5407,12 @@
         @page { size: A4; margin: 15mm; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color: #000; line-height: 1.4; }
-        
-        /* GRID SYSTEM */
         .grid { display: grid; gap: 10px; }
         .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
         .sm_grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
         .md_grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
         @media (max-width: 640px) { .sm_grid-cols-3 { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 768px) { .md_grid-cols-4 { grid-template-columns: repeat(2, 1fr); } }
-
-        /* LAYOUT & SPACING */
         .flex { display: flex; }
         .inline-flex { display: inline-flex; align-items: center; justify-content: center; }
         .items-center, .items-start { align-items: center; }
@@ -5409,14 +5423,10 @@
         .gap-3 { gap: 12px; }
         .min-w-0 { min-width: 0; }
         .flex-shrink-0 { flex-shrink: 0; }
-        
-        /* BORDERS & RADIUS */
         .border { border: 1px solid #e5e7eb; }
         .rounded-xl { border-radius: 12px; }
         .rounded-lg { border-radius: 8px; }
         .rounded-full { border-radius: 50%; }
-        
-        /* PADDING & MARGIN */
         .p-3 { padding: 12px; }
         .mb-6 { margin-bottom: 24px; }
         .mt-0\.5 { margin-top: 2px; }
@@ -5425,8 +5435,6 @@
         .px-4 { padding-left: 16px; padding-right: 16px; }
         .py-2\.5 { padding-top: 10px; padding-bottom: 10px; }
         .py-3 { padding-top: 12px; padding-bottom: 12px; }
-        
-        /* TYPOGRAPHY */
         .text-xs { font-size: 10pt; }
         .text-sm { font-size: 11pt; }
         .text-\[10px\] { font-size: 9pt; }
@@ -5441,10 +5449,7 @@
         .text-gray-800 { color: #1f2937; }
         .text-white { color: #ffffff; }
         .leading-tight { line-height: 1.25; }
-        .whitespace-nowrap { white-space: nowrap; }
         .opacity-30 { opacity: 0.3; }
-        
-        /* TABLE */
         table { border-collapse: collapse; width: 100%; }
         th, td { border: 1px solid #e5e7eb; padding: 5pt 8pt; }
         .bg-gray-50 { background-color: #f9fafb; }
@@ -5452,18 +5457,12 @@
         .divide-y > * + * { border-top: 1px solid #f3f4f6; }
         .overflow-x-auto { overflow-x: auto; }
         tr { page-break-inside: avoid; }
-
-        /* BADGES & SHAPES */
         .w-5, .w-7, .w-8, .w-16 { display: inline-block; text-align: center; }
         .w-5 { width: 20px; height: 20px; line-height: 20px; font-size: 8pt; border-radius: 50%; }
         .w-7 { width: 28px; height: 28px; line-height: 28px; font-size: 10pt; border-radius: 8px; }
         .w-8 { width: 32px; height: 32px; line-height: 32px; border-radius: 8px; }
         .w-16 { width: 64px; }
-        .h-1\.5, .h-5 { display: inline-block; }
         .h-1\.5 { height: 6px; width: 100%; border-radius: 999px; }
-        .h-5 { width: 20px; height: 20px; line-height: 20px; font-size: 8pt; border-radius: 50%; }
-        
-        /* POSITIONING */
         .relative { position: relative; }
         .absolute { position: absolute; }
         .-top-1\.5 { top: -6px; }
@@ -5519,22 +5518,33 @@
             { no: 16, nama: 'Desa Damai Berkeadilan',                 icon: 'fa-dove',               color: '#00689D' },
             { no: 17, nama: 'Kemitraan untuk Pembangunan Desa',       icon: 'fa-handshake',          color: '#19486A' }
         ];
-        
-        const kategoriToSDGS = {
-            'Infrastruktur': [6, 7, 9, 11],       // Air bersih, energi, infrastruktur, permukiman
-            'Ekonomi':       [1, 2, 8, 17],       // Kemiskinan, kelaparan, ekonomi desa, kemitraan
-            'Pendidikan':    [4],                 // Pendidikan desa berkualitas
-            'Kesehatan':     [3],                 // Desa sehat dan sejahtera
-            'Sosial':        [5, 10, 16],         // Perempuan desa, kesenjangan, damai berkeadilan
-            'Lingkungan':    [12, 13, 14, 15]     // Konsumsi/produksi, iklim, laut, darat
-        };
+
+        // Parsing field sdgId
+        function parseSdgId(usulan) {
+            const val = usulan.sdgId;
+            if (val === null || val === undefined || val === '') return [];
+            if (Array.isArray(val)) {
+                return val.map(s => parseInt(s)).filter(s => !isNaN(s) && s >= 1 && s <= 17);
+            }
+            if (typeof val === 'string' && val.includes(',')) {
+                return val.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s) && s >= 1 && s <= 17);
+            }
+            if (typeof val === 'string') {
+                const num = parseInt(val.trim());
+                return (!isNaN(num) && num >= 1 && num <= 17) ? [num] : [];
+            }
+            if (typeof val === 'number') {
+                return (val >= 1 && val <= 17) ? [val] : [];
+            }
+            return [];
+        }
 
         const sdgs = sdgsList.find(s => s.no === sdgsNo);
         if (!sdgs) return;
 
         const relatedUsulan = cachedUsulan.filter(u => {
-            const mappedSDGS = kategoriToSDGS[u.kategori] || [];
-            return mappedSDGS.includes(sdgsNo) && u.tahun == tahun && (u.status === 'final' || u.status === 'ranked_dusun');
+            const ids = parseSdgId(u);
+            return ids.includes(sdgsNo) && u.tahun == tahun && (u.status === 'final' || u.status === 'ranked_dusun');
         });
 
         const totalBiaya = relatedUsulan.reduce((s, u) => s + (parseInt(u.estimasiBiaya) || 0), 0);
