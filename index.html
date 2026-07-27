@@ -276,7 +276,7 @@
        1. KONFIGURASI APLIKASI
        ========================================== */
     const CONFIG = {
-        API_URL: 'https://script.google.com/macros/s/AKfycbxBkcYOmyU0_YCbLV-Za1tHHC9NCNOiqIlkIvwcGYW7y9iD-6O5ojdtrPoz5WwhKGTNoA/exec',
+        API_URL: 'https://script.google.com/macros/s/AKfycbzbnhmV098XpsLHRXVgEHbSpMlS3dmbARnjxQzdrDiRiZPdFi7QyE4MzZMdbvEvObqc3Q/exec',
         APP_NAME: 'NgusulBee',
         DESA: 'Desa Jangkang',
         KATEGORI: ['Infrastruktur', 'Pendidikan', 'Kesehatan', 'Ekonomi', 'Sosial', 'Lingkungan'],
@@ -2059,6 +2059,7 @@
                 { key: 'beranda',          label: 'Beranda',          icon: 'fa-home',           mLabel: 'Beranda' },
                 { key: 'verifikasi_desa',  label: 'Musyawarah Desa',  icon: 'fa-gavel',          mLabel: 'Musyawarah' },
                 { key: 'monitoring',       label: 'Monitoring',       icon: 'fa-eye',            mLabel: 'Monitor' },
+                { key: 'penyesuaian',      label: 'Penyesuaian Usulan', icon: 'fa-pen-to-square', mLabel: 'Penyesuaian' },
                 // ✅ PARENT MENU DENGAN SUBMENU
                 { key: 'lap_musdes',       label: 'Lap. Musdes',      icon: 'fa-file-lines',     mLabel: 'Musdes', isSubmenuParent: true },
                 // ✅ SUB-MENU ITEMS
@@ -2344,7 +2345,7 @@
         </div>`);
     }
 
-/* ==========================================
+    /* ==========================================
     10. KOMPONEN TAB LAINNYA
     ========================================== */
     function renderTab() {
@@ -2370,14 +2371,15 @@
         if (user.role === 'admrom') {
             if (STATE.dashboardTab === 'monitoring') return banner + rMonitorTable(allUsulan, 'admrom');
         }
-        if (user.role === 'admdesa') {
-            if (STATE.dashboardTab === 'verifikasi_desa') return banner + rVerifDesaTable(user, allUsulan.filter(item => item.status === 'ranked_dusun' || item.status === 'dikembalikan_dusun'));
-            if (STATE.dashboardTab === 'monitoring') return banner + rMonitorTable(allUsulan.filter(item => item.status === 'final'), 'admdesa');
-            
-            // ✅✅✅ TAMBAHAN BARU (SUB-MENU LAP. MUSDES) ✅✅✅
-            if (STATE.dashboardTab === 'ba_musdes') return banner + rBaMusdes();
-            if (STATE.dashboardTab === 'laporan_prioritas') return banner + rLaporanPrioritas();
-            if (STATE.dashboardTab === 'laporan_sdgs') return banner + rLaporanSDGS();
+    if (user.role === 'admdesa') {
+    if (STATE.dashboardTab === 'verifikasi_desa') return banner + rVerifDesaTable(user, allUsulan.filter(item => item.status === 'ranked_dusun' || item.status === 'dikembalikan_dusun'));
+    if (STATE.dashboardTab === 'monitoring') return banner + rMonitorTable(allUsulan.filter(item => item.status === 'final'), 'admdesa');
+    if (STATE.dashboardTab === 'penyesuaian') return banner + rPenyesuaian();
+    
+    // ✅✅✅ TAMBAHAN BARU (SUB-MENU LAP. MUSDES) ✅✅✅
+    if (STATE.dashboardTab === 'ba_musdes') return banner + rBaMusdes();
+    if (STATE.dashboardTab === 'laporan_prioritas') return banner + rLaporanPrioritas();
+    if (STATE.dashboardTab === 'laporan_sdgs') return banner + rLaporanSDGS();
         }
         if (user.role === 'kasikaur') {
             if (STATE.dashboardTab === 'koordinasi') {
@@ -3405,6 +3407,622 @@
                 card.style.display = 'none';
             }
         });
+    }
+
+    /* ==========================================
+    TABEL PENYESUAIAN USULAN
+    ========================================== */
+    function rPenyesuaian() {
+        const tahun = STATE.tahunAktif;
+        
+        // 1. Ambil SEMUA data tanpa filter status
+        let list = cachedUsulan.filter(u => u.tahun == tahun);
+        if (!list) list = [];
+
+        // 2. Urutkan Data (Status -> Dusun -> Ranking)
+        const sorted = list.sort((a, b) => {
+            const statusOrder = { draft: 0, verified_dusun: 1, ranked_dusun: 2, final: 3, ditolak: 4 };
+            if ((statusOrder[a.status] || 0) !== (statusOrder[b.status] || 0)) {
+                return (statusOrder[a.status] || 0) - (statusOrder[b.status] || 0);
+            }
+            if (a.dusun !== b.dusun) return (a.dusun || '').localeCompare(b.dusun || '');
+            return (a.rankingDesa || 999) - (b.rankingDesa || 999);
+        });
+
+        // 3. Logika Kolom
+        const colDusun = true;
+        const colRankDusun = true;
+        const colRankDesa = true;
+        const totalCol = 10 + (colDusun ? 1 : 0) + (colRankDusun ? 1 : 0) + (colRankDesa ? 1 : 0);
+
+        // 4. Stats Bar
+        let statsHTML = '';
+        try {
+            if (typeof statsBar === 'function') statsHTML = statsBar(sorted);
+        } catch (e) { /* ignore */ }
+
+        // 5. Empty state text
+        const emptyText = 'Belum ada data usulan untuk tahun ' + tahun;
+
+        // 6. TABLE ROWS HTML
+        let rowsHTML = '';
+        if (sorted.length) {
+            rowsHTML = sorted.map((i, n) => `
+                <tr class="main-row cursor-pointer hover:bg-gray-50" onclick="showDetail('${escapeJs(i.id)}')">
+                    <td class="text-center text-gray-400 border-b border-r border-gray-200 px-2 py-2.5 tabular-nums">${n + 1}</td>
+                    
+                    <td class="text-center border-b border-r border-gray-200 px-2 py-2.5">${statusLabel(i.status).replace('whitespace-nowrap', 'whitespace-normal break-words')}</td>
+                    
+                    <td class="font-semibold text-gray-800 border-b border-r border-gray-200 px-3 py-2.5 whitespace-normal break-words leading-snug min-w-[180px]">${escapeHtml(i.judul)}</td>
+                    
+                    <td class="text-gray-500 border-b border-r border-gray-200 px-2 py-2.5 whitespace-normal break-words">${escapeHtml(i.namaPengusul || i.username)}</td>
+                    
+                    ${colDusun ? `<td class="text-gray-500 border-b border-r border-gray-200 px-2 py-2.5 whitespace-normal break-words">${escapeHtml(i.dusun)}</td>` : ''}
+                    
+                    <td class="border-b border-r border-gray-200 px-2 py-2.5"><span class="badge-sm px-2 py-0.5 bg-gray-100 text-gray-600 rounded font-medium whitespace-normal break-words">${escapeHtml(i.kategori)}</span></td>
+                    
+                    <td class="text-gray-500 border-b border-r border-gray-200 px-2 py-2.5 whitespace-nowrap">${Array.isArray(i.rt) ? i.rt.join(', ') : i.rt}</td>
+                    <td class="text-gray-600 border-b border-r border-gray-200 px-2 py-2.5 whitespace-nowrap">${i.volume} ${escapeHtml(i.satuan)}</td>
+                    <td class="text-right font-semibold text-gray-700 border-b border-r border-gray-200 px-2 py-2.5 whitespace-nowrap tabular-nums">${formatRupiah(i.estimasiBiaya)}</td>
+                    
+                    ${colRankDusun ? `<td class="text-center border-b border-r border-gray-200 px-2 py-2.5 whitespace-nowrap">${i.rankingDusun ? `<span class="font-display font-extrabold text-blue-600">#${i.rankingDusun}</span>` : '<span class="text-gray-300">-</span>'}</td>` : ''}
+                    ${colRankDesa ? `<td class="text-center border-b border-r border-gray-200 px-2 py-2.5 whitespace-nowrap">${i.rankingDesa ? `<span class="font-display font-extrabold text-forest-600">#${i.rankingDesa}</span>` : '<span class="text-gray-300">-</span>'}</td>` : ''}
+                    
+                    <td class="text-center border-b border-gray-200 px-2 py-2.5 whitespace-nowrap">
+                        <span onclick="event.stopPropagation(); openFullEditPenyesuaian('${escapeJs(i.id)}')" class="badge-sm px-2.5 py-1 bg-blue-100 text-blue-700 font-semibold rounded hover:bg-blue-200 transition-colors inline-flex items-center gap-1 cursor-pointer">
+                            <i class="fas fa-pen-to-square"></i><span class="sm:hidden">Edit</span><span class="hidden sm:inline ml-1">Edit Data</span>
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        } else {
+            rowsHTML = typeof emptyRow === 'function' ? emptyRow(totalCol, emptyText) : `<tr><td colspan="${totalCol}" class="text-center py-8 text-gray-400">${emptyText}</td></tr>`;
+        }
+
+        // 7. Render HTML
+        return `
+        <style>
+            #tablePenyesuaianWrap thead th { background-color: #f9fafb; }
+            #tablePenyesuaianWrap tbody tr { transition: background-color 0.15s ease; }
+            #tablePenyesuaianWrap tbody tr:hover td { background-color: #f9fafb; }
+            
+            /* Font Fleksibel */
+            #tablePenyesuaianWrap thead tr { font-size: clamp(0.6rem, 0.9vw, 0.75rem); }
+            #tablePenyesuaianWrap tbody { font-size: clamp(0.7rem, 1.1vw, 0.875rem); }
+            #tablePenyesuaianWrap tbody span { font-size: inherit; }
+            #tablePenyesuaianWrap tbody .badge-sm { font-size: clamp(0.55rem, 0.8vw, 0.65rem); }
+
+            /* Wrap Teks & Rata Atas */
+            #tablePenyesuaianWrap td { vertical-align: top; line-height: 1.4; }
+            #tablePenyesuaianWrap th { vertical-align: middle; }
+
+            /* SLIDER GESER KIRI KANAN */
+            .tbl-inner {
+                scrollbar-gutter: stable; 
+                overflow-x: auto; 
+                overflow-y: auto; 
+                scrollbar-width: thin; 
+                scrollbar-color: #64748b #e2e8f0;
+            }
+            .tbl-inner::-webkit-scrollbar { width: 8px; height: 16px; }
+            .tbl-inner::-webkit-scrollbar-track { background: #e2e8f0; }
+            .tbl-inner::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 2px; border: 2px solid #e2e8f0; }
+            .tbl-inner::-webkit-scrollbar-thumb:hover { background: #64748b; }
+            .tbl-inner::-webkit-scrollbar-corner { background: #e2e8f0; }
+        </style>
+
+        <div class="space-y-4">
+            ${statsHTML}
+
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div>
+                    <h3 class="font-display font-bold text-xl">Penyesuaian Usulan</h3>
+                    <p class="text-xs text-gray-400 mt-0.5">Tahun ${tahun} · ${sorted.length} data — klik baris untuk lihat detail, atau klik Edit untuk ubah data</p>
+                </div>
+            </div>
+
+            <div class="relative">
+                <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                <input type="text" id="searchPenyesuaianTable" placeholder="Cari judul, pengusul, dusun, kategori..."
+                    class="w-full pl-10 pr-4 py-2.5 border rounded-lg text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all"
+                    oninput="filterPenyesuaianTable(this.value)">
+            </div>
+
+            <!-- TABEL VIEW -->
+            <div class="container mx-auto px-2 sm:px-4 md:px-6 xl:max-w-[1600px]">
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div class="tbl-inner h-[500px] scroll-smooth">
+                        <table class="w-full min-w-[1200px] border-collapse" id="tablePenyesuaianWrap">
+                            <colgroup>
+                                <col style="width: 50px">   
+                                <col style="width: 130px">  
+                                <col>                      
+                                <col style="width: 180px">  
+                                ${colDusun ? '<col style="width: 130px">' : ''}  
+                                <col style="width: 130px">  
+                                <col style="width: 80px">   
+                                <col style="width: 120px">  
+                                <col style="width: 160px">  
+                                ${colRankDusun ? '<col style="width: 110px">' : ''}  
+                                ${colRankDesa ? '<col style="width: 110px">' : ''}  
+                                <col style="width: 100px">  
+                            </colgroup>
+                            
+                            <thead>
+                                <tr class="text-gray-500 uppercase tracking-wider">
+                                    <th class="sticky top-0 z-10 px-2 py-2.5 text-center border-b border-r border-gray-200 bg-gray-50">No</th>
+                                    <th class="sticky top-0 z-10 px-2 py-2.5 text-center border-b border-r border-gray-200 bg-gray-50">Status</th>
+                                    <th class="sticky top-0 z-10 px-3 py-2.5 text-left border-b border-r border-gray-200 bg-gray-50">Judul Usulan</th>
+                                    <th class="sticky top-0 z-10 px-2 py-2.5 border-b border-r border-gray-200 bg-gray-50">Pengusul</th>
+                                    ${colDusun ? '<th class="sticky top-0 z-10 px-2 py-2.5 border-b border-r border-gray-200 bg-gray-50">Dusun</th>' : ''}
+                                    <th class="sticky top-0 z-10 px-2 py-2.5 border-b border-r border-gray-200 bg-gray-50">Kategori</th>
+                                    <th class="sticky top-0 z-10 px-2 py-2.5 border-b border-r border-gray-200 bg-gray-50">RT</th>
+                                    <th class="sticky top-0 z-10 px-2 py-2.5 border-b border-r border-gray-200 bg-gray-50">Volume</th>
+                                    <th class="sticky top-0 z-10 px-2 py-2.5 text-right border-b border-r border-gray-200 bg-gray-50">Estimasi</th>
+                                    ${colRankDusun ? '<th class="sticky top-0 z-10 px-2 py-2.5 text-center border-b border-r border-gray-200 bg-gray-50">Rank Dusun</th>' : ''}
+                                    ${colRankDesa ? '<th class="sticky top-0 z-10 px-2 py-2.5 text-center border-b border-r border-gray-200 bg-gray-50">Rank Desa</th>' : ''}
+                                    <th class="sticky top-0 z-10 px-2 py-2.5 text-center border-b border-gray-200 bg-gray-50">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyPenyesuaian">
+                                ${rowsHTML}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    /* ==========================================
+        FILTER TABEL PENYESUAIAN
+        ========================================== */
+    function filterPenyesuaianTable(query) {
+        const q = query.toLowerCase();
+        const rows = document.querySelectorAll('#tbodyPenyesuaian tr');
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(q) ? '' : 'none';
+        });
+    }
+
+    /* ==========================================
+    HELPER & MODAL EDIT PENYESUAIAN
+    ========================================== */
+
+    // Parse sdgId
+    function parseSdgIdForDisplay(val) {
+        if (!val) return [];
+        if (Array.isArray(val)) return val.map(s => parseInt(s)).filter(s => !isNaN(s) && s >= 1 && s <= 17);
+        if (typeof val === 'string' && val.includes(',')) return val.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s) && s >= 1 && s <= 17);
+        const num = parseInt(val);
+        return (!isNaN(num) && num >= 1 && num <= 17) ? [num] : [];
+    }
+
+    // Modal Edit Lengkap
+    function openFullEditPenyesuaian(id) {
+        const u = cachedUsulan.find(x => x.id === id);
+        if (!u) return;
+
+        // Ambil data dari CONFIG
+        const kategoriList = CONFIG.KATEGORI;
+        const satuanList = CONFIG.SATUAN;
+        const sdgsList = CONFIG.SDGS;
+        
+        const statusList = [
+            { val: 'draft', label: 'Draft' },
+            { val: 'verified_dusun', label: 'Terverifikasi Dusun' },
+            { val: 'ranked_dusun', label: 'Teranking Dusun' },
+            { val: 'final', label: 'Final' },
+            { val: 'ditolak', label: 'Ditolak' }
+        ];
+
+        // Buat daftar Dusun unik dari CONFIG.RT_MAP
+        const dusunList = [...new Set(Object.values(CONFIG.RT_MAP))].sort();
+        
+        // Buat daftar RT berdasarkan Dusun saat ini
+        const rtList = Object.entries(CONFIG.RT_MAP)
+            .filter(([rt, dusun]) => dusun === u.dusun)
+            .map(([rt]) => rt)
+            .sort();
+
+        const currentSdgs = parseSdgIdForDisplay(u.sdgId);
+        
+        // ✅ FIX: Ambil nilai RT pertama dari Array untuk dicocokkan dengan dropdown
+        const currentRt = Array.isArray(u.rt) ? u.rt[0] : u.rt;
+
+        openModal(`
+        <div class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this)closeModal()">
+            <div class="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl view-enter">
+                <div class="sticky top-0 bg-white border-b px-5 py-4 flex items-center justify-between z-10">
+                    <div>
+                        <div class="text-xs text-gray-500">Edit Lengkap Usulan</div>
+                        <div class="font-display font-bold text-sm text-gray-800">${escapeHtml(u.judul)}</div>
+                    </div>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-1"><i class="fas fa-times text-lg"></i></button>
+                </div>
+                <div class="p-5 space-y-4" id="formEditPenyesuaian">
+                    <!-- Judul -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Judul Usulan <span class="text-red-500">*</span></label>
+                        <input type="text" id="editFull_judul" value="${escapeHtml(u.judul)}" class="w-full py-2 px-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-colors">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- Dusun (Dropdown) -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Dusun <span class="text-red-500">*</span></label>
+                            <select id="editFull_dusun" onchange="updateRtOptionsPenyesuaian()" class="w-full py-2 px-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none bg-white transition-colors">
+                                <option value="">-- Pilih Dusun --</option>
+                                ${dusunList.map(d => `<option value="${d}" ${u.dusun === d ? 'selected' : ''}>${d}</option>`).join('')}
+                            </select>
+                        </div>
+                        <!-- RT (Dropdown Dinamis) -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">RT <span class="text-red-500">*</span></label>
+                            <select id="editFull_rt" class="w-full py-2 px-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none bg-white transition-colors">
+                                <option value="">-- Pilih RT --</option>
+                                ${rtList.map(rt => `<option value="${rt}" ${currentRt === rt ? 'selected' : ''}>RT ${rt}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Kategori <span class="text-red-500">*</span></label>
+                            <select id="editFull_kategori" class="w-full py-2 px-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none bg-white transition-colors">
+                                <option value="">-- Pilih Kategori --</option>
+                                ${kategoriList.map(k => `<option value="${k}" ${u.kategori === k ? 'selected' : ''}>${k}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Status</label>
+                            <select id="editFull_status" class="w-full py-2 px-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none bg-white transition-colors">
+                                ${statusList.map(s => `<option value="${s.val}" ${u.status === s.val ? 'selected' : ''}>${s.label}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Volume <span class="text-red-500">*</span></label>
+                            <input type="number" id="editFull_volume" value="${u.volume || ''}" min="1" class="w-full py-2 px-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Satuan <span class="text-red-500">*</span></label>
+                            <select id="editFull_satuan" class="w-full py-2 px-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none bg-white transition-colors">
+                                <option value="">-- Pilih --</option>
+                                ${satuanList.map(s => `<option value="${s}" ${u.satuan === s ? 'selected' : ''}>${s}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Estimasi Biaya <span class="text-red-500">*</span></label>
+                            <input type="text" id="editFull_estimasiBiaya" value="${formatRupiah(u.estimasiBiaya)}" inputmode="numeric" class="w-full py-2 px-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-right transition-colors" placeholder="Contoh: 50.000.000">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Deskripsi <span class="text-red-500">*</span></label>
+                        <textarea id="editFull_deskripsi" rows="3" class="w-full py-2 px-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-y transition-colors">${escapeHtml(u.deskripsi || '')}</textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-2">SDGs Desa <span class="text-red-500">*</span></label>
+                        <div class="grid grid-cols-4 sm:grid-cols-6 gap-2" id="editFull_sdgsGrid">
+                            ${sdgsList.map(s => `
+                                <div onclick="toggleSdgsEditFull(${s.id})" 
+                                    class="sdgs-edit-item-${s.id} cursor-pointer border-2 rounded-lg p-2 text-center transition-all hover:shadow-sm ${currentSdgs.includes(s.id) ? 'border-current shadow-sm' : 'border-gray-200 opacity-40 hover:opacity-70'}"
+                                    style="color: ${s.warna}; ${currentSdgs.includes(s.id) ? 'background-color:' + s.warna + '15;' : ''}">
+                                    <div class="text-xs font-bold leading-tight">${s.kode}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <input type="hidden" id="editFull_sdgId" value="${currentSdgs.join(',')}">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Catatan Kasi/Kaur</label>
+                        <textarea id="editFull_catatanKasiKaur" rows="2" class="w-full py-2 px-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-y transition-colors">${escapeHtml(u.catatanKasiKaur || '')}</textarea>
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-3 border-t">
+                        <button onclick="closeModal()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg text-sm font-semibold transition-colors">Batal</button>
+                        <button onclick="saveFullEditPenyesuaian('${escapeJs(u.id)}')" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition-colors shadow-sm shadow-blue-600/20">
+                            <i class="fas fa-save mr-1.5"></i> Simpan Perubahan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>`);
+    }
+
+    // Update Dropdown RT saat Dusun berubah
+    function updateRtOptionsPenyesuaian() {
+        const selectedDusun = document.getElementById('editFull_dusun')?.value;
+        const rtSelect = document.getElementById('editFull_rt');
+        if (!rtSelect) return;
+
+        const rtList = Object.entries(CONFIG.RT_MAP)
+            .filter(([rt, dusun]) => dusun === selectedDusun)
+            .map(([rt]) => rt)
+            .sort();
+
+        rtSelect.innerHTML = '<option value="">-- Pilih RT --</option>' + 
+            rtList.map(rt => `<option value="${rt}">RT ${rt}</option>`).join('');
+        
+        // ✅ FIX: Hapus error lama dengan class yang benar ('.val-err')
+        rtSelect.classList.remove('border-red-400');
+        const errEl = rtSelect.parentNode.querySelector('.val-err');
+        if (errEl) errEl.remove();
+    }
+
+    // Toggle SDGs di Modal
+    function toggleSdgsEditFull(id) {
+        const input = document.getElementById('editFull_sdgId');
+        let current = input.value ? input.value.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s)) : [];
+        
+        if (current.includes(id)) {
+            current = current.filter(s => s !== id);
+        } else {
+            current.push(id);
+            current.sort((a, b) => a - b);
+        }
+        
+        input.value = current.join(',');
+        
+        const el = document.querySelector(`.sdgs-edit-item-${id}`);
+        if (el) {
+            if (current.includes(id)) {
+                el.classList.remove('border-gray-200', 'opacity-40', 'hover:opacity-70');
+                el.classList.add('border-current', 'shadow-sm');
+                el.style.backgroundColor = el.style.color + '15';
+            } else {
+                el.classList.add('border-gray-200', 'opacity-40', 'hover:opacity-70');
+                el.classList.remove('border-current', 'shadow-sm');
+                el.style.backgroundColor = '';
+            }
+        }
+
+        if (current.length > 0) {
+            const grid = document.getElementById('editFull_sdgsGrid');
+            // ✅ FIX: Gunakan class yang benar
+            const errEl = grid?.parentNode.querySelector('.val-err');
+            if (errEl) errEl.remove();
+        }
+    }
+
+    /* ==========================================
+        VALIDASI FORM PENYESUAIAN
+        ========================================== */
+    function validatePenyesuaianForm() {
+        const judul = document.getElementById('editFull_judul')?.value.trim();
+        const dusun = document.getElementById('editFull_dusun')?.value;
+        const rt = document.getElementById('editFull_rt')?.value;
+        const kategori = document.getElementById('editFull_kategori')?.value;
+        const volume = document.getElementById('editFull_volume')?.value;
+        const satuan = document.getElementById('editFull_satuan')?.value;
+        const estimasiBiaya = document.getElementById('editFull_estimasiBiaya')?.value;
+        const deskripsi = document.getElementById('editFull_deskripsi')?.value.trim();
+        const sdgId = document.getElementById('editFull_sdgId')?.value.trim();
+
+        const setError = (id, msg) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.classList.add('border-red-400');
+            el.classList.remove('border-gray-200');
+            const oldErr = el.parentNode.querySelector('.val-err');
+            if (oldErr) oldErr.remove();
+            const errEl = document.createElement('div');
+            errEl.className = 'text-red-500 text-[10px] mt-1 font-medium val-err';
+            errEl.textContent = msg;
+            el.parentNode.appendChild(errEl);
+        };
+
+        const clearErrors = () => {
+            document.querySelectorAll('#formEditPenyesuaian .val-err').forEach(el => el.remove());
+            ['editFull_judul', 'editFull_dusun', 'editFull_rt', 'editFull_kategori', 'editFull_volume', 'editFull_satuan', 'editFull_estimasiBiaya', 'editFull_deskripsi'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.classList.remove('border-red-400');
+                    el.classList.add('border-gray-200');
+                }
+            });
+        };
+
+        clearErrors();
+        let isValid = true;
+
+        if (!judul || judul.length < 10) {
+            setError('editFull_judul', !judul ? 'Judul usulan wajib diisi' : 'Judul terlalu singkat (min 10 karakter)');
+            isValid = false;
+        }
+        if (!dusun) { setError('editFull_dusun', 'Pilih dusun terlebih dahulu'); isValid = false; }
+        if (!rt) { setError('editFull_rt', 'Pilih RT terlebih dahulu'); isValid = false; }
+        else if (dusun && CONFIG.RT_MAP[rt] !== dusun) { setError('editFull_rt', `RT ${rt} bukan wilayah ${dusun}`); isValid = false; }
+        if (!kategori) { setError('editFull_kategori', 'Pilih kategori'); isValid = false; }
+        if (!volume || Number(volume) <= 0) { setError('editFull_volume', 'Volume harus angka lebih dari 0'); isValid = false; }
+        if (!satuan) { setError('editFull_satuan', 'Pilih satuan'); isValid = false; }
+        
+        const cleanBiaya = String(estimasiBiaya).replace(/\D/g, '');
+        if (!cleanBiaya || parseInt(cleanBiaya) <= 0) { setError('editFull_estimasiBiaya', 'Estimasi biaya wajib diisi'); isValid = false; }
+        
+        if (!deskripsi || deskripsi.length < 20) { setError('editFull_deskripsi', !deskripsi ? 'Deskripsi wajib diisi' : 'Deskripsi terlalu singkat (min 20 karakter)'); isValid = false; }
+        
+        if (!sdgId) {
+            const grid = document.getElementById('editFull_sdgsGrid');
+            if (grid) {
+                const oldErr = grid.parentNode.querySelector('.val-err');
+                if (oldErr) oldErr.remove();
+                const errEl = document.createElement('div');
+                errEl.className = 'text-red-500 text-[10px] mt-1 font-medium val-err';
+                errEl.textContent = 'Pilih minimal 1 tujuan SDGs Desa';
+                grid.parentNode.appendChild(errEl);
+            }
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    /* ==========================================
+        SIMPAN HASIL EDIT (SUPER ADMIN BYPASS)
+        ========================================== */
+    async function saveFullEditPenyesuaian(id) {
+        const btn = document.querySelector('#formEditPenyesuaian .bg-blue-600');
+        const btnTextDefault = '<i class="fas fa-save mr-1.5"></i> Simpan Perubahan';
+        const btnTextLoading = '<i class="fas fa-spinner fa-spin mr-1.5"></i> Menyimpan...';
+
+        try {
+            if (!validatePenyesuaianForm()) {
+                showToast('Lengkapi data yang ditandai merah', 'error');
+                return;
+            }
+
+            // 1. Cari data asli di cache
+            const originalData = cachedUsulan.find(u => u.id === id);
+            if (!originalData) {
+                showToast('Data asli tidak ditemukan di cache', 'error');
+                return;
+            }
+
+            // 2. Ambil nilai dari form edit
+            const elJudul = document.getElementById('editFull_judul');
+            const elDusun = document.getElementById('editFull_dusun');
+            const elRt = document.getElementById('editFull_rt');
+            const elKategori = document.getElementById('editFull_kategori');
+            const elStatus = document.getElementById('editFull_status');
+            const elVolume = document.getElementById('editFull_volume');
+            const elSatuan = document.getElementById('editFull_satuan');
+            const elEstimasi = document.getElementById('editFull_estimasiBiaya');
+            const elDeskripsi = document.getElementById('editFull_deskripsi');
+            const elSdgId = document.getElementById('editFull_sdgId');
+            const elCatatan = document.getElementById('editFull_catatanKasiKaur');
+
+            const judul = (elJudul && elJudul.value ? elJudul.value : '').trim();
+            const dusun = (elDusun && elDusun.value ? elDusun.value : '');
+            const rt = (elRt && elRt.value ? elRt.value : '');
+            const kategori = (elKategori && elKategori.value ? elKategori.value : '');
+            const status = (elStatus && elStatus.value ? elStatus.value : 'draft');
+            const volumeRaw = (elVolume && elVolume.value ? elVolume.value : '0');
+            const satuan = (elSatuan && elSatuan.value ? elSatuan.value : '');
+            const estimasiRaw = (elEstimasi && elEstimasi.value ? elEstimasi.value : '0');
+            const deskripsi = (elDeskripsi && elDeskripsi.value ? elDeskripsi.value : '').trim();
+            const sdgIdRaw = (elSdgId && elSdgId.value ? elSdgId.value : '').trim();
+            const catatanKasiKaur = (elCatatan && elCatatan.value ? elCatatan.value : '').trim();
+
+            const volume = parseFloat(volumeRaw);
+            const estimasiBiaya = parseInt(estimasiRaw.replace(/\D/g, ''), 10);
+            
+            let sdgId = '';
+            if (sdgIdRaw) {
+                const sdgArray = sdgIdRaw.split(',').map(s => parseInt(s.trim(), 10)).filter(s => !isNaN(s) && s >= 1 && s <= 17);
+                sdgId = sdgArray.join(',');
+            }
+
+            // 3. Gabungkan data asli + data baru (KHUSUS UNTUK DIKIRIM KE SERVER)
+            const payload = {
+                ...originalData, 
+                action: 'penyesuaianDesa',
+                _reqUser: 'admin', 
+                _reqRole: 'admdesa', 
+                tahun: STATE.tahunAktif, 
+                judul: judul,
+                dusun: dusun,
+                rt: [rt], 
+                kategori: kategori,
+                status: status,
+                volume: isNaN(volume) ? 0 : volume,
+                satuan: satuan,
+                estimasiBiaya: isNaN(estimasiBiaya) ? 0 : estimasiBiaya,
+                deskripsi: deskripsi,
+                sdgId: sdgId,
+                catatanKasiKaur: catatanKasiKaur
+            };
+
+            // 4. Hapus field yang tidak boleh di-update / terlalu besar
+            if (payload.foto) delete payload.foto; 
+            if (payload._loading) delete payload._loading;
+
+            // Ubah tombol jadi loading
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = btnTextLoading;
+                btn.classList.add('opacity-75', 'cursor-not-allowed');
+            }
+
+            // 5. Kirim request
+            const res = await fetch(CONFIG.API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(payload)
+            });
+            
+            const result = await res.json();
+            
+            // Kembalikan tombol ke normal
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = btnTextDefault;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+            }
+
+            if (!result.success) {
+                showToast(result.message || 'Gagal menyimpan di server', 'error');
+                return;
+            }
+
+            // 6. Update cache lokal dengan data bersih
+            const cleanCacheData = {
+                ...originalData, 
+                tahun: STATE.tahunAktif, 
+                judul: judul,
+                dusun: dusun,
+                rt: [rt], 
+                kategori: kategori,
+                status: status,
+                volume: isNaN(volume) ? 0 : volume,
+                satuan: satuan,
+                estimasiBiaya: isNaN(estimasiBiaya) ? 0 : estimasiBiaya,
+                deskripsi: deskripsi,
+                sdgId: sdgId,
+                catatanKasiKaur: catatanKasiKaur
+            };
+
+            const idx = cachedUsulan.findIndex(u => u.id === id);
+            if (idx !== -1) {
+                cachedUsulan[idx] = cleanCacheData; 
+            }
+            
+            closeModal();
+
+            // 7. RENDER ULANG LANGSUNG DI SINI (Tanpa fungsi luar agar aman dari error not defined)
+            const tbody = document.getElementById('tbodyPenyesuaian');
+            if (tbody) {
+                const parentContainer = tbody.closest('.space-y-4');
+                if (parentContainer) {
+                    const newTableHTML = rPenyesuaian();
+                    // Ekstrak bagian dalam <div class="space-y-4">...</div>
+                    const divMatch = newTableHTML.match(/<div class="space-y-4">([\s\S]*)<\/div>\s*$/);
+                    if (divMatch) {
+                        parentContainer.innerHTML = divMatch[0];
+                    } else {
+                        // Fallback jika regex gagal
+                        parentContainer.innerHTML = newTableHTML;
+                    }
+                }
+            }
+            
+            showToast('Usulan berhasil diperbarui', 'success');
+            
+        } catch (err) {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = btnTextDefault;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+            }
+            console.error('Error saving:', err);
+            showToast('Gagal menyimpan: ' + err.message, 'error');
+        }
     }
 
     // ==========================================
