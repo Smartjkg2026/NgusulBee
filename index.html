@@ -276,7 +276,7 @@
        1. KONFIGURASI APLIKASI
        ========================================== */
     const CONFIG = {
-        API_URL: 'https://script.google.com/macros/s/AKfycbwnUzYJw6uSxCNiuVaiTZE-3yBI3b0Q3NxHcP0MzvqPL_pd2sUJjHr9Kn_Gqh42AcOKhw/exec',
+        API_URL: 'https://script.google.com/macros/s/AKfycbyqj17r_8KVA4DVbKnpkdA30rKhsDfPuIxooRigPpcvYFy_ILGEk9XX9peuZUYD9-m-jA/exec',
         APP_NAME: 'NgusulBee',
         DESA: 'Desa Jangkang',
         KATEGORI: ['Infrastruktur', 'Pendidikan', 'Kesehatan', 'Ekonomi', 'Sosial', 'Lingkungan'],
@@ -3865,7 +3865,7 @@
     }
 
     /* ==========================================
-        SIMPAN HASIL EDIT (SUPER ADMIN BYPASS)
+        SIMPAN HASIL EDIT (SUPER ADMIN MODE)
         ========================================== */
     async function saveFullEditPenyesuaian(id) {
         const btn = document.querySelector('#formEditPenyesuaian .bg-blue-600');
@@ -3878,14 +3878,12 @@
                 return;
             }
 
-            // 1. Cari data asli di cache
             const originalData = cachedUsulan.find(u => u.id === id);
             if (!originalData) {
                 showToast('Data asli tidak ditemukan di cache', 'error');
                 return;
             }
 
-            // 2. Ambil nilai dari form edit
             const elJudul = document.getElementById('editFull_judul');
             const elDusun = document.getElementById('editFull_dusun');
             const elRt = document.getElementById('editFull_rt');
@@ -3919,12 +3917,10 @@
                 sdgId = sdgArray.join(',');
             }
 
-            // 3. Gabungkan data asli + data baru (KHUSUS UNTUK DIKIRIM KE SERVER)
+            // Kirim payload bersih langsung ke fungsi doPenyesuaianDesa
             const payload = {
-                ...originalData, 
-                action: 'penyesuaianDesa',
-                _reqUser: 'admin', 
-                _reqRole: 'admdesa', 
+                action: 'penyesuaianDesa', // <- BARIS INI YANG SEBELUMNYA HILANG
+                id: id,
                 tahun: STATE.tahunAktif, 
                 judul: judul,
                 dusun: dusun,
@@ -3939,18 +3935,12 @@
                 catatanKasiKaur: catatanKasiKaur
             };
 
-            // 4. Hapus field yang tidak boleh di-update / terlalu besar
-            if (payload.foto) delete payload.foto; 
-            if (payload._loading) delete payload._loading;
-
-            // Ubah tombol jadi loading
             if (btn) {
                 btn.disabled = true;
                 btn.innerHTML = btnTextLoading;
                 btn.classList.add('opacity-75', 'cursor-not-allowed');
             }
 
-            // 5. Kirim request
             const res = await fetch(CONFIG.API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain' },
@@ -3959,7 +3949,6 @@
             
             const result = await res.json();
             
-            // Kembalikan tombol ke normal
             if (btn) {
                 btn.disabled = false;
                 btn.innerHTML = btnTextDefault;
@@ -3971,7 +3960,7 @@
                 return;
             }
 
-            // 6. Update cache lokal dengan data bersih
+            // Update cache lokal dengan data bersih
             const cleanCacheData = {
                 ...originalData, 
                 tahun: STATE.tahunAktif, 
@@ -3995,18 +3984,16 @@
             
             closeModal();
 
-            // 7. RENDER ULANG LANGSUNG DI SINI (Tanpa fungsi luar agar aman dari error not defined)
+            // Render ulang langsung
             const tbody = document.getElementById('tbodyPenyesuaian');
             if (tbody) {
                 const parentContainer = tbody.closest('.space-y-4');
                 if (parentContainer) {
                     const newTableHTML = rPenyesuaian();
-                    // Ekstrak bagian dalam <div class="space-y-4">...</div>
                     const divMatch = newTableHTML.match(/<div class="space-y-4">([\s\S]*)<\/div>\s*$/);
                     if (divMatch) {
                         parentContainer.innerHTML = divMatch[0];
                     } else {
-                        // Fallback jika regex gagal
                         parentContainer.innerHTML = newTableHTML;
                     }
                 }
