@@ -7106,11 +7106,113 @@
         });
     }
 
+    /* ==========================================
+        HELPER FUNCTIONS (WAJIB DITEMPELKAN)
+        ========================================== */
+    function updateRtLabel() {
+        const checkedBoxes = document.querySelectorAll('.rt-checkbox:checked');
+        const selectedRts = Array.from(checkedBoxes).map(cb => cb.value);
+        const rtLabel = document.getElementById('rtLabel');
+        const dusunField = document.getElementById('fDusun');
+        
+        // Update tampilan label RT
+        if (selectedRts.length > 0) {
+            rtLabel.textContent = selectedRts.map(rt => 'RT ' + rt).join(', ');
+            rtLabel.classList.remove('text-gray-400');
+        } else {
+            rtLabel.textContent = 'Pilih RT...';
+            rtLabel.classList.add('text-gray-400');
+        }
+        
+        // ✅ PERUBAHAN: Auto-fill Dusun (Bisa lebih dari 1, pisah koma)
+        if (dusunField) {
+            const selectedDusuns = selectedRts.map(rt => CONFIG.RT_MAP[rt]).filter(Boolean);
+            const uniqueDusuns = [...new Set(selectedDusuns)]; // Hilangkan duplikat
+            
+            if (uniqueDusuns.length > 0) {
+                // Jika ada 1 atau lebih dusun, gabungkan dengan koma
+                dusunField.value = uniqueDusuns.join(', ');
+            } else {
+                // Jika tidak ada RT yang dipilih
+                dusunField.value = '';
+            }
+        }
+    }
+
+    function filterRtOptions(query) {
+        const options = document.querySelectorAll('.rt-option');
+        const q = query.toLowerCase();
+        options.forEach(opt => {
+            const rt = opt.dataset.rt;
+            const dusun = opt.dataset.dusun.toLowerCase();
+            opt.style.display = (rt.includes(q) || dusun.includes(q)) ? '' : 'none';
+        });
+    }
+
+    function toggleRtDropdown() {
+        const dropdown = document.getElementById('rtDropdown');
+        const searchInput = document.getElementById('rtSearch');
+        if (dropdown) {
+            const isHidden = dropdown.classList.contains('hidden');
+            dropdown.classList.toggle('hidden');
+            if (isHidden && searchInput) {
+                searchInput.value = '';
+                filterRtOptions('');
+                setTimeout(() => searchInput.focus(), 50);
+            }
+        }
+    }
+
+    function toggleSdgMusdesDropdown() {
+        const dropdown = document.getElementById('sdgMusdesDropdown');
+        if (dropdown) {
+            dropdown.classList.toggle('hidden');
+            const searchInput = dropdown.querySelector('input[type="text"]');
+            if (searchInput && !dropdown.classList.contains('hidden')) {
+                searchInput.value = '';
+                filterSdgMusdesOptions('');
+                setTimeout(() => searchInput.focus(), 50);
+            }
+        }
+    }
+
+    function updateSdgMusdesLabel() {
+        const checkedBoxes = document.querySelectorAll('.sdg-musdes-cb:checked');
+        const selectedIds = Array.from(checkedBoxes).map(cb => cb.value);
+        const hiddenField = document.getElementById('fSdgId');
+        const labelEl = document.getElementById('sdgMusdesLabel');
+        
+        if (hiddenField) hiddenField.value = selectedIds.join(',');
+        
+        if (selectedIds.length > 0) {
+            const texts = Array.from(checkedBoxes).map(cb => cb.closest('label')?.dataset.sdgText || '').filter(Boolean);
+            labelEl.textContent = texts.join(', '); 
+            labelEl.classList.remove('text-gray-400'); 
+            labelEl.classList.add('text-gray-800');
+        } else {
+            labelEl.textContent = 'Pilih SDGs...'; 
+            labelEl.classList.add('text-gray-400'); 
+            labelEl.classList.remove('text-gray-800');
+        }
+    }
+
+    function filterSdgMusdesOptions(query) {
+        const options = document.querySelectorAll('#sdgMusdesOptions label');
+        const q = query.toLowerCase();
+        options.forEach(opt => { 
+            opt.style.display = (opt.dataset.sdgText || '').toLowerCase().includes(q) ? '' : 'none'; 
+        });
+    }
+
+
+    /* ==========================================
+        FORM USULAN (FOKUS MUSDES DESA)
+        ========================================== */
     function openFormUsulan(id) {
         const u = STATE.currentUser; 
         if (STATE.isLocked && u.role !== 'admdesa') { showToast('Pengimputan ditutup untuk tahun ini', 'error'); return; }
         
-        // ✅ TAMBAHAN: Deteksi jika ini input musdes dari Admin Desa
+        // ✅ Deteksi jika ini input musdes dari Admin Desa
         const isMusdesDesa = (id === 'musdes_desa');
         const isMusyawarah = (id === 'musyawarah') || isMusdesDesa; 
         const existData = isMusyawarah ? null : (id ? cachedUsulan.find(x => x.id === id) : null);
@@ -7118,15 +7220,30 @@
         
         const rtOptions = Object.keys(CONFIG.RT_MAP).map(rt => `<label class="rt-option flex items-center gap-2 py-1.5 px-2 hover:bg-honey-50 rounded cursor-pointer text-sm" data-rt="${rt}" data-dusun="${CONFIG.RT_MAP[rt]}"><input type="checkbox" class="rt-checkbox accent-honey-500" value="${rt}" ${existData?.rt?.includes(rt) ? 'checked' : ''} onchange="updateRtLabel()"> RT ${rt} <span class="text-gray-400 text-xs ml-auto">(${CONFIG.RT_MAP[rt]})</span></label>`).join('');
         
-        // ✅ PERUBAHAN: Logika Dropdown Dusun
-        const uniqueDusuns = [...new Set(Object.values(CONFIG.RT_MAP))].sort();
-        const dusunDropdown = uniqueDusuns.map(d => `<option value="${d}">${d}</option>`).join('');
-        
-        const dusunFieldHtml = isMusdesDesa 
-            ? `<div><label class="block text-sm font-semibold mb-1">Dusun <span class="text-red-500">*</span></label><select id="fDusun" required class="w-full px-4 py-2.5 border rounded-xl text-sm bg-white focus:ring-2 focus:ring-indigo-200"><option value="">-- Pilih Dusun --</option>${dusunDropdown}</select></div>`
-            : `<div><label class="block text-sm font-semibold mb-1">Dusun</label><input type="text" id="fDusun" value="${escapeHtml(existData?.dusun || u.dusun || '')}" readonly class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-100 text-gray-600"></div>`;
+        // ✅ PERUBAHAN: Hitung dusun awal dari RT yang dipilih (jika ada)
+        let initialDusun = '';
+        if (existData?.rt?.length) {
+            const dusunsFromRt = existData.rt.map(rt => CONFIG.RT_MAP[rt]).filter(Boolean);
+            initialDusun = [...new Set(dusunsFromRt)].join(', ');
+        } else if (!isMusdesDesa) {
+            initialDusun = u.dusun || '';
+        }
 
-        // ✅ TAMBAHAN: Logika SDGs
+        // ✅ PERUBAHAN PENTING: Field Dusun untuk Admin Desa diubah menjadi Input Text (bukan Select)
+        // Agar bisa menampung nilai lebih dari 1 dusun yang dipisahkan koma
+        const dusunFieldHtml = isMusdesDesa 
+            ? `<div>
+                <label class="block text-sm font-semibold mb-1">Dusun <span class="text-red-500">*</span></label>
+                <input type="text" id="fDusun" value="${escapeHtml(initialDusun)}" readonly class="w-full px-4 py-2.5 border rounded-xl text-sm bg-indigo-50 text-indigo-700 font-medium">
+                <p class="text-xs text-gray-400 mt-1"><i class="fas fa-magic mr-1"></i>Otomatis terisi saat RT dipilih (bisa lebih dari 1)</p>
+            </div>`
+            : `<div>
+                <label class="block text-sm font-semibold mb-1">Dusun</label>
+                <input type="text" id="fDusun" value="${escapeHtml(initialDusun)}" readonly class="w-full px-4 py-2.5 border rounded-xl text-sm bg-indigo-50 text-indigo-700 font-medium">
+                <p class="text-xs text-gray-400 mt-1"><i class="fas fa-magic mr-1"></i>Otomatis sesuai RT yang dipilih</p>
+            </div>`;
+
+        // ✅ Logika SDGs
         let currentSdgIds = [];
         if (existData?.sdgId) {
             if (Array.isArray(existData.sdgId)) {
@@ -7165,13 +7282,23 @@
             </div>
         </div>`;
 
-        openModal(`<div class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"><div class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl view-enter p-6"><div class="flex justify-between items-center mb-5"><h3 class="font-display font-700 text-xl">${existData ? 'Edit' : 'Buat'} Usulan ${isMusyawarah ? '(Hasil Musyawarah)' : ''}</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-1" aria-label="Tutup"><i class="fas fa-times text-lg"></i></button></div><form id="formUsulan" class="space-y-4"><div><label class="block text-sm font-semibold mb-1">Judul Usulan <span class="text-red-500">*</span></label><input type="text" id="fJudul" value="${escapeHtml(existData?.judul || '')}" required class="w-full px-4 py-2.5 border rounded-xl text-sm"></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="block text-sm font-semibold mb-1">Kategori <span class="text-red-500">*</span></label><select id="fKategori" required class="w-full px-4 py-2.5 border rounded-xl text-sm bg-white">${CONFIG.KATEGORI.map(k => `<option ${existData?.kategori === k ? 'selected' : ''}>${k}</option>`).join('')}</select></div><div><label class="block text-sm font-semibold mb-1">RT <span class="text-red-500">*</span></label><div class="relative" id="rtSelectWrapper"><button type="button" onclick="toggleRtDropdown()" class="w-full px-4 py-2.5 border rounded-xl text-sm text-left bg-white flex justify-between items-center"><span id="rtLabel" class="${existData?.rt?.length ? '' : 'text-gray-400'}">${existData?.rt?.length ? existData.rt.join(', ') : 'Pilih RT...'}</span><i class="fas fa-chevron-down text-xs text-gray-400"></i></button><div id="rtDropdown" class="hidden absolute z-20 w-full mt-1 bg-white border rounded-xl shadow-lg max-h-56 overflow-hidden flex flex-col"><div class="p-2 border-b sticky top-0 bg-white z-10"><input type="text" id="rtSearch" placeholder="Cari RT atau dusun..." class="w-full px-3 py-1.5 border rounded-lg text-sm" oninput="filterRtOptions(this.value)"></div><div class="overflow-y-auto p-2 space-y-0.5">${rtOptions}</div></div></div></div></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4">${dusunFieldHtml}<div><label class="block text-sm font-semibold mb-1">Desa</label><input type="text" value="${CONFIG.DESA}" readonly class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-100 text-gray-600"></div></div><div><label class="block text-sm font-semibold mb-1">Deskripsi <span class="text-red-500">*</span></label><textarea id="fDeskripsi" rows="3" required class="w-full px-4 py-2.5 border rounded-xl text-sm">${escapeHtml(existData?.deskripsi || '')}</textarea></div><div class="grid grid-cols-1 sm:grid-cols-3 gap-4"><div><label class="block text-sm font-semibold mb-1">Volume <span class="text-red-500">*</span></label><input type="number" id="fVolume" value="${existData?.volume || ''}" required min="1" class="w-full px-4 py-2.5 border rounded-xl text-sm"></div><div><label class="block text-sm font-semibold mb-1">Satuan <span class="text-red-500">*</span></label><select id="fSatuan" required class="w-full px-4 py-2.5 border rounded-xl text-sm bg-white">${CONFIG.SATUAN.map(s => `<option ${existData?.satuan === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div><div><label class="block text-sm font-semibold mb-1">Estimasi Biaya (Rp) <span class="text-red-500">*</span></label><input type="text" id="fBiaya" value="${initVal}" required class="w-full px-4 py-2.5 border rounded-xl text-sm" placeholder="0"></div></div>
-        
-        ${sdgFieldHtml}
-        
-        <div><label class="block text-sm font-semibold mb-1">Link Proposal (Opsional)</label><input type="url" id="fLink" value="${escapeHtml(existData?.linkProposal || '')}" class="w-full px-4 py-2.5 border rounded-xl text-sm"></div><input type="hidden" id="fId" value="${existData?.id || ''}"><input type="hidden" id="fIsMusdesDesa" value="${isMusdesDesa}"><div id="errUsulan" class="hidden text-sm text-red-600 bg-red-50 p-2.5 rounded-lg"></div><div class="flex justify-end gap-3 pt-2"><button type="button" onclick="closeModal()" class="px-5 py-2.5 border rounded-xl text-sm font-semibold hover:bg-gray-50">Batal</button><button type="submit" class="px-5 py-2.5 btn-primary rounded-xl shadow">Simpan</button></div></form></div></div>`);
+        openModal(`<div class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"><div class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl view-enter p-6"><div class="flex justify-between items-center mb-5"><h3 class="font-display font-bold text-xl">${isMusdesDesa ? 'Input Usulan Musdes Desa' : (existData ? 'Edit' : 'Buat') + ' Usulan'}</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-1" aria-label="Tutup"><i class="fas fa-times text-lg"></i></button></div><form id="formUsulan" class="space-y-4"><div><label class="block text-sm font-semibold mb-1">Judul Usulan <span class="text-red-500">*</span></label><input type="text" id="fJudul" value="${escapeHtml(existData?.judul || '')}" required class="w-full px-4 py-2.5 border rounded-xl text-sm"></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="block text-sm font-semibold mb-1">Kategori <span class="text-red-500">*</span></label><select id="fKategori" required class="w-full px-4 py-2.5 border rounded-xl text-sm bg-white">${CONFIG.KATEGORI.map(k => `<option ${existData?.kategori === k ? 'selected' : ''}>${k}</option>`).join('')}</select></div><div><label class="block text-sm font-semibold mb-1">RT <span class="text-red-500">*</span></label><div class="relative" id="rtSelectWrapper"><button type="button" onclick="toggleRtDropdown()" class="w-full px-4 py-2.5 border rounded-xl text-sm text-left bg-white flex justify-between items-center"><span id="rtLabel" class="${existData?.rt?.length ? '' : 'text-gray-400'}">${existData?.rt?.length ? existData.rt.join(', ') : 'Pilih RT...'}</span><i class="fas fa-chevron-down text-xs text-gray-400"></i></button><div id="rtDropdown" class="hidden absolute z-20 w-full mt-1 bg-white border rounded-xl shadow-lg max-h-56 overflow-hidden flex flex-col"><div class="p-2 border-b sticky top-0 bg-white z-10"><input type="text" id="rtSearch" placeholder="Cari RT atau dusun..." class="w-full px-3 py-1.5 border rounded-lg text-sm" oninput="filterRtOptions(this.value)"></div><div class="overflow-y-auto p-2 space-y-0.5">${rtOptions}</div></div></div></div></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4">${dusunFieldHtml}<div><label class="block text-sm font-semibold mb-1">Desa</label><input type="text" value="${CONFIG.DESA}" readonly class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-100 text-gray-600"></div></div><div><label class="block text-sm font-semibold mb-1">Deskripsi <span class="text-red-500">*</span></label><textarea id="fDeskripsi" rows="3" required class="w-full px-4 py-2.5 border rounded-xl text-sm">${escapeHtml(existData?.deskripsi || '')}</textarea></div><div class="grid grid-cols-1 sm:grid-cols-3 gap-4"><div><label class="block text-sm font-semibold mb-1">Volume <span class="text-red-500">*</span></label><input type="number" id="fVolume" value="${existData?.volume || ''}" required min="1" class="w-full px-4 py-2.5 border rounded-xl text-sm"></div><div><label class="block text-sm font-semibold mb-1">Satuan <span class="text-red-500">*</span></label><select id="fSatuan" required class="w-full px-4 py-2.5 border rounded-xl text-sm bg-white">${CONFIG.SATUAN.map(s => `<option ${existData?.satuan === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div><div><label class="block text-sm font-semibold mb-1">Estimasi Biaya (Rp) <span class="text-red-500">*</span></label><input type="text" id="fBiaya" value="${initVal}" required class="w-full px-4 py-2.5 border rounded-xl text-sm" placeholder="0"></div></div>
+            
+            ${sdgFieldHtml}
+            
+            <div><label class="block text-sm font-semibold mb-1">Link Proposal (Opsional)</label><input type="url" id="fLink" value="${escapeHtml(existData?.linkProposal || '')}" class="w-full px-4 py-2.5 border rounded-xl text-sm"></div><input type="hidden" id="fId" value="${existData?.id || ''}"><input type="hidden" id="fIsMusdesDesa" value="${isMusdesDesa}"><div id="errUsulan" class="hidden text-sm text-red-600 bg-red-50 p-2.5 rounded-lg"></div><div class="flex justify-end gap-3 pt-2"><button type="button" onclick="closeModal()" class="px-5 py-2.5 border rounded-xl text-sm font-semibold hover:bg-gray-50">Batal</button><button type="submit" class="px-5 py-2.5 btn-primary rounded-xl shadow">Simpan</button></div></form></div></div>`);
         
         setupRupiahInput('fBiaya');
+
+        // ✅ Tutup dropdown saat klik di luar area
+        setTimeout(() => {
+            document.addEventListener('click', function closeDropdowns(e) {
+                const rtWrapper = document.getElementById('rtSelectWrapper'), rtDropdown = document.getElementById('rtDropdown');
+                if (rtWrapper && rtDropdown && !rtWrapper.contains(e.target)) rtDropdown.classList.add('hidden');
+                const sdgWrapper = document.getElementById('sdgMusdesDropdown');
+                if (sdgWrapper && sdgWrapper.parentElement && !sdgWrapper.parentElement.contains(e.target)) sdgWrapper.classList.add('hidden');
+            });
+        }, 100);
     }
 
     // ==========================================
