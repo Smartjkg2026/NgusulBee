@@ -276,7 +276,7 @@
        1. KONFIGURASI APLIKASI
        ========================================== */
     const CONFIG = {
-        API_URL: 'https://script.google.com/macros/s/AKfycbyqj17r_8KVA4DVbKnpkdA30rKhsDfPuIxooRigPpcvYFy_ILGEk9XX9peuZUYD9-m-jA/exec',
+        API_URL: 'https://script.google.com/macros/s/AKfycbxcbzb9-PCUAEenHXYsxX0iSXLTBfWiVH3owLh2Pyk87afHUNkJuE8b-ZC34ltlN-sMKg/exec',
         APP_NAME: 'NgusulBee',
         DESA: 'Desa Jangkang',
         KATEGORI: ['Infrastruktur', 'Pendidikan', 'Kesehatan', 'Ekonomi', 'Sosial', 'Lingkungan'],
@@ -2500,45 +2500,48 @@
                 const hasProgres = !!item.progresUsulan;
 
                 return `
-                <tbody id="row-koor-detail-${item.id}" class="text-sm">
+                <tbody id="row-koor-detail-${item.id}">
                     <tr class="main-row cursor-pointer hover:bg-gray-50" onclick="showDetail('${itemId}')">
-                        <td class="text-center text-gray-400 text-xs border-b row-koor-num">${index + 1}</td>
-                        <td class="font-semibold text-gray-800 border-b">
+                        <td class="text-center text-gray-400 text-xs border-b border-r border-gray-200 px-1.5 py-1.5 row-koor-num">${index + 1}</td>
+                        <td class="font-semibold text-gray-800 border-b border-r border-gray-200 px-2 py-1.5">
                             <div class="td-judul">${escapeHtml(item.judul)}</div>
-                            <div class="text-[11px] text-gray-400 mt-0.5">${escapeHtml(item.kategori)}</div>
+                            <div class="text-[10px] text-gray-400 mt-0.5">${escapeHtml(item.kategori)}</div>
                         </td>
-                        <td class="text-xs text-gray-500 border-b whitespace-nowrap">${escapeHtml(item.dusun)}</td>
-                        <td class="text-xs text-gray-500 border-b whitespace-nowrap">${Array.isArray(item.rt) ? item.rt.join(', ') : item.rt}</td>
-                        <td class="text-xs text-gray-600 border-b whitespace-nowrap">${item.volume || 0} ${escapeHtml(item.satuan || '')}</td>
-                        <td class="text-right text-xs font-semibold text-gray-700 whitespace-nowrap border-b">${formatRupiah(item.estimasiBiaya)}</td>
-                        <td class="text-center border-b">
-                            <span class="font-display font-extrabold text-forest-600">#${item.rankingDesa || '-'}</span>
+                        <td class="text-xs text-gray-500 border-b border-r border-gray-200 px-1.5 py-1.5 whitespace-nowrap">${escapeHtml(item.dusun)}</td>
+                        
+                        <!-- ✅ PERBAIKAN: Kolom RT di-wrap agar tidak melebar -->
+                        <td class="text-xs text-gray-500 border-b border-r border-gray-200 px-1.5 py-1.5 break-words" style="max-width: 60px;">${Array.isArray(item.rt) ? item.rt.join(', ') : item.rt}</td>
+                        
+                        <td class="text-xs text-gray-600 border-b border-r border-gray-200 px-1.5 py-1.5 whitespace-nowrap">${item.volume || 0} ${escapeHtml(item.satuan || '')}</td>
+                        <td class="text-right text-xs font-semibold text-gray-700 border-b border-r border-gray-200 px-1.5 py-1.5 whitespace-nowrap tabular-nums">${formatRupiah(item.estimasiBiaya)}</td>
+                        <td class="text-center border-b border-r border-gray-200 px-1.5 py-1.5">
+                            <span class="font-display font-extrabold text-forest-600 text-xs">#${item.rankingDesa || '-'}</span>
                         </td>
-                        <td class="text-center border-b">
+                        <td class="text-center border-b border-r border-gray-200 px-1.5 py-1.5 text-xs">
                             ${hasProgres 
                                 ? statusLabel(item.progresUsulan) 
-                                : '<span class="text-gray-400 text-xs italic">Belum</span>'}
+                                : '<span class="text-gray-400 italic">Belum</span>'}
                         </td>
-                        <td class="text-center border-b" onclick="event.stopPropagation()">
+                        <td class="text-center border-b px-1.5 py-1.5" onclick="event.stopPropagation()">
                             <div class="flex justify-center gap-1">
                                 <button onclick="openProgresKasiKaurModal('${itemId}')" 
-                                    class="group relative w-8 h-8 flex items-center justify-center rounded-lg transition-colors
+                                    class="group relative w-7 h-7 flex items-center justify-center rounded-md transition-colors
                                     ${hasProgres 
                                         ? 'bg-amber-100 text-amber-600 hover:bg-amber-200' 
                                         : 'bg-honey-100 text-honey-700 hover:bg-honey-200'}">
-                                    <i class="fas ${hasProgres ? 'fa-pen-to-square' : 'fa-clipboard-check'} text-xs"></i>
-                                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">${hasProgres ? 'Ubah Progres' : 'Isi Progres'}</span>
+                                    <i class="fas ${hasProgres ? 'fa-pen-to-square' : 'fa-clipboard-check'} text-[10px]"></i>
+                                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[9px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">${hasProgres ? 'Ubah Progres' : 'Isi Progres'}</span>
                                 </button>
                                 ${hasCatatan ? `
                                 <button onclick="toggleSubRow('koor-detail-${item.id}')" 
-                                    class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors">
-                                    <i class="fas fa-comment-dots text-xs"></i>
-                                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Lihat Catatan</span>
+                                    class="group relative w-7 h-7 flex items-center justify-center rounded-md bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors">
+                                    <i class="fas fa-comment-dots text-[10px]"></i>
+                                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[9px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Lihat Catatan</span>
                                 </button>` : ''}
                                 <button onclick="showDetail('${itemId}')" 
-                                    class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors">
-                                    <i class="fas fa-eye text-xs"></i>
-                                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Detail</span>
+                                    class="group relative w-7 h-7 flex items-center justify-center rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors">
+                                    <i class="fas fa-eye text-[10px]"></i>
+                                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[9px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Detail</span>
                                 </button>
                             </div>
                         </td>
@@ -2546,7 +2549,7 @@
                     ${hasCatatan ? `
                     <tr class="sub-row hidden" id="subrow-koor-detail-${item.id}">
                         <td colspan="9" class="bg-blue-50/50">
-                            <div class="flex items-start gap-2 text-xs text-blue-700 bg-blue-50 rounded-lg px-3 py-2.5 m-2">
+                            <div class="flex items-start gap-1.5 text-[11px] text-blue-700 bg-blue-50 rounded-md px-2.5 py-2 m-1.5">
                                 <i class="fas fa-sticky-note mt-0.5 flex-shrink-0"></i>
                                 <div>
                                     <b class="block mb-0.5 text-blue-800">Catatan Kasi/Kaur:</b>
@@ -2558,37 +2561,50 @@
                 </tbody>`;
             }).join('');
         } else {
-            desktopRowsHTML = `<tbody class="text-sm"><tr><td colspan="9" class="text-center py-8 text-gray-400">Belum ada usulan yang dikordinatori kepada Anda</td></tr></tbody>`;
+            desktopRowsHTML = `<tbody><tr><td colspan="9" class="text-center py-8 text-gray-400 text-xs">Belum ada usulan yang dikordinatori kepada Anda</td></tr></tbody>`;
         }
 
         // Render HTML
         return `
         <style>
-            /* ── FLUID TYPOGRAPHY ── */
-            #tableKoorWrap { font-size: clamp(0.7rem, 1.2vw, 0.875rem); }
-            #tableKoorWrap thead { font-size: clamp(0.65rem, 0.95vw, 0.75rem); }
-            #tableKoorWrap .td-judul { font-size: clamp(0.75rem, 1.3vw, 0.95rem); font-weight: 600; }
+            /* ── FLUID TYPOGRAPHY (DIPERKECIL) ── */
+            #tableKoorWrap { font-size: clamp(0.6rem, 1vw, 0.75rem); }
+            #tableKoorWrap thead { font-size: clamp(0.58rem, 0.8vw, 0.68rem); }
+            #tableKoorWrap .td-judul { font-size: clamp(0.68rem, 1.05vw, 0.82rem); font-weight: 600; }
+
+            /* ── FLUID SPACING (DITAMBAHKAN) ── */
+            #tableKoorWrap th, 
+            #tableKoorWrap td { 
+                padding: clamp(0.35rem, 0.65vw, 0.55rem) clamp(0.4rem, 0.8vw, 0.6rem); 
+                vertical-align: middle;
+                border-right: 1px solid #f3f4f6;
+                line-height: 1.35;
+            }
+            #tableKoorWrap th:last-child,
+            #tableKoorWrap td:last-child { border-right: none; }
 
             /* ── HEADER STYLING ── */
             #tableKoorWrap thead th { 
                 background-color: #f9fafb; 
                 color: #374151; 
                 text-transform: uppercase; 
-                letter-spacing: 0.05em; 
+                letter-spacing: 0.04em; 
                 font-weight: 700;
                 position: sticky;
                 top: 0;
                 z-index: 10;
                 border-bottom: 2px solid #d1d5db;
+                border-right-color: #f3f4f6;
                 white-space: nowrap; 
-                box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+                box-shadow: 0 1px 3px rgba(0,0,0,0.03);
             }
+            #tableKoorWrap thead th:last-child { border-right: none; }
 
             /* ── INTERAKSI BARIS ── */
             #tableKoorWrap tbody tr { transition: background-color 0.15s ease; }
             #tableKoorWrap tbody tr.main-row:hover { background-color: #f9fafb; }
 
-            /* ── SCROLLBAR KLASIK ── */
+            /* ── SCROLLBAR KLASIK (DIPERKECIL) ── */
             .tbl-inner {
                 scrollbar-gutter: stable; 
                 overflow-x: auto; 
@@ -2596,51 +2612,52 @@
                 scrollbar-width: thin; 
                 scrollbar-color: #94a3b8 #e2e8f0;
             }
-            .tbl-inner::-webkit-scrollbar { width: 8px; height: 16px; }
+            .tbl-inner::-webkit-scrollbar { width: 6px; height: 12px; }
             .tbl-inner::-webkit-scrollbar-track { background: #e2e8f0; }
-            .tbl-inner::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 2px; border: 2px solid #e2e8f0; }
+            .tbl-inner::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 2px; border: 1px solid #e2e8f0; }
             .tbl-inner::-webkit-scrollbar-thumb:hover { background: #64748b; }
             .tbl-inner::-webkit-scrollbar-corner { background: #e2e8f0; }
-        </>
+        </style>
 
-        <div class="space-y-4">
+        <div class="space-y-3">
             ${statsBar(sorted)}
             
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <div>
-                    <h3 class="font-display font-bold text-xl">Usulan di Koordinasi Saya</h3>
-                    <p class="text-xs text-gray-400 mt-0.5">Daftar usulan yang ditugaskan kepada Anda untuk dikoordinasikan penyelesaiannya.</p>
+                    <h3 class="font-display font-bold text-lg">Usulan di Koordinasi Saya</h3>
+                    <p class="text-[11px] text-gray-400 mt-0.5">Daftar usulan yang ditugaskan kepada Anda untuk dikoordinasikan penyelesaiannya.</p>
                 </div>
-                ${sorted.length ? `<button onclick="doExportKoordinasi()" class="btn-success px-4 py-2.5 text-white text-sm font-semibold rounded-lg shadow hover:opacity-90 active:opacity-80 transition-opacity flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-center"><i class="fas fa-file-excel"></i> Unduh Excel</button>` : ''}
+                ${sorted.length ? `<button onclick="doExportKoordinasi()" class="btn-success px-3 py-2 text-white text-[11px] font-semibold rounded-md shadow hover:opacity-90 active:opacity-80 transition-opacity flex items-center gap-1.5 flex-shrink-0 w-full sm:w-auto justify-center"><i class="fas fa-file-excel text-xs"></i> Unduh Excel</button>` : ''}
             </div>
             
             <!-- TABEL VIEW -->
-            <div class="container mx-auto px-2 sm:px-4 md:px-6 xl:max-w-[1400px]">
-                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="container mx-auto px-1 sm:px-3 md:px-4 xl:max-w-[1400px]">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                     <div class="tbl-inner h-[500px] scroll-smooth">
-                        <table class="w-full min-w-[900px] border-collapse" id="tableKoorWrap">
+                        <table class="w-full min-w-[850px] border-collapse" id="tableKoorWrap">
                             <colgroup>
-                                <col style="width: 45px">   
+                                <col style="width: 35px">   
                                 <col>                     
-                                <col style="width: 110px">  
-                                <col style="width: 70px">   
                                 <col style="width: 100px">  
-                                <col style="width: 130px">  
-                                <col style="width: 70px">
-                                <col style="width: 100px">
-                                <col style="width: 110px">  
+                                <!-- ✅ PERBAIKAN: Lebar Kolom RT di-maximize 60px -->
+                                <col style="width: 60px">   
+                                <col style="width: 90px">  
+                                <col style="width: 115px">  
+                                <col style="width: 65px">
+                                <col style="width: 90px">
+                                <col style="width: 100px">  
                             </colgroup>
                             <thead>
                                 <tr>
-                                    <th class="text-center px-3 py-3">No</th>
-                                    <th class="text-left px-3 py-3">Judul Usulan</th>
-                                    <th class="text-center px-3 py-3">Dusun</th>
-                                    <th class="text-center px-3 py-3">RT</th>
-                                    <th class="text-center px-3 py-3">Volume</th>
-                                    <th class="text-right px-3 py-3">Estimasi</th>
-                                    <th class="text-center px-3 py-3">Rank</th>
-                                    <th class="text-center px-3 py-3">Progres</th>
-                                    <th class="text-center px-3 py-3">Aksi</th>
+                                    <th class="text-center">No</th>
+                                    <th class="text-left">Judul Usulan</th>
+                                    <th class="text-center">Dusun</th>
+                                    <th class="text-center">RT</th>
+                                    <th class="text-center">Volume</th>
+                                    <th class="text-right">Estimasi</th>
+                                    <th class="text-center">Rank</th>
+                                    <th class="text-center">Progres</th>
+                                    <th class="text-center">Aksi</th>
                                 </tr>
                             </thead>
                             ${desktopRowsHTML}
@@ -2794,7 +2811,7 @@
         try { if (typeof statsBar === 'function') statsHTML = statsBar(list); } catch(e) {}
         const emptyText = 'Belum ada draf usulan. Klik tombol + untuk memulai.';
 
-        // ═══════════════════════════════════════════
+            // ═══════════════════════════════════════════
         //  TABLE ROWS HTML
         // ═══════════════════════════════════════════
         let rowsHTML = '';
@@ -2805,36 +2822,36 @@
                 const rtDisplay = Array.isArray(item.rt) ? item.rt.join(', ') : (item.rt || '-');
 
                 return `
-                <tbody id="row-draft-${item.id}" class="text-sm">
+                <tbody id="row-draft-${item.id}">
                     <tr class="main-row hover:bg-gray-50">
-                        <td class="text-center border-b" onclick="event.stopPropagation()">${locked ? '' : `<input type="checkbox" class="bulk-check accent-honey-500" data-id="${item.id}" onchange="updateBulkCount()" aria-label="Pilih">`}</td>
+                        <td class="text-center border-b" onclick="event.stopPropagation()">${locked ? '' : `<input type="checkbox" class="bulk-check accent-honey-500 w-3.5 h-3.5" data-id="${item.id}" onchange="updateBulkCount()" aria-label="Pilih">`}</td>
                         <td class="text-center text-gray-400 text-xs border-b row-draft-num tabular-nums">${index + 1}</td>
-                        <td class="text-center border-b">${statusLabel(item.status)}</td>
+                        <td class="text-center border-b text-xs">${statusLabel(item.status)}</td>
                         <td class="font-semibold text-gray-800 border-b">
                             <div class="td-judul">${escapeHtml(item.judul)}</div>
                         </td>
-                        <td class="border-b"><span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded font-medium">${escapeHtml(item.kategori)}</span></td>
+                        <td class="border-b"><span class="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded font-medium">${escapeHtml(item.kategori)}</span></td>
                         <td class="text-xs text-gray-500 border-b whitespace-nowrap">${rtDisplay}</td>
                         <td class="text-xs text-gray-600 border-b whitespace-nowrap">${item.volume || 0} ${escapeHtml(item.satuan || '')}</td>
                         <td class="text-right text-xs font-semibold text-gray-700 whitespace-nowrap border-b tabular-nums">${formatRupiah(item.estimasiBiaya)}</td>
                         <td class="text-center border-b">
                         ${locked ? `
-                        <span class="group relative w-8 h-8 inline-flex items-center justify-center rounded-lg bg-amber-100 text-amber-600 cursor-default">
-                            <i class="fas fa-lock text-xs"></i>
-                            <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Terkunci</span>
+                        <span class="group relative w-7 h-7 inline-flex items-center justify-center rounded-md bg-amber-100 text-amber-600 cursor-default">
+                            <i class="fas fa-lock text-[10px]"></i>
+                            <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[9px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Terkunci</span>
                         </span>` : `
                         <div class="flex justify-center gap-1">
-                            <button onclick="openFormUsulan('${itemId}')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors">
-                                <i class="fas fa-edit text-xs"></i>
-                                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Edit</span>
+                            <button onclick="openFormUsulan('${itemId}')" class="group relative w-7 h-7 flex items-center justify-center rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors">
+                                <i class="fas fa-edit text-[10px]"></i>
+                                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[9px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Edit</span>
                             </button>
-                            <button onclick="singleDeleteUsulan('${itemId}')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors">
-                                <i class="fas fa-trash-alt text-xs"></i>
-                                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Hapus</span>
+                            <button onclick="singleDeleteUsulan('${itemId}')" class="group relative w-7 h-7 flex items-center justify-center rounded-md bg-red-100 text-red-600 hover:bg-red-200 transition-colors">
+                                <i class="fas fa-trash-alt text-[10px]"></i>
+                                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[9px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Hapus</span>
                             </button>
-                            <button onclick="singleSubmitUsulan('${itemId}')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-green-100 text-green-600 hover:bg-green-200 transition-colors">
-                                <i class="fas fa-paper-plane text-xs"></i>
-                                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Submit</span>
+                            <button onclick="singleSubmitUsulan('${itemId}')" class="group relative w-7 h-7 flex items-center justify-center rounded-md bg-green-100 text-green-600 hover:bg-green-200 transition-colors">
+                                <i class="fas fa-paper-plane text-[10px]"></i>
+                                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[9px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Submit</span>
                             </button>
                         </div>`}
                         </td>
@@ -2842,7 +2859,7 @@
                     ${item.status === 'dikembalikan_user' ? `
                     <tr class="sub-row">
                         <td colspan="9" class="bg-red-50/50">
-                            <div class="flex items-start gap-2 text-xs text-red-700 bg-red-50 rounded-lg px-3 py-2.5 m-2">
+                            <div class="flex items-start gap-1.5 text-[11px] text-red-700 bg-red-50 rounded-md px-2.5 py-2 m-1.5">
                                 <i class="fas fa-comment-dots mt-0.5 flex-shrink-0"></i>
                                 <div><b class="block mb-0.5">Catatan dari Kepala Dusun:</b>${escapeHtml(item.catatanKembali)}</div>
                             </div>
@@ -2851,7 +2868,7 @@
                 </tbody>`;
             }).join('');
         } else {
-            rowsHTML = `<tbody class="text-sm"><tr><td colspan="9" class="text-center py-8 text-gray-400">${emptyText}</td></tr></tbody>`;
+            rowsHTML = `<tbody><tr><td colspan="9" class="text-center py-8 text-gray-400 text-xs">${emptyText}</td></tr></tbody>`;
         }
 
         // ═══════════════════════════════════════════
@@ -2859,36 +2876,36 @@
         // ═══════════════════════════════════════════
         let headerBtnsHTML = '';
         if (locked) {
-            headerBtnsHTML = '<span class="px-3 py-1.5 bg-red-100 text-red-700 text-xs font-bold rounded-lg"><i class="fas fa-lock mr-1"></i>Pengimputan Ditutup</span>';
+            headerBtnsHTML = '<span class="px-2.5 py-1 bg-red-100 text-red-700 text-[10px] font-bold rounded-md"><i class="fas fa-lock mr-1"></i>Pengimputan Ditutup</span>';
         } else {
             headerBtnsHTML = `
             <!-- Mobile -->
-            <div class="sm:hidden space-y-2">
-                <div class="flex items-center gap-2">
-                    <button onclick="bulkSubmitUser()" class="flex-1 h-10 px-3 flex items-center justify-center gap-1.5 btn-success text-xs font-semibold rounded-lg shadow-sm"><i class="fas fa-paper-plane"></i> Submit Terpilih</button>
-                    <button onclick="bulkDeleteUsulan()" class="flex-1 h-10 px-3 flex items-center justify-center gap-1.5 btn-danger text-xs font-semibold rounded-lg shadow-sm"><i class="fas fa-trash"></i> Hapus Terpilih</button>
+            <div class="sm:hidden space-y-1.5">
+                <div class="flex items-center gap-1.5">
+                    <button onclick="bulkSubmitUser()" class="flex-1 h-8 px-2.5 flex items-center justify-center gap-1 btn-success text-[10px] font-semibold rounded-md shadow-sm"><i class="fas fa-paper-plane text-[9px]"></i> Submit Terpilih</button>
+                    <button onclick="bulkDeleteUsulan()" class="flex-1 h-8 px-2.5 flex items-center justify-center gap-1 btn-danger text-[10px] font-semibold rounded-md shadow-sm"><i class="fas fa-trash text-[9px]"></i> Hapus Terpilih</button>
                 </div>
-                <div id="bulkCountMobile" class="bulk-count hidden text-xs text-honey-700 font-semibold pl-1 -mt-1"><span id="bulkNumMobile">0</span> terpilih</div>
-                <div class="flex items-center gap-2">
-                    <button onclick="openFormUsulan()" class="flex-1 h-10 px-3 flex items-center justify-center gap-2 rounded-lg bg-blue-600 text-white shadow-sm hover:bg-blue-700 active:bg-blue-800 transition-colors text-xs font-semibold"><i class="fas fa-plus text-sm"></i> Buat Usulan</button>
-                    <button onclick="openModalAjukanKembali()" class="flex-1 h-10 px-3 flex items-center justify-center gap-2 rounded-lg bg-amber-500 text-white shadow-sm hover:bg-amber-600 active:bg-amber-700 transition-colors text-xs font-semibold"><i class="fas fa-recycle text-sm"></i> Ajukan Kembali</button>
+                <div id="bulkCountMobile" class="bulk-count hidden text-[10px] text-honey-700 font-semibold pl-1 -mt-1"><span id="bulkNumMobile">0</span> terpilih</div>
+                <div class="flex items-center gap-1.5">
+                    <button onclick="openFormUsulan()" class="flex-1 h-8 px-2.5 flex items-center justify-center gap-1.5 rounded-md bg-blue-600 text-white shadow-sm hover:bg-blue-700 active:bg-blue-800 transition-colors text-[10px] font-semibold"><i class="fas fa-plus text-xs"></i> Buat Usulan</button>
+                    <button onclick="openModalAjukanKembali()" class="flex-1 h-8 px-2.5 flex items-center justify-center gap-1.5 rounded-md bg-amber-500 text-white shadow-sm hover:bg-amber-600 active:bg-amber-700 transition-colors text-[10px] font-semibold"><i class="fas fa-recycle text-xs"></i> Ajukan Kembali</button>
                 </div>
             </div>
             <!-- Desktop -->
-            <div class="hidden sm:flex sm:flex-wrap sm:items-center sm:justify-between gap-3 mb-3">
-                <div class="flex items-center gap-2">
-                    <button onclick="bulkSubmitUser()" class="h-10 px-4 flex items-center gap-1.5 btn-success text-xs font-semibold rounded-lg shadow-sm"><i class="fas fa-paper-plane"></i>Submit Terpilih</button>
-                    <button onclick="bulkDeleteUsulan()" class="h-10 px-4 flex items-center gap-1.5 btn-danger text-xs font-semibold rounded-lg shadow-sm"><i class="fas fa-trash"></i>Hapus Terpilih</button>
-                    <span id="bulkCount" class="bulk-count hidden text-xs text-honey-700 font-semibold ml-1"><span id="bulkNum">0</span> terpilih</span>
+            <div class="hidden sm:flex sm:flex-wrap sm:items-center sm:justify-between gap-2 mb-2">
+                <div class="flex items-center gap-1.5">
+                    <button onclick="bulkSubmitUser()" class="h-8 px-3 flex items-center gap-1 btn-success text-[10px] font-semibold rounded-md shadow-sm"><i class="fas fa-paper-plane text-[9px]"></i>Submit Terpilih</button>
+                    <button onclick="bulkDeleteUsulan()" class="h-8 px-3 flex items-center gap-1 btn-danger text-[10px] font-semibold rounded-md shadow-sm"><i class="fas fa-trash text-[9px]"></i>Hapus Terpilih</button>
+                    <span id="bulkCount" class="bulk-count hidden text-[10px] text-honey-700 font-semibold ml-1"><span id="bulkNum">0</span> terpilih</span>
                 </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="openFormUsulan()" class="group relative w-10 h-10 flex items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm hover:bg-blue-700 transition-colors">
-                        <i class="fas fa-plus text-sm"></i>
-                        <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Buat Usulan</span>
+                <div class="flex items-center gap-1.5">
+                    <button onclick="openFormUsulan()" class="group relative w-8 h-8 flex items-center justify-center rounded-md bg-blue-600 text-white shadow-sm hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-plus text-xs"></i>
+                        <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[9px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Buat Usulan</span>
                     </button>
-                    <button onclick="openModalAjukanKembali()" class="group relative w-10 h-10 flex items-center justify-center rounded-lg bg-amber-500 text-white shadow-sm hover:bg-amber-600 transition-colors">
-                        <i class="fas fa-recycle text-sm"></i>
-                        <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-800 text-white text-[10px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Ajukan Kembali</span>
+                    <button onclick="openModalAjukanKembali()" class="group relative w-8 h-8 flex items-center justify-center rounded-md bg-amber-500 text-white shadow-sm hover:bg-amber-600 transition-colors">
+                        <i class="fas fa-recycle text-xs"></i>
+                        <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[9px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Ajukan Kembali</span>
                     </button>
                 </div>
             </div>`;
@@ -2899,19 +2916,19 @@
         // ═══════════════════════════════════════════
         return `
         <style>
-            /* ── FLUID TYPOGRAPHY ── */
-            #tableDraftWrap { font-size: clamp(0.7rem, 1.2vw, 0.875rem); }
-            #tableDraftWrap thead { font-size: clamp(0.65rem, 0.95vw, 0.75rem); }
-            #tableDraftWrap .td-judul { font-size: clamp(0.75rem, 1.3vw, 0.95rem); font-weight: 600; }
+            /* ── FLUID TYPOGRAPHY (DIPERKECIL) ── */
+            #tableDraftWrap { font-size: clamp(0.6rem, 1vw, 0.75rem); }
+            #tableDraftWrap thead { font-size: clamp(0.58rem, 0.8vw, 0.68rem); }
+            #tableDraftWrap .td-judul { font-size: clamp(0.68rem, 1.05vw, 0.82rem); font-weight: 600; }
 
-            /* ── FLUID SPACING ── */
+            /* ── FLUID SPACING (DIPERKECIL) ── */
             #tableDraftWrap th, 
             #tableDraftWrap td { 
-                padding: clamp(0.5rem, 0.9vw, 0.75rem) clamp(0.6rem, 1.1vw, 0.85rem); 
+                padding: clamp(0.35rem, 0.65vw, 0.55rem) clamp(0.4rem, 0.8vw, 0.6rem); 
                 vertical-align: middle;
                 border-bottom: 1px solid #e5e7eb;
-                border-right: 1px solid #e5e7eb;
-                line-height: 1.5;
+                border-right: 1px solid #f3f4f6;
+                line-height: 1.35;
             }
             #tableDraftWrap th:last-child,
             #tableDraftWrap td:last-child { border-right: none; }
@@ -2921,15 +2938,15 @@
                 background-color: #f9fafb; 
                 color: #374151; 
                 text-transform: uppercase; 
-                letter-spacing: 0.05em; 
+                letter-spacing: 0.04em; 
                 font-weight: 700;
                 position: sticky;
                 top: 0;
                 z-index: 10;
                 border-bottom: 2px solid #d1d5db;
-                border-right-color: #e5e7eb;
+                border-right-color: #f3f4f6;
                 white-space: nowrap; 
-                box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+                box-shadow: 0 1px 3px rgba(0,0,0,0.03);
             }
             #tableDraftWrap thead th:last-child { border-right: none; }
 
@@ -2937,7 +2954,7 @@
             #tableDraftWrap tbody tr { transition: background-color 0.15s ease; }
             #tableDraftWrap tbody tr.main-row:hover { background-color: #f9fafb; }
             
-            /* ── SCROLLBAR KLASIK ── */
+            /* ── SCROLLBAR KLASIK (DIPERKECIL) ── */
             .tbl-inner {
                 scrollbar-gutter: stable; 
                 overflow-x: auto; 
@@ -2945,20 +2962,20 @@
                 scrollbar-width: thin; 
                 scrollbar-color: #94a3b8 #e2e8f0;
             }
-            .tbl-inner::-webkit-scrollbar { width: 8px; height: 16px; }
+            .tbl-inner::-webkit-scrollbar { width: 6px; height: 12px; }
             .tbl-inner::-webkit-scrollbar-track { background: #e2e8f0; }
-            .tbl-inner::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 2px; border: 2px solid #e2e8f0; }
+            .tbl-inner::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 2px; border: 1px solid #e2e8f0; }
             .tbl-inner::-webkit-scrollbar-thumb:hover { background: #64748b; }
             .tbl-inner::-webkit-scrollbar-corner { background: #e2e8f0; }
         </style>
 
-        <div class="space-y-4">
+        <div class="space-y-3">
             ${statsHTML}
             
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <div>
-                    <h3 class="font-display font-bold text-xl">Usulan Saya</h3>
-                    <p class="text-xs text-gray-400 mt-0.5">Draft dan usulan yang dikembalikan — bisa diedit, dihapus, atau disubmit</p>
+                    <h3 class="font-display font-bold text-lg">Usulan Saya</h3>
+                    <p class="text-[11px] text-gray-400 mt-0.5">Draft dan usulan yang dikembalikan — bisa diedit, dihapus, atau disubmit</p>
                 </div>
                 ${locked ? `<div class="flex items-center gap-2">${headerBtnsHTML}</div>` : ''}
             </div>
@@ -2966,24 +2983,24 @@
             ${!locked ? headerBtnsHTML : ''}
             
             <!-- TABEL VIEW -->
-            <div class="container mx-auto px-2 sm:px-4 md:px-6 xl:max-w-[1400px]">
-                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="container mx-auto px-1 sm:px-3 md:px-4 xl:max-w-[1400px]">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                     <div class="tbl-inner h-[500px] scroll-smooth">
-                        <table class="w-full min-w-[950px] border-collapse" id="tableDraftWrap">
+                        <table class="w-full min-w-[850px] border-collapse" id="tableDraftWrap">
                             <colgroup>
-                                <col style="width: 40px">   
-                                <col style="width: 40px">  
-                                <col style="width: 130px"> 
+                                <col style="width: 35px">   
+                                <col style="width: 35px">  
+                                <col style="width: 100px"> 
                                 <col>                     
-                                <col style="width: 120px">  
-                                <col style="width: 80px">   
-                                <col style="width: 110px">  
-                                <col style="width: 140px">  
-                                <col style="width: 120px">  
+                                <col style="width: 100px">  
+                                <col style="width: 60px">   
+                                <col style="width: 90px">  
+                                <col style="width: 115px">  
+                                <col style="width: 100px">  
                             </colgroup>
                             <thead>
                                 <tr>
-                                    <th class="text-center">${locked ? '' : `<input type="checkbox" onchange="document.querySelectorAll('.bulk-check').forEach(c=>{c.checked=this.checked});updateBulkCount()" aria-label="Pilih semua">`}</th>
+                                    <th class="text-center">${locked ? '' : `<input type="checkbox" class="w-3.5 h-3.5" onchange="document.querySelectorAll('.bulk-check').forEach(c=>{c.checked=this.checked});updateBulkCount()" aria-label="Pilih semua">`}</th>
                                     <th class="text-center">No</th>
                                     <th class="text-center">Status</th>
                                     <th class="text-left">Judul Usulan</th>
@@ -3001,7 +3018,6 @@
             </div>
         </div>`;
     }
-
 
     /* ==========================================
     UPDATE BULK COUNT (UNIVERSAL)
@@ -3240,36 +3256,38 @@
         if (sorted.length) {
             rowsHTML = sorted.map((i, n) => `
                 <tr id="row-mon-${i.id}" class="main-row cursor-pointer" onclick="showDetail('${escapeJs(i.id)}')">
-                    <td class="text-center text-gray-400 border-b border-r border-gray-200 px-2 py-2.5 row-mon-num tabular-nums">${n + 1}</td>
+                    <td class="text-center text-gray-400 border-b border-r border-gray-200 px-1.5 py-1.5 row-mon-num tabular-nums text-xs">${n + 1}</td>
                     
-                    <td class="text-center border-b border-r border-gray-200 px-2 py-2.5">${statusLabel(i.status).replace('whitespace-nowrap', 'whitespace-normal break-words')}</td>
+                    <td class="text-center border-b border-r border-gray-200 px-1.5 py-1.5 text-xs">${statusLabel(i.status).replace('whitespace-nowrap', 'whitespace-normal break-words')}</td>
                     
-                    <td class="font-semibold text-gray-800 border-b border-r border-gray-200 px-3 py-2.5 whitespace-normal break-words leading-snug min-w-[180px]">${escapeHtml(i.judul)}</td>
+                    <td class="font-semibold text-gray-800 border-b border-r border-gray-200 px-2 py-1.5 whitespace-normal break-words leading-snug min-w-[150px] text-xs">${escapeHtml(i.judul)}</td>
                     
-                    <td class="text-gray-500 border-b border-r border-gray-200 px-2 py-2.5 whitespace-normal break-words">${escapeHtml(i.namaPengusul || i.username)}</td>
+                    <td class="text-gray-500 border-b border-r border-gray-200 px-1.5 py-1.5 whitespace-normal break-words text-xs">${escapeHtml(i.namaPengusul || i.username)}</td>
                     
-                    ${colDusun ? `<td class="text-gray-500 border-b border-r border-gray-200 px-2 py-2.5 whitespace-normal break-words">${escapeHtml(i.dusun)}</td>` : ''}
+                    ${colDusun ? `<td class="text-gray-500 border-b border-r border-gray-200 px-1.5 py-1.5 whitespace-normal break-words text-xs">${escapeHtml(i.dusun)}</td>` : ''}
                     
-                    <td class="border-b border-r border-gray-200 px-2 py-2.5"><span class="badge-sm px-2 py-0.5 bg-gray-100 text-gray-600 rounded font-medium whitespace-normal break-words">${escapeHtml(i.kategori)}</span></td>
+                    <td class="border-b border-r border-gray-200 px-1.5 py-1.5"><span class="badge-sm px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded font-medium whitespace-normal break-words text-[10px]">${escapeHtml(i.kategori)}</span></td>
                     
-                    <td class="text-gray-500 border-b border-r border-gray-200 px-2 py-2.5 whitespace-nowrap">${Array.isArray(i.rt) ? i.rt.join(', ') : i.rt}</td>
-                    <td class="text-gray-600 border-b border-r border-gray-200 px-2 py-2.5 whitespace-nowrap">${i.volume} ${escapeHtml(i.satuan)}</td>
-                    <td class="text-right font-semibold text-gray-700 border-b border-r border-gray-200 px-2 py-2.5 whitespace-nowrap tabular-nums">${formatRupiah(i.estimasiBiaya)}</td>
+                    <!-- ✅ PERBAIKAN: Hapus whitespace-nowrap, tambahkan break-words & max-width -->
+                    <td class="text-gray-500 border-b border-r border-gray-200 px-1.5 py-1.5 text-xs break-words" style="max-width: 60px;">${Array.isArray(i.rt) ? i.rt.join(', ') : i.rt}</td>
                     
-                    ${colRankDusun ? `<td class="text-center border-b border-r border-gray-200 px-2 py-2.5 whitespace-nowrap">${i.rankingDusun ? `<span class="font-display font-extrabold text-blue-600">#${i.rankingDusun}</span>` : '<span class="text-gray-300">-</span>'}</td>` : ''}
-                    ${colRankDesa ? `<td class="text-center border-b border-r border-gray-200 px-2 py-2.5 whitespace-nowrap">${i.rankingDesa ? `<span class="font-display font-extrabold text-forest-600">#${i.rankingDesa}</span>` : '<span class="text-gray-300">-</span>'}</td>` : ''}
+                    <td class="text-gray-600 border-b border-r border-gray-200 px-1.5 py-1.5 whitespace-nowrap text-xs">${i.volume} ${escapeHtml(i.satuan)}</td>
+                    <td class="text-right font-semibold text-gray-700 border-b border-r border-gray-200 px-1.5 py-1.5 whitespace-nowrap tabular-nums text-xs">${formatRupiah(i.estimasiBiaya)}</td>
                     
-                    ${colAksi ? `<td class="border-b border-r border-gray-200 px-2 py-2.5 whitespace-normal break-words">${i.rencanaAksi ? `<span class="badge-sm px-2 py-0.5 rounded-full font-bold whitespace-normal break-words ${i.rencanaAksi === 'Kewenangan Desa' ? 'bg-forest-100 text-forest-700' : 'bg-amber-100 text-amber-700'}">${escapeHtml(i.rencanaAksi)}</span>${i.rujukanUsulan ? `<br><span class="text-gray-400">→ ${escapeHtml(i.rujukanUsulan)}</span>` : ''}` : '<span class="text-gray-300">-</span>'}</td>` : ''}
+                    ${colRankDusun ? `<td class="text-center border-b border-r border-gray-200 px-1.5 py-1.5 whitespace-nowrap text-xs">${i.rankingDusun ? `<span class="font-display font-extrabold text-blue-600">#${i.rankingDusun}</span>` : '<span class="text-gray-300">-</span>'}</td>` : ''}
+                    ${colRankDesa ? `<td class="text-center border-b border-r border-gray-200 px-1.5 py-1.5 whitespace-nowrap text-xs">${i.rankingDesa ? `<span class="font-display font-extrabold text-forest-600">#${i.rankingDesa}</span>` : '<span class="text-gray-300">-</span>'}</td>` : ''}
                     
-                    <td class="text-center border-b border-gray-200 px-2 py-2.5 whitespace-nowrap">
-                        <span class="badge-sm px-2.5 py-1 bg-honey-100 text-honey-700 font-semibold rounded hover:bg-honey-200 transition-colors inline-flex items-center gap-1">
+                    ${colAksi ? `<td class="border-b border-r border-gray-200 px-1.5 py-1.5 whitespace-normal break-words text-xs">${i.rencanaAksi ? `<span class="badge-sm px-1.5 py-0.5 rounded-full font-bold whitespace-normal break-words text-[10px] ${i.rencanaAksi === 'Kewenangan Desa' ? 'bg-forest-100 text-forest-700' : 'bg-amber-100 text-amber-700'}">${escapeHtml(i.rencanaAksi)}</span>${i.rujukanUsulan ? `<br><span class="text-gray-400">→ ${escapeHtml(i.rujukanUsulan)}</span>` : ''}` : '<span class="text-gray-300">-</span>'}</td>` : ''}
+                    
+                    <td class="text-center border-b border-gray-200 px-1.5 py-1.5 whitespace-nowrap">
+                        <span class="badge-sm px-2 py-1 bg-honey-100 text-honey-700 font-semibold rounded hover:bg-honey-200 transition-colors inline-flex items-center gap-1 text-[10px]">
                             <i class="fas fa-eye"></i><span class="sm:hidden">Detail</span><span class="hidden sm:inline ml-1">Lihat</span>
                         </span>
                     </td>
                 </tr>
             `).join('');
         } else {
-            rowsHTML = typeof emptyRow === 'function' ? emptyRow(totalCol, emptyText) : `<tr><td colspan="${totalCol}" class="text-center py-8 text-gray-400">${emptyText}</td></tr>`;
+            rowsHTML = typeof emptyRow === 'function' ? emptyRow(totalCol, emptyText) : `<tr><td colspan="${totalCol}" class="text-center py-8 text-gray-400 text-xs">${emptyText}</td></tr>`;
         }
 
         // 7. Render HTML
@@ -3279,89 +3297,90 @@
             #tableMonitorWrap tbody tr { transition: background-color 0.15s ease; }
             #tableMonitorWrap tbody tr:hover td { background-color: #f9fafb; }
             
-            /* Font Fleksibel */
-            #tableMonitorWrap thead tr { font-size: clamp(0.6rem, 0.9vw, 0.75rem); }
-            #tableMonitorWrap tbody { font-size: clamp(0.7rem, 1.1vw, 0.875rem); }
+            /* Font Fleksibel (DIPERKECIL) */
+            #tableMonitorWrap thead tr { font-size: clamp(0.55rem, 0.8vw, 0.68rem); }
+            #tableMonitorWrap tbody { font-size: clamp(0.6rem, 1vw, 0.75rem); }
             #tableMonitorWrap tbody span { font-size: inherit; }
-            #tableMonitorWrap tbody .badge-sm { font-size: clamp(0.55rem, 0.8vw, 0.65rem); }
+            #tableMonitorWrap tbody .badge-sm { font-size: clamp(0.5rem, 0.7vw, 0.6rem); }
 
             /* Wrap Teks & Rata Atas */
-            #tableMonitorWrap td { vertical-align: top; line-height: 1.4; }
+            #tableMonitorWrap td { vertical-align: top; line-height: 1.35; }
             #tableMonitorWrap th { vertical-align: middle; }
 
             /* ==========================================
-            SLIDER GESER KIRI KANAN (KLASIK & TEBAL)
+            SLIDER GESER KIRI KANAN (DIPERKECIL)
             ========================================== */
             .tbl-inner {
                 scrollbar-gutter: stable; 
                 overflow-x: auto; 
                 overflow-y: auto; 
                 scrollbar-width: thin; 
-                scrollbar-color: #64748b #e2e8f0;
+                scrollbar-color: #94a3b8 #e2e8f0;
             }
-            .tbl-inner::-webkit-scrollbar { width: 8px; height: 16px; }
+            .tbl-inner::-webkit-scrollbar { width: 6px; height: 12px; }
             .tbl-inner::-webkit-scrollbar-track { background: #e2e8f0; }
-            .tbl-inner::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 2px; border: 2px solid #e2e8f0; }
+            .tbl-inner::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 2px; border: 1px solid #e2e8f0; }
             .tbl-inner::-webkit-scrollbar-thumb:hover { background: #64748b; }
             .tbl-inner::-webkit-scrollbar-corner { background: #e2e8f0; }
         </style>
 
-        <div class="space-y-4">
+        <div class="space-y-3">
             ${statsHTML}
 
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <div>
-                    <h3 class="font-display font-bold text-xl">Monitoring Usulan</h3>
-                    <p class="text-xs text-gray-400 mt-0.5">Diurutkan berdasarkan ranking — geser ke kanan untuk melihat kolom lainnya</p>
+                    <h3 class="font-display font-bold text-lg">Monitoring Usulan</h3>
+                    <p class="text-[11px] text-gray-400 mt-0.5">Diurutkan berdasarkan ranking — geser ke kanan untuk melihat kolom lainnya</p>
                 </div>
-                <button onclick="doExportExcel()" class="px-4 py-2.5 bg-forest-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-forest-700 active:bg-forest-800 transition-colors flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-center">
-                    <i class="fas fa-file-excel"></i> Unduh Excel
+                <button onclick="doExportExcel()" class="px-3 py-2 bg-forest-600 text-white text-[11px] font-semibold rounded-lg shadow hover:bg-forest-700 active:bg-forest-800 transition-colors flex items-center gap-1.5 flex-shrink-0 w-full sm:w-auto justify-center">
+                    <i class="fas fa-file-excel text-xs"></i> Unduh Excel
                 </button>
             </div>
 
             <div class="relative">
-                <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[10px]"></i>
                 <input type="text" id="searchMonitorTable" placeholder="Cari judul, pengusul, dusun, kategori..."
-                    class="w-full pl-10 pr-4 py-2.5 border rounded-lg text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-forest-200 focus:border-forest-400 transition-all"
+                    class="w-full pl-9 pr-3 py-2 border rounded-lg text-xs bg-gray-50 focus:bg-white focus:ring-2 focus:ring-forest-200 focus:border-forest-400 transition-all"
                     oninput="filterMonitorTable(this.value)">
             </div>
 
             <!-- TABEL VIEW (TAMPIL DI SEMUA UKURAN LAYAR) -->
-            <div class="container mx-auto px-2 sm:px-4 md:px-6 xl:max-w-[1600px]">
-                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="container mx-auto px-1 sm:px-3 md:px-4 xl:max-w-[1600px]">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                     <div class="tbl-inner h-[500px] scroll-smooth">
-                        <table class="w-full min-w-[1200px] border-collapse" id="tableMonitorWrap">
+                        <table class="w-full min-w-[1000px] border-collapse" id="tableMonitorWrap">
                             <colgroup>
-                                <col style="width: 50px">   
-                                <col style="width: 130px">  
-                                <col>                      
-                                <col style="width: 180px">  
-                                ${colDusun ? '<col style="width: 130px">' : ''}  
-                                <col style="width: 130px">  
-                                <col style="width: 80px">   
-                                <col style="width: 120px">  
-                                <col style="width: 160px">  
-                                ${colRankDusun ? '<col style="width: 110px">' : ''}  
-                                ${colRankDesa ? '<col style="width: 110px">' : ''}  
-                                ${colAksi ? '<col style="width: 160px">' : ''}  
+                                <col style="width: 35px">   
                                 <col style="width: 100px">  
+                                <col>                      
+                                <col style="width: 140px">  
+                                ${colDusun ? '<col style="width: 110px">' : ''}  
+                                <col style="width: 110px">  
+                                <!-- ✅ PERBAIKAN: Sesuaikan lebar kolom RT -->
+                                <col style="width: 60px">   
+                                <col style="width: 90px">  
+                                <col style="width: 120px">  
+                                ${colRankDusun ? '<col style="width: 75px">' : ''}  
+                                ${colRankDesa ? '<col style="width: 75px">' : ''}  
+                                ${colAksi ? '<col style="width: 130px">' : ''}  
+                                <col style="width: 70px">  
                             </colgroup>
                             
                             <thead>
                                 <tr class="text-gray-500 uppercase tracking-wider">
-                                    <th class="sticky top-0 z-10 px-2 py-2.5 text-center border-b border-r border-gray-200 bg-gray-50">No</th>
-                                    <th class="sticky top-0 z-10 px-2 py-2.5 text-center border-b border-r border-gray-200 bg-gray-50">Status</th>
-                                    <th class="sticky top-0 z-10 px-3 py-2.5 text-left border-b border-r border-gray-200 bg-gray-50">Judul Usulan</th>
-                                    <th class="sticky top-0 z-10 px-2 py-2.5 border-b border-r border-gray-200 bg-gray-50">Pengusul</th>
-                                    ${colDusun ? '<th class="sticky top-0 z-10 px-2 py-2.5 border-b border-r border-gray-200 bg-gray-50">Dusun</th>' : ''}
-                                    <th class="sticky top-0 z-10 px-2 py-2.5 border-b border-r border-gray-200 bg-gray-50">Kategori</th>
-                                    <th class="sticky top-0 z-10 px-2 py-2.5 border-b border-r border-gray-200 bg-gray-50">RT</th>
-                                    <th class="sticky top-0 z-10 px-2 py-2.5 border-b border-r border-gray-200 bg-gray-50">Volume</th>
-                                    <th class="sticky top-0 z-10 px-2 py-2.5 text-right border-b border-r border-gray-200 bg-gray-50">Estimasi</th>
-                                    ${colRankDusun ? '<th class="sticky top-0 z-10 px-2 py-2.5 text-center border-b border-r border-gray-200 bg-gray-50">Rank Dusun</th>' : ''}
-                                    ${colRankDesa ? '<th class="sticky top-0 z-10 px-2 py-2.5 text-center border-b border-r border-gray-200 bg-gray-50">Rank Desa</th>' : ''}
-                                    ${colAksi ? '<th class="sticky top-0 z-10 px-2 py-2.5 border-b border-r border-gray-200 bg-gray-50">Rencana Aksi</th>' : ''}
-                                    <th class="sticky top-0 z-10 px-2 py-2.5 text-center border-b border-gray-200 bg-gray-50">Detail</th>
+                                    <th class="sticky top-0 z-10 px-1.5 py-1.5 text-center border-b border-r border-gray-200 bg-gray-50">No</th>
+                                    <th class="sticky top-0 z-10 px-1.5 py-1.5 text-center border-b border-r border-gray-200 bg-gray-50">Status</th>
+                                    <th class="sticky top-0 z-10 px-2 py-1.5 text-left border-b border-r border-gray-200 bg-gray-50">Judul Usulan</th>
+                                    <th class="sticky top-0 z-10 px-1.5 py-1.5 border-b border-r border-gray-200 bg-gray-50">Pengusul</th>
+                                    ${colDusun ? '<th class="sticky top-0 z-10 px-1.5 py-1.5 border-b border-r border-gray-200 bg-gray-50">Dusun</th>' : ''}
+                                    <th class="sticky top-0 z-10 px-1.5 py-1.5 border-b border-r border-gray-200 bg-gray-50">Kategori</th>
+                                    <th class="sticky top-0 z-10 px-1.5 py-1.5 border-b border-r border-gray-200 bg-gray-50">RT</th>
+                                    <th class="sticky top-0 z-10 px-1.5 py-1.5 border-b border-r border-gray-200 bg-gray-50">Volume</th>
+                                    <th class="sticky top-0 z-10 px-1.5 py-1.5 text-right border-b border-r border-gray-200 bg-gray-50">Estimasi</th>
+                                    ${colRankDusun ? '<th class="sticky top-0 z-10 px-1.5 py-1.5 text-center border-b border-r border-gray-200 bg-gray-50">Rank Dusun</th>' : ''}
+                                    ${colRankDesa ? '<th class="sticky top-0 z-10 px-1.5 py-1.5 text-center border-b border-r border-gray-200 bg-gray-50">Rank Desa</th>' : ''}
+                                    ${colAksi ? '<th class="sticky top-0 z-10 px-1.5 py-1.5 border-b border-r border-gray-200 bg-gray-50">Rencana Aksi</th>' : ''}
+                                    <th class="sticky top-0 z-10 px-1.5 py-1.5 text-center border-b border-gray-200 bg-gray-50">Detail</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -3449,34 +3468,36 @@
         if (sorted.length) {
             rowsHTML = sorted.map((i, n) => `
                 <tr class="main-row cursor-pointer hover:bg-gray-50" onclick="showDetail('${escapeJs(i.id)}')">
-                    <td class="text-center text-gray-400 border-b border-r border-gray-200 px-2 py-2.5 tabular-nums">${n + 1}</td>
+                    <td class="text-center text-gray-400 border-b border-r border-gray-200 px-1.5 py-1.5 tabular-nums text-xs">${n + 1}</td>
                     
-                    <td class="text-center border-b border-r border-gray-200 px-2 py-2.5">${statusLabel(i.status).replace('whitespace-nowrap', 'whitespace-normal break-words')}</td>
+                    <td class="text-center border-b border-r border-gray-200 px-1.5 py-1.5 text-xs">${statusLabel(i.status).replace('whitespace-nowrap', 'whitespace-normal break-words')}</td>
                     
-                    <td class="font-semibold text-gray-800 border-b border-r border-gray-200 px-3 py-2.5 whitespace-normal break-words leading-snug min-w-[180px]">${escapeHtml(i.judul)}</td>
+                    <td class="font-semibold text-gray-800 border-b border-r border-gray-200 px-2 py-1.5 whitespace-normal break-words leading-snug min-w-[150px] text-xs">${escapeHtml(i.judul)}</td>
                     
-                    <td class="text-gray-500 border-b border-r border-gray-200 px-2 py-2.5 whitespace-normal break-words">${escapeHtml(i.namaPengusul || i.username)}</td>
+                    <td class="text-gray-500 border-b border-r border-gray-200 px-1.5 py-1.5 whitespace-normal break-words text-xs">${escapeHtml(i.namaPengusul || i.username)}</td>
                     
-                    ${colDusun ? `<td class="text-gray-500 border-b border-r border-gray-200 px-2 py-2.5 whitespace-normal break-words">${escapeHtml(i.dusun)}</td>` : ''}
+                    ${colDusun ? `<td class="text-gray-500 border-b border-r border-gray-200 px-1.5 py-1.5 whitespace-normal break-words text-xs">${escapeHtml(i.dusun)}</td>` : ''}
                     
-                    <td class="border-b border-r border-gray-200 px-2 py-2.5"><span class="badge-sm px-2 py-0.5 bg-gray-100 text-gray-600 rounded font-medium whitespace-normal break-words">${escapeHtml(i.kategori)}</span></td>
+                    <td class="border-b border-r border-gray-200 px-1.5 py-1.5"><span class="badge-sm px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded font-medium whitespace-normal break-words text-[10px]">${escapeHtml(i.kategori)}</span></td>
                     
-                    <td class="text-gray-500 border-b border-r border-gray-200 px-2 py-2.5 whitespace-nowrap">${Array.isArray(i.rt) ? i.rt.join(', ') : i.rt}</td>
-                    <td class="text-gray-600 border-b border-r border-gray-200 px-2 py-2.5 whitespace-nowrap">${i.volume} ${escapeHtml(i.satuan)}</td>
-                    <td class="text-right font-semibold text-gray-700 border-b border-r border-gray-200 px-2 py-2.5 whitespace-nowrap tabular-nums">${formatRupiah(i.estimasiBiaya)}</td>
+                    <!-- ✅ PERBAIKAN: Hapus whitespace-nowrap, tambahkan break-words & max-width agar wrap ke bawah -->
+                    <td class="text-gray-500 border-b border-r border-gray-200 px-1.5 py-1.5 text-xs break-words" style="max-width: 60px;">${Array.isArray(i.rt) ? i.rt.join(', ') : i.rt}</td>
                     
-                    ${colRankDusun ? `<td class="text-center border-b border-r border-gray-200 px-2 py-2.5 whitespace-nowrap">${i.rankingDusun ? `<span class="font-display font-extrabold text-blue-600">#${i.rankingDusun}</span>` : '<span class="text-gray-300">-</span>'}</td>` : ''}
-                    ${colRankDesa ? `<td class="text-center border-b border-r border-gray-200 px-2 py-2.5 whitespace-nowrap">${i.rankingDesa ? `<span class="font-display font-extrabold text-forest-600">#${i.rankingDesa}</span>` : '<span class="text-gray-300">-</span>'}</td>` : ''}
+                    <td class="text-gray-600 border-b border-r border-gray-200 px-1.5 py-1.5 whitespace-nowrap text-xs">${i.volume} ${escapeHtml(i.satuan)}</td>
+                    <td class="text-right font-semibold text-gray-700 border-b border-r border-gray-200 px-1.5 py-1.5 whitespace-nowrap tabular-nums text-xs">${formatRupiah(i.estimasiBiaya)}</td>
                     
-                    <td class="text-center border-b border-gray-200 px-2 py-2.5 whitespace-nowrap">
-                        <span onclick="event.stopPropagation(); openFullEditPenyesuaian('${escapeJs(i.id)}')" class="badge-sm px-2.5 py-1 bg-blue-100 text-blue-700 font-semibold rounded hover:bg-blue-200 transition-colors inline-flex items-center gap-1 cursor-pointer">
+                    ${colRankDusun ? `<td class="text-center border-b border-r border-gray-200 px-1.5 py-1.5 whitespace-nowrap text-xs">${i.rankingDusun ? `<span class="font-display font-extrabold text-blue-600">#${i.rankingDusun}</span>` : '<span class="text-gray-300">-</span>'}</td>` : ''}
+                    ${colRankDesa ? `<td class="text-center border-b border-r border-gray-200 px-1.5 py-1.5 whitespace-nowrap text-xs">${i.rankingDesa ? `<span class="font-display font-extrabold text-forest-600">#${i.rankingDesa}</span>` : '<span class="text-gray-300">-</span>'}</td>` : ''}
+                    
+                    <td class="text-center border-b border-gray-200 px-1.5 py-1.5 whitespace-nowrap">
+                        <span onclick="event.stopPropagation(); openFullEditPenyesuaian('${escapeJs(i.id)}')" class="badge-sm px-2 py-1 bg-blue-100 text-blue-700 font-semibold rounded hover:bg-blue-200 transition-colors inline-flex items-center gap-1 cursor-pointer text-[10px]">
                             <i class="fas fa-pen-to-square"></i><span class="sm:hidden">Edit</span><span class="hidden sm:inline ml-1">Edit Data</span>
                         </span>
                     </td>
                 </tr>
             `).join('');
         } else {
-            rowsHTML = typeof emptyRow === 'function' ? emptyRow(totalCol, emptyText) : `<tr><td colspan="${totalCol}" class="text-center py-8 text-gray-400">${emptyText}</td></tr>`;
+            rowsHTML = typeof emptyRow === 'function' ? emptyRow(totalCol, emptyText) : `<tr><td colspan="${totalCol}" class="text-center py-8 text-gray-400 text-xs">${emptyText}</td></tr>`;
         }
 
         // 7. Render HTML
@@ -3486,82 +3507,83 @@
             #tablePenyesuaianWrap tbody tr { transition: background-color 0.15s ease; }
             #tablePenyesuaianWrap tbody tr:hover td { background-color: #f9fafb; }
             
-            /* Font Fleksibel */
-            #tablePenyesuaianWrap thead tr { font-size: clamp(0.6rem, 0.9vw, 0.75rem); }
-            #tablePenyesuaianWrap tbody { font-size: clamp(0.7rem, 1.1vw, 0.875rem); }
+            /* Font Fleksibel (DIPERKECIL) */
+            #tablePenyesuaianWrap thead tr { font-size: clamp(0.55rem, 0.8vw, 0.68rem); }
+            #tablePenyesuaianWrap tbody { font-size: clamp(0.6rem, 1vw, 0.75rem); }
             #tablePenyesuaianWrap tbody span { font-size: inherit; }
-            #tablePenyesuaianWrap tbody .badge-sm { font-size: clamp(0.55rem, 0.8vw, 0.65rem); }
+            #tablePenyesuaianWrap tbody .badge-sm { font-size: clamp(0.5rem, 0.7vw, 0.6rem); }
 
             /* Wrap Teks & Rata Atas */
-            #tablePenyesuaianWrap td { vertical-align: top; line-height: 1.4; }
+            #tablePenyesuaianWrap td { vertical-align: top; line-height: 1.35; }
             #tablePenyesuaianWrap th { vertical-align: middle; }
 
-            /* SLIDER GESER KIRI KANAN */
+            /* SLIDER GESER KIRI KANAN (DIPERKECIL) */
             .tbl-inner {
                 scrollbar-gutter: stable; 
                 overflow-x: auto; 
                 overflow-y: auto; 
                 scrollbar-width: thin; 
-                scrollbar-color: #64748b #e2e8f0;
+                scrollbar-color: #94a3b8 #e2e8f0;
             }
-            .tbl-inner::-webkit-scrollbar { width: 8px; height: 16px; }
+            .tbl-inner::-webkit-scrollbar { width: 6px; height: 12px; }
             .tbl-inner::-webkit-scrollbar-track { background: #e2e8f0; }
-            .tbl-inner::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 2px; border: 2px solid #e2e8f0; }
+            .tbl-inner::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 2px; border: 1px solid #e2e8f0; }
             .tbl-inner::-webkit-scrollbar-thumb:hover { background: #64748b; }
             .tbl-inner::-webkit-scrollbar-corner { background: #e2e8f0; }
         </style>
 
-        <div class="space-y-4">
+        <div class="space-y-3">
             ${statsHTML}
 
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <div>
-                    <h3 class="font-display font-bold text-xl">Penyesuaian Usulan</h3>
-                    <p class="text-xs text-gray-400 mt-0.5">Tahun ${tahun} · ${sorted.length} data — klik baris untuk lihat detail, atau klik Edit untuk ubah data</p>
+                    <h3 class="font-display font-bold text-lg">Penyesuaian Usulan</h3>
+                    <p class="text-[11px] text-gray-400 mt-0.5">Tahun ${tahun} · ${sorted.length} data — klik baris untuk lihat detail, atau klik Edit untuk ubah data</p>
                 </div>
             </div>
 
             <div class="relative">
-                <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[10px]"></i>
                 <input type="text" id="searchPenyesuaianTable" placeholder="Cari judul, pengusul, dusun, kategori..."
-                    class="w-full pl-10 pr-4 py-2.5 border rounded-lg text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all"
+                    class="w-full pl-9 pr-3 py-2 border rounded-lg text-xs bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all"
                     oninput="filterPenyesuaianTable(this.value)">
             </div>
 
             <!-- TABEL VIEW -->
-            <div class="container mx-auto px-2 sm:px-4 md:px-6 xl:max-w-[1600px]">
-                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="container mx-auto px-1 sm:px-3 md:px-4 xl:max-w-[1600px]">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                     <div class="tbl-inner h-[500px] scroll-smooth">
-                        <table class="w-full min-w-[1200px] border-collapse" id="tablePenyesuaianWrap">
+                        <table class="w-full min-w-[1000px] border-collapse" id="tablePenyesuaianWrap">
                             <colgroup>
-                                <col style="width: 50px">   
-                                <col style="width: 130px">  
-                                <col>                      
-                                <col style="width: 180px">  
-                                ${colDusun ? '<col style="width: 130px">' : ''}  
-                                <col style="width: 130px">  
-                                <col style="width: 80px">   
-                                <col style="width: 120px">  
-                                <col style="width: 160px">  
-                                ${colRankDusun ? '<col style="width: 110px">' : ''}  
-                                ${colRankDesa ? '<col style="width: 110px">' : ''}  
+                                <col style="width: 35px">   
                                 <col style="width: 100px">  
+                                <col>                      
+                                <col style="width: 140px">  
+                                ${colDusun ? '<col style="width: 110px">' : ''}  
+                                <col style="width: 110px">  
+                                <!-- ✅ PERBAIKAN: Sesuaikan lebar kolom RT -->
+                                <col style="width: 60px">   
+                                <col style="width: 90px">  
+                                <col style="width: 120px">  
+                                ${colRankDusun ? '<col style="width: 75px">' : ''}  
+                                ${colRankDesa ? '<col style="width: 75px">' : ''}  
+                                <col style="width: 80px">  
                             </colgroup>
                             
                             <thead>
                                 <tr class="text-gray-500 uppercase tracking-wider">
-                                    <th class="sticky top-0 z-10 px-2 py-2.5 text-center border-b border-r border-gray-200 bg-gray-50">No</th>
-                                    <th class="sticky top-0 z-10 px-2 py-2.5 text-center border-b border-r border-gray-200 bg-gray-50">Status</th>
-                                    <th class="sticky top-0 z-10 px-3 py-2.5 text-left border-b border-r border-gray-200 bg-gray-50">Judul Usulan</th>
-                                    <th class="sticky top-0 z-10 px-2 py-2.5 border-b border-r border-gray-200 bg-gray-50">Pengusul</th>
-                                    ${colDusun ? '<th class="sticky top-0 z-10 px-2 py-2.5 border-b border-r border-gray-200 bg-gray-50">Dusun</th>' : ''}
-                                    <th class="sticky top-0 z-10 px-2 py-2.5 border-b border-r border-gray-200 bg-gray-50">Kategori</th>
-                                    <th class="sticky top-0 z-10 px-2 py-2.5 border-b border-r border-gray-200 bg-gray-50">RT</th>
-                                    <th class="sticky top-0 z-10 px-2 py-2.5 border-b border-r border-gray-200 bg-gray-50">Volume</th>
-                                    <th class="sticky top-0 z-10 px-2 py-2.5 text-right border-b border-r border-gray-200 bg-gray-50">Estimasi</th>
-                                    ${colRankDusun ? '<th class="sticky top-0 z-10 px-2 py-2.5 text-center border-b border-r border-gray-200 bg-gray-50">Rank Dusun</th>' : ''}
-                                    ${colRankDesa ? '<th class="sticky top-0 z-10 px-2 py-2.5 text-center border-b border-r border-gray-200 bg-gray-50">Rank Desa</th>' : ''}
-                                    <th class="sticky top-0 z-10 px-2 py-2.5 text-center border-b border-gray-200 bg-gray-50">Aksi</th>
+                                    <th class="sticky top-0 z-10 px-1.5 py-1.5 text-center border-b border-r border-gray-200 bg-gray-50">No</th>
+                                    <th class="sticky top-0 z-10 px-1.5 py-1.5 text-center border-b border-r border-gray-200 bg-gray-50">Status</th>
+                                    <th class="sticky top-0 z-10 px-2 py-1.5 text-left border-b border-r border-gray-200 bg-gray-50">Judul Usulan</th>
+                                    <th class="sticky top-0 z-10 px-1.5 py-1.5 border-b border-r border-gray-200 bg-gray-50">Pengusul</th>
+                                    ${colDusun ? '<th class="sticky top-0 z-10 px-1.5 py-1.5 border-b border-r border-gray-200 bg-gray-50">Dusun</th>' : ''}
+                                    <th class="sticky top-0 z-10 px-1.5 py-1.5 border-b border-r border-gray-200 bg-gray-50">Kategori</th>
+                                    <th class="sticky top-0 z-10 px-1.5 py-1.5 border-b border-r border-gray-200 bg-gray-50">RT</th>
+                                    <th class="sticky top-0 z-10 px-1.5 py-1.5 border-b border-r border-gray-200 bg-gray-50">Volume</th>
+                                    <th class="sticky top-0 z-10 px-1.5 py-1.5 text-right border-b border-r border-gray-200 bg-gray-50">Estimasi</th>
+                                    ${colRankDusun ? '<th class="sticky top-0 z-10 px-1.5 py-1.5 text-center border-b border-r border-gray-200 bg-gray-50">Rank Dusun</th>' : ''}
+                                    ${colRankDesa ? '<th class="sticky top-0 z-10 px-1.5 py-1.5 text-center border-b border-r border-gray-200 bg-gray-50">Rank Desa</th>' : ''}
+                                    <th class="sticky top-0 z-10 px-1.5 py-1.5 text-center border-b border-gray-200 bg-gray-50">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="tbodyPenyesuaian">
@@ -7124,16 +7146,20 @@
             rtLabel.classList.add('text-gray-400');
         }
         
-        // ✅ PERUBAHAN: Auto-fill Dusun (Bisa lebih dari 1, pisah koma)
+        // Simpan nilai RT ke dalam HIDDEN FIELD
+        const fRtHidden = document.getElementById('fRt');
+        if (fRtHidden) {
+            fRtHidden.value = selectedRts.join(','); 
+        }
+        
+        // Auto-fill Dusun
         if (dusunField) {
             const selectedDusuns = selectedRts.map(rt => CONFIG.RT_MAP[rt]).filter(Boolean);
-            const uniqueDusuns = [...new Set(selectedDusuns)]; // Hilangkan duplikat
+            const uniqueDusuns = [...new Set(selectedDusuns)]; 
             
             if (uniqueDusuns.length > 0) {
-                // Jika ada 1 atau lebih dusun, gabungkan dengan koma
                 dusunField.value = uniqueDusuns.join(', ');
             } else {
-                // Jika tidak ada RT yang dipilih
                 dusunField.value = '';
             }
         }
@@ -7212,7 +7238,6 @@
         const u = STATE.currentUser; 
         if (STATE.isLocked && u.role !== 'admdesa') { showToast('Pengimputan ditutup untuk tahun ini', 'error'); return; }
         
-        // ✅ Deteksi jika ini input musdes dari Admin Desa
         const isMusdesDesa = (id === 'musdes_desa');
         const isMusyawarah = (id === 'musyawarah') || isMusdesDesa; 
         const existData = isMusyawarah ? null : (id ? cachedUsulan.find(x => x.id === id) : null);
@@ -7220,7 +7245,6 @@
         
         const rtOptions = Object.keys(CONFIG.RT_MAP).map(rt => `<label class="rt-option flex items-center gap-2 py-1.5 px-2 hover:bg-honey-50 rounded cursor-pointer text-sm" data-rt="${rt}" data-dusun="${CONFIG.RT_MAP[rt]}"><input type="checkbox" class="rt-checkbox accent-honey-500" value="${rt}" ${existData?.rt?.includes(rt) ? 'checked' : ''} onchange="updateRtLabel()"> RT ${rt} <span class="text-gray-400 text-xs ml-auto">(${CONFIG.RT_MAP[rt]})</span></label>`).join('');
         
-        // ✅ PERUBAHAN: Hitung dusun awal dari RT yang dipilih (jika ada)
         let initialDusun = '';
         if (existData?.rt?.length) {
             const dusunsFromRt = existData.rt.map(rt => CONFIG.RT_MAP[rt]).filter(Boolean);
@@ -7229,28 +7253,16 @@
             initialDusun = u.dusun || '';
         }
 
-        // ✅ PERUBAHAN PENTING: Field Dusun untuk Admin Desa diubah menjadi Input Text (bukan Select)
-        // Agar bisa menampung nilai lebih dari 1 dusun yang dipisahkan koma
-        const dusunFieldHtml = isMusdesDesa 
-            ? `<div>
-                <label class="block text-sm font-semibold mb-1">Dusun <span class="text-red-500">*</span></label>
-                <input type="text" id="fDusun" value="${escapeHtml(initialDusun)}" readonly class="w-full px-4 py-2.5 border rounded-xl text-sm bg-indigo-50 text-indigo-700 font-medium">
-                <p class="text-xs text-gray-400 mt-1"><i class="fas fa-magic mr-1"></i>Otomatis terisi saat RT dipilih (bisa lebih dari 1)</p>
-            </div>`
-            : `<div>
-                <label class="block text-sm font-semibold mb-1">Dusun</label>
-                <input type="text" id="fDusun" value="${escapeHtml(initialDusun)}" readonly class="w-full px-4 py-2.5 border rounded-xl text-sm bg-indigo-50 text-indigo-700 font-medium">
-                <p class="text-xs text-gray-400 mt-1"><i class="fas fa-magic mr-1"></i>Otomatis sesuai RT yang dipilih</p>
-            </div>`;
+        const dusunFieldHtml = `<div>
+            <label class="block text-sm font-semibold mb-1">Dusun <span class="${isMusdesDesa ? 'text-red-500' : 'text-transparent'}">*</span></label>
+            <input type="text" id="fDusun" value="${escapeHtml(initialDusun)}" readonly class="w-full px-4 py-2.5 border rounded-xl text-sm bg-indigo-50 text-indigo-700 font-medium">
+            <p class="text-xs text-gray-400 mt-1"><i class="fas fa-magic mr-1"></i>Otomatis sesuai RT yang dipilih</p>
+        </div>`;
 
-        // ✅ Logika SDGs
         let currentSdgIds = [];
         if (existData?.sdgId) {
-            if (Array.isArray(existData.sdgId)) {
-                currentSdgIds = existData.sdgId.map(String);
-            } else if (typeof existData.sdgId === 'string' && existData.sdgId.trim() !== '') {
-                currentSdgIds = existData.sdgId.split(',').map(s => s.trim()).filter(Boolean);
-            }
+            if (Array.isArray(existData.sdgId)) currentSdgIds = existData.sdgId.map(String);
+            else if (typeof existData.sdgId === 'string' && existData.sdgId.trim() !== '') currentSdgIds = existData.sdgId.split(',').map(s => s.trim()).filter(Boolean);
         }
         
         const sdgOptionsHtml = CONFIG.SDGS ? CONFIG.SDGS.map(s => {
@@ -7263,7 +7275,7 @@
             : '';
             
         const sdgFieldHtml = `
-        <input type="hidden" id="fSdgId" value="${currentSdgIds.join(',')}">
+        <input type="hidden" name="sdgId" id="fSdgId" value="${currentSdgIds.join(',')}">
         <div>
             <label class="block text-sm font-semibold mb-1">Mendukung SDGs (Opsional)</label>
             <div class="relative">
@@ -7282,15 +7294,26 @@
             </div>
         </div>`;
 
-        openModal(`<div class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"><div class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl view-enter p-6"><div class="flex justify-between items-center mb-5"><h3 class="font-display font-bold text-xl">${isMusdesDesa ? 'Input Usulan Musdes Desa' : (existData ? 'Edit' : 'Buat') + ' Usulan'}</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-1" aria-label="Tutup"><i class="fas fa-times text-lg"></i></button></div><form id="formUsulan" class="space-y-4"><div><label class="block text-sm font-semibold mb-1">Judul Usulan <span class="text-red-500">*</span></label><input type="text" id="fJudul" value="${escapeHtml(existData?.judul || '')}" required class="w-full px-4 py-2.5 border rounded-xl text-sm"></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="block text-sm font-semibold mb-1">Kategori <span class="text-red-500">*</span></label><select id="fKategori" required class="w-full px-4 py-2.5 border rounded-xl text-sm bg-white">${CONFIG.KATEGORI.map(k => `<option ${existData?.kategori === k ? 'selected' : ''}>${k}</option>`).join('')}</select></div><div><label class="block text-sm font-semibold mb-1">RT <span class="text-red-500">*</span></label><div class="relative" id="rtSelectWrapper"><button type="button" onclick="toggleRtDropdown()" class="w-full px-4 py-2.5 border rounded-xl text-sm text-left bg-white flex justify-between items-center"><span id="rtLabel" class="${existData?.rt?.length ? '' : 'text-gray-400'}">${existData?.rt?.length ? existData.rt.join(', ') : 'Pilih RT...'}</span><i class="fas fa-chevron-down text-xs text-gray-400"></i></button><div id="rtDropdown" class="hidden absolute z-20 w-full mt-1 bg-white border rounded-xl shadow-lg max-h-56 overflow-hidden flex flex-col"><div class="p-2 border-b sticky top-0 bg-white z-10"><input type="text" id="rtSearch" placeholder="Cari RT atau dusun..." class="w-full px-3 py-1.5 border rounded-lg text-sm" oninput="filterRtOptions(this.value)"></div><div class="overflow-y-auto p-2 space-y-0.5">${rtOptions}</div></div></div></div></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4">${dusunFieldHtml}<div><label class="block text-sm font-semibold mb-1">Desa</label><input type="text" value="${CONFIG.DESA}" readonly class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-100 text-gray-600"></div></div><div><label class="block text-sm font-semibold mb-1">Deskripsi <span class="text-red-500">*</span></label><textarea id="fDeskripsi" rows="3" required class="w-full px-4 py-2.5 border rounded-xl text-sm">${escapeHtml(existData?.deskripsi || '')}</textarea></div><div class="grid grid-cols-1 sm:grid-cols-3 gap-4"><div><label class="block text-sm font-semibold mb-1">Volume <span class="text-red-500">*</span></label><input type="number" id="fVolume" value="${existData?.volume || ''}" required min="1" class="w-full px-4 py-2.5 border rounded-xl text-sm"></div><div><label class="block text-sm font-semibold mb-1">Satuan <span class="text-red-500">*</span></label><select id="fSatuan" required class="w-full px-4 py-2.5 border rounded-xl text-sm bg-white">${CONFIG.SATUAN.map(s => `<option ${existData?.satuan === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div><div><label class="block text-sm font-semibold mb-1">Estimasi Biaya (Rp) <span class="text-red-500">*</span></label><input type="text" id="fBiaya" value="${initVal}" required class="w-full px-4 py-2.5 border rounded-xl text-sm" placeholder="0"></div></div>
+        openModal(`<div class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"><div class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl view-enter p-6"><div class="flex justify-between items-center mb-5"><h3 class="font-display font-bold text-xl">${isMusdesDesa ? 'Input Usulan Musdes Desa' : (existData ? 'Edit' : 'Buat') + ' Usulan'}</h3><button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-1" aria-label="Tutup"><i class="fas fa-times text-lg"></i></button></div>
+        
+        <!-- ✅ PERBAIKAN AKHIR: Panggil handleFormUsulan langsung di onsubmit dan return false -->
+        <form id="formUsulan" onsubmit="event.preventDefault(); handleFormUsulan(this); return false;" class="space-y-4">
+            
+            <div><label class="block text-sm font-semibold mb-1">Judul Usulan <span class="text-red-500">*</span></label><input type="text" id="fJudul" value="${escapeHtml(existData?.judul || '')}" required class="w-full px-4 py-2.5 border rounded-xl text-sm"></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="block text-sm font-semibold mb-1">Kategori <span class="text-red-500">*</span></label><select id="fKategori" required class="w-full px-4 py-2.5 border rounded-xl text-sm bg-white">${CONFIG.KATEGORI.map(k => `<option ${existData?.kategori === k ? 'selected' : ''}>${k}</option>`).join('')}</select></div><div><label class="block text-sm font-semibold mb-1">RT <span class="text-red-500">*</span></label><div class="relative" id="rtSelectWrapper"><button type="button" onclick="toggleRtDropdown()" class="w-full px-4 py-2.5 border rounded-xl text-sm text-left bg-white flex justify-between items-center"><span id="rtLabel" class="${existData?.rt?.length ? '' : 'text-gray-400'}">${existData?.rt?.length ? existData.rt.join(', ') : 'Pilih RT...'}</span><i class="fas fa-chevron-down text-xs text-gray-400"></i></button><div id="rtDropdown" class="hidden absolute z-20 w-full mt-1 bg-white border rounded-xl shadow-lg max-h-56 overflow-hidden flex flex-col"><div class="p-2 border-b sticky top-0 bg-white z-10"><input type="text" id="rtSearch" placeholder="Cari RT atau dusun..." class="w-full px-3 py-1.5 border rounded-lg text-sm" oninput="filterRtOptions(this.value)"></div><div class="overflow-y-auto p-2 space-y-0.5">${rtOptions}</div></div></div></div></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4">${dusunFieldHtml}<div><label class="block text-sm font-semibold mb-1">Desa</label><input type="text" value="${CONFIG.DESA}" readonly class="w-full px-4 py-2.5 border rounded-xl text-sm bg-gray-100 text-gray-600"></div></div><div><label class="block text-sm font-semibold mb-1">Deskripsi <span class="text-red-500">*</span></label><textarea id="fDeskripsi" rows="3" required class="w-full px-4 py-2.5 border rounded-xl text-sm">${escapeHtml(existData?.deskripsi || '')}</textarea></div><div class="grid grid-cols-1 sm:grid-cols-3 gap-4"><div><label class="block text-sm font-semibold mb-1">Volume <span class="text-red-500">*</span></label><input type="number" id="fVolume" value="${existData?.volume || ''}" required min="1" class="w-full px-4 py-2.5 border rounded-xl text-sm"></div><div><label class="block text-sm font-semibold mb-1">Satuan <span class="text-red-500">*</span></label><select id="fSatuan" required class="w-full px-4 py-2.5 border rounded-xl text-sm bg-white">${CONFIG.SATUAN.map(s => `<option ${existData?.satuan === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div><div><label class="block text-sm font-semibold mb-1">Estimasi Biaya (Rp) <span class="text-red-500">*</span></label><input type="text" id="fBiaya" value="${initVal}" required class="w-full px-4 py-2.5 border rounded-xl text-sm" placeholder="0"></div></div>
             
             ${sdgFieldHtml}
             
-            <div><label class="block text-sm font-semibold mb-1">Link Proposal (Opsional)</label><input type="url" id="fLink" value="${escapeHtml(existData?.linkProposal || '')}" class="w-full px-4 py-2.5 border rounded-xl text-sm"></div><input type="hidden" id="fId" value="${existData?.id || ''}"><input type="hidden" id="fIsMusdesDesa" value="${isMusdesDesa}"><div id="errUsulan" class="hidden text-sm text-red-600 bg-red-50 p-2.5 rounded-lg"></div><div class="flex justify-end gap-3 pt-2"><button type="button" onclick="closeModal()" class="px-5 py-2.5 border rounded-xl text-sm font-semibold hover:bg-gray-50">Batal</button><button type="submit" class="px-5 py-2.5 btn-primary rounded-xl shadow">Simpan</button></div></form></div></div>`);
+            <div><label class="block text-sm font-semibold mb-1">Link Proposal (Opsional)</label><input type="url" id="fLink" value="${escapeHtml(existData?.linkProposal || '')}" class="w-full px-4 py-2.5 border rounded-xl text-sm"></div>
+            
+            <input type="hidden" name="fRt" id="fRt" value="${existData?.rt?.join(',') || ''}">
+            <input type="hidden" name="id" id="fId" value="${existData?.id || ''}">
+            <input type="hidden" name="isMusdesDesa" id="fIsMusdesDesa" value="${isMusdesDesa}">
+            
+            <div id="errUsulan" class="hidden text-sm text-red-600 bg-red-50 p-2.5 rounded-lg"></div><div class="flex justify-end gap-3 pt-2"><button type="button" onclick="closeModal()" class="px-5 py-2.5 border rounded-xl text-sm font-semibold hover:bg-gray-50">Batal</button><button type="submit" class="px-5 py-2.5 btn-primary rounded-xl shadow">Simpan</button></div></form></div></div>`);
         
         setupRupiahInput('fBiaya');
 
-        // ✅ Tutup dropdown saat klik di luar area
+        // ✅ HANYA ini yang tersisa: Cukup tutup dropdown saat klik di luar
         setTimeout(() => {
             document.addEventListener('click', function closeDropdowns(e) {
                 const rtWrapper = document.getElementById('rtSelectWrapper'), rtDropdown = document.getElementById('rtDropdown');
@@ -8414,45 +8437,38 @@
                 const itemId = escapeJs(item.id);
                 const rtDisplay = Array.isArray(item.rt) ? item.rt.join(', ') : (item.rt || '-');
 
-                let actionBtns = `<div class="flex items-center gap-1.5 mt-1">
-                    <!-- ✅ PERBAIKAN: Gunakan handleUpdateDesa -->
-                    <button onclick="event.stopPropagation(); handleUpdateDesa('${itemId}')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors">
-                        <i class="fas fa-save text-xs"></i>
-                        <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[10px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Update</span>
+                let actionBtns = `<div class="flex items-center gap-1 mt-1">
+                    <button onclick="event.stopPropagation(); handleUpdateDesa('${itemId}')" class="group relative w-7 h-7 flex items-center justify-center rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors" title="Update">
+                        <i class="fas fa-save text-[10px]"></i>
                     </button>
-                    <button onclick="event.stopPropagation(); prosesDesa('${itemId}','final')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-green-100 text-green-600 hover:bg-green-200 transition-colors">
-                        <i class="fas fa-check-double text-xs"></i>
-                        <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[10px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Final</span>
+                    <button onclick="event.stopPropagation(); prosesDesa('${itemId}','final')" class="group relative w-7 h-7 flex items-center justify-center rounded-md bg-green-100 text-green-600 hover:bg-green-200 transition-colors" title="Final">
+                        <i class="fas fa-check-double text-[10px]"></i>
                     </button>
                     ${!item.isMusdes ? `
-                    <button onclick="event.stopPropagation(); openModalKembalikan('${itemId}','dikembalikan_dusun')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-amber-100 text-amber-600 hover:bg-amber-200 transition-colors">
-                        <i class="fas fa-undo text-xs"></i>
-                        <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[10px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Kembalikan</span>
+                    <button onclick="event.stopPropagation(); openModalKembalikan('${itemId}','dikembalikan_dusun')" class="group relative w-7 h-7 flex items-center justify-center rounded-md bg-amber-100 text-amber-600 hover:bg-amber-200 transition-colors" title="Kembalikan">
+                        <i class="fas fa-undo text-[10px]"></i>
                     </button>` : ''}
                     ${canEditMusdes ? `
-                    <div class="w-px h-5 bg-gray-300 mx-1"></div>
-                    <button onclick="event.stopPropagation(); openFormUsulan('${itemId}')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 hover:bg-indigo-200 transition-colors">
-                        <i class="fas fa-pen text-xs"></i>
-                        <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[10px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Edit</span>
+                    <div class="w-px h-4 bg-gray-300 mx-0.5"></div>
+                    <button onclick="event.stopPropagation(); openFormUsulan('${itemId}')" class="group relative w-7 h-7 flex items-center justify-center rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200 transition-colors" title="Edit">
+                        <i class="fas fa-pen text-[10px]"></i>
                     </button>
-                    <button onclick="event.stopPropagation(); deleteUsulanMusdes('${itemId}', '${escapeJs(item.judul)}')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors">
-                        <i class="fas fa-trash-alt text-xs"></i>
-                        <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[10px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Hapus</span>
+                    <button onclick="event.stopPropagation(); deleteUsulanMusdes('${itemId}', '${escapeJs(item.judul)}')" class="group relative w-7 h-7 flex items-center justify-center rounded-md bg-red-100 text-red-600 hover:bg-red-200 transition-colors" title="Hapus">
+                        <i class="fas fa-trash-alt text-[10px]"></i>
                     </button>` : ''}
                 </div>`;
 
-                const catatanHtml = item.status === 'dikembalikan_dusun' ? `<div class="flex items-start gap-2 text-xs text-amber-700 bg-amber-50 rounded-lg p-3"><i class="fas fa-info-circle mt-0.5 flex-shrink-0"></i><span>Usulan ini dikembalikan dari proses sebelumnya.</span></div>` : '';
+                const catatanHtml = item.status === 'dikembalikan_dusun' ? `<div class="flex items-start gap-1.5 text-[11px] text-amber-700 bg-amber-50 rounded-md p-2"><i class="fas fa-info-circle mt-0.5 flex-shrink-0"></i><span>Usulan ini dikembalikan dari proses sebelumnya.</span></div>` : '';
                 
-                const subContent = `<div class="flex flex-col gap-3">
-                    <div class="flex flex-col sm:flex-row sm:items-center gap-x-4 gap-y-2">
-                        <div class="flex items-center gap-2">
-                            <label class="text-xs font-semibold text-gray-600 whitespace-nowrap">Rank Desa:</label>
-                            <!-- ✅ PERBAIKAN: Hapus oninput sort, tambahkan data-original & onblur -->
-                            <input type="number" min="1" placeholder="#" value="${item.rankingDesa}" class="w-20 px-2 py-1.5 border rounded-lg text-sm text-center focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all" id="rankd-${item.id}" data-original="${item.rankingDesa}" onblur="highlightChangedRank(this)">
+                const subContent = `<div class="flex flex-col gap-2">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-x-3 gap-y-1.5">
+                        <div class="flex items-center gap-1.5">
+                            <label class="text-[11px] font-semibold text-gray-600 whitespace-nowrap">Rank Desa:</label>
+                            <input type="number" min="1" placeholder="#" value="${item.rankingDesa}" class="w-16 px-1.5 py-1 border rounded-md text-xs text-center focus:ring-1 focus:ring-blue-200 focus:border-blue-400 transition-all" id="rankd-${item.id}" data-original="${item.rankingDesa}" onblur="highlightChangedRank(this)">
                         </div>
-                        <div class="flex items-center gap-2">
-                            <label class="text-xs font-semibold text-gray-600 whitespace-nowrap">Rencana Aksi:</label>
-                            <select id="aksi-${item.id}" onchange="toggleRujukan('${itemId}',this.value)" class="px-2 py-1.5 border rounded-lg text-sm bg-white">
+                        <div class="flex items-center gap-1.5">
+                            <label class="text-[11px] font-semibold text-gray-600 whitespace-nowrap">Rencana Aksi:</label>
+                            <select id="aksi-${item.id}" onchange="toggleRujukan('${itemId}',this.value)" class="px-1.5 py-1 border rounded-md text-xs bg-white">
                                 <option value="">Pilih...</option>
                                 <option value="Kewenangan Desa" ${item.rencanaAksi === 'Kewenangan Desa' ? 'selected' : ''}>Kewenangan Desa</option>
                                 <option value="Non Kewenangan Desa" ${item.rencanaAksi === 'Non Kewenangan Desa' ? 'selected' : ''}>Non Kewenangan Desa</option>
@@ -8460,12 +8476,12 @@
                         </div>
                     </div>
                     <div id="rujuk-${item.id}" class="${item.rencanaAksi === 'Non Kewenangan Desa' ? '' : 'hidden'}">
-                        <textarea id="rujuk-text-${item.id}" placeholder="Rujukan ke..." rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" class="w-full px-3 py-2 border rounded-lg text-sm resize-none overflow-hidden">${escapeHtml(item.rujukanUsulan || '')}</textarea>
+                        <textarea id="rujuk-text-${item.id}" placeholder="Rujukan ke..." rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" class="w-full px-2 py-1 border rounded-md text-xs resize-none overflow-hidden">${escapeHtml(item.rujukanUsulan || '')}</textarea>
                     </div>
-                    <div class="flex flex-col sm:flex-row sm:items-start gap-x-4 gap-y-2">
-                        <div class="flex items-center gap-2">
-                            <label class="text-xs font-semibold text-gray-600 whitespace-nowrap pt-1">Kordinator:</label>
-                            <select id="kord-${item.id}" class="px-2 py-1.5 border rounded-lg text-sm bg-white">${kordHtml}</select>
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-x-3 gap-y-1.5">
+                        <div class="flex items-center gap-1.5">
+                            <label class="text-[11px] font-semibold text-gray-600 whitespace-nowrap pt-0.5">Kordinator:</label>
+                            <select id="kord-${item.id}" class="px-1.5 py-1 border rounded-md text-xs bg-white">${kordHtml}</select>
                         </div>
                         ${actionBtns}
                     </div>
@@ -8473,20 +8489,22 @@
 
                 return `<tbody id="row-desa-${item.id}">
                             <tr class="main-row cursor-pointer hover:bg-gray-50/80" onclick="showDetail('${itemId}')">
-                                <td class="td-cell text-center" onclick="event.stopPropagation()"><input type="checkbox" class="bulk-check-desa accent-honey-500" data-id="${item.id}" onchange="updateBulkCountDesa()"></td>
-                                <td class="td-cell text-center text-gray-400 row-desa-num tabular-nums">${n + 1}</td>
+                                <td class="td-cell text-center" onclick="event.stopPropagation()"><input type="checkbox" class="bulk-check-desa accent-honey-500 w-3.5 h-3.5" data-id="${item.id}" onchange="updateBulkCountDesa()"></td>
+                                <td class="td-cell text-center text-gray-400 row-desa-num tabular-nums text-xs">${n + 1}</td>
                                 <td class="td-cell text-center">${statusLabel(item.status)}</td>
                                 <td class="td-cell font-semibold text-gray-800 td-judul">${escapeHtml(item.judul)}</td>
-                                <td class="td-cell text-gray-500 whitespace-nowrap">
+                                <td class="td-cell text-gray-500 whitespace-nowrap text-xs">
                                     ${item.isMusdes 
-                                        ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-full font-semibold text-[10px]"><i class="fas fa-file-circle-plus text-[8px]"></i>Musdes</span>' 
+                                        ? '<span class="inline-flex items-center gap-1 px-1.5 py-0.5 bg-indigo-50 text-indigo-600 rounded-full font-semibold text-[9px]"><i class="fas fa-file-circle-plus text-[7px]"></i>Musdes</span>' 
                                         : escapeHtml(item.namaPengusul || item.username)}
                                 </td>
-                                <td class="td-cell text-gray-500 whitespace-nowrap">${escapeHtml(item.dusun)}</td>
-                                <td class="td-cell text-gray-500 whitespace-nowrap">${rtDisplay}</td>
-                                <td class="td-cell text-gray-600 whitespace-nowrap">${item.volume || 0} ${escapeHtml(item.satuan || '')}</td>
-                                <td class="td-cell text-right font-semibold text-gray-700 whitespace-nowrap tabular-nums">${formatRupiah(item.estimasiBiaya)}</td>
-                                <td class="td-cell text-center"><span class="font-display font-extrabold text-blue-600">#${item.rankingDusun || '-'}</span></td>
+                                <td class="td-cell text-gray-500 whitespace-nowrap text-xs">${escapeHtml(item.dusun)}</td>
+                                
+                                <td class="td-cell text-gray-500 text-xs break-words" style="max-width: 60px;">${rtDisplay}</td>
+                                
+                                <td class="td-cell text-gray-600 whitespace-nowrap text-xs">${item.volume || 0} ${escapeHtml(item.satuan || '')}</td>
+                                <td class="td-cell text-right font-semibold text-gray-700 whitespace-nowrap tabular-nums text-xs">${formatRupiah(item.estimasiBiaya)}</td>
+                                <td class="td-cell text-center"><span class="font-display font-extrabold text-blue-600 text-xs">#${item.rankingDusun || '-'}</span></td>
                             </tr>
                             <tr class="sub-row">
                                 <td colspan="10" class="sub-cell">
@@ -8504,35 +8522,35 @@
         // ═══════════════════════════════════════════
         const btns = `
         <div class="sm:hidden space-y-2 mb-3">
-            <button onclick="bulkProsesDesa()" class="w-full h-10 px-4 flex items-center justify-center gap-1.5 btn-success text-xs font-semibold rounded-lg shadow-sm">
-                <i class="fas fa-check-double"></i> Finalisasi Terpilih
+            <button onclick="bulkProsesDesa()" class="w-full h-9 px-3 flex items-center justify-center gap-1.5 btn-success text-[11px] font-semibold rounded-lg shadow-sm">
+                <i class="fas fa-check-double text-xs"></i> Finalisasi Terpilih
             </button>
-            <div id="bulkCountDesaMobile" class="bulk-count hidden text-xs text-honey-700 font-semibold -mt-1 mb-1 pl-1"><span id="bulkNumDesaMobile">0</span> terpilih</div>
+            <div id="bulkCountDesaMobile" class="bulk-count hidden text-[11px] text-honey-700 font-semibold -mt-1 mb-1 pl-1"><span id="bulkNumDesaMobile">0</span> terpilih</div>
             <div class="flex items-center gap-2">
-                <button onclick="openFormUsulan('musdes_desa')" class="flex-1 h-10 px-3 flex items-center justify-center gap-2 rounded-lg bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 active:bg-indigo-800 transition-colors text-xs font-semibold">
-                    <i class="fas fa-file-circle-plus text-sm"></i> Input Musdes
+                <button onclick="openFormUsulan('musdes_desa')" class="flex-1 h-9 px-3 flex items-center justify-center gap-1.5 rounded-lg bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 active:bg-indigo-800 transition-colors text-[11px] font-semibold">
+                    <i class="fas fa-file-circle-plus text-xs"></i> Input Musdes
                 </button>
-                <button onclick="openAjukanKembaliDesaModal()" class="flex-1 h-10 px-3 flex items-center justify-center gap-2 rounded-lg bg-amber-500 text-white shadow-sm hover:bg-amber-600 active:bg-amber-700 transition-colors text-xs font-semibold">
-                    <i class="fas fa-rotate-left text-sm"></i> Ajukan Kembali
+                <button onclick="openAjukanKembaliDesaModal()" class="flex-1 h-9 px-3 flex items-center justify-center gap-1.5 rounded-lg bg-amber-500 text-white shadow-sm hover:bg-amber-600 active:bg-amber-700 transition-colors text-[11px] font-semibold">
+                    <i class="fas fa-rotate-left text-xs"></i> Ajukan Kembali
                 </button>
             </div>
         </div>
-        <div class="hidden sm:flex sm:flex-wrap sm:items-center sm:justify-between gap-3 mb-3">
+        <div class="hidden sm:flex sm:flex-wrap sm:items-center sm:justify-between gap-2 mb-3">
             <div class="flex items-center gap-2">
-                <button onclick="openFormUsulan('musdes_desa')" class="group relative w-10 h-10 flex items-center justify-center rounded-lg bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 transition-colors">
-                    <i class="fas fa-file-circle-plus text-sm"></i>
+                <button onclick="openFormUsulan('musdes_desa')" class="group relative w-9 h-9 flex items-center justify-center rounded-lg bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 transition-colors">
+                    <i class="fas fa-file-circle-plus text-xs"></i>
                     <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[10px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Input Musdes</span>
                 </button>
-                <button onclick="openAjukanKembaliDesaModal()" class="group relative w-10 h-10 flex items-center justify-center rounded-lg bg-amber-500 text-white shadow-sm hover:bg-amber-600 transition-colors">
-                    <i class="fas fa-rotate-left text-sm"></i>
+                <button onclick="openAjukanKembaliDesaModal()" class="group relative w-9 h-9 flex items-center justify-center rounded-lg bg-amber-500 text-white shadow-sm hover:bg-amber-600 transition-colors">
+                    <i class="fas fa-rotate-left text-xs"></i>
                     <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[10px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Ajukan Kembali</span>
                 </button>
             </div>
             <div class="flex items-center gap-2">
-                <button onclick="bulkProsesDesa()" class="h-10 px-4 flex items-center gap-1.5 btn-success text-xs font-semibold rounded-lg shadow-sm">
-                    <i class="fas fa-check-double"></i> Finalisasi Terpilih
+                <button onclick="bulkProsesDesa()" class="h-9 px-3 flex items-center gap-1.5 btn-success text-[11px] font-semibold rounded-lg shadow-sm">
+                    <i class="fas fa-check-double text-xs"></i> Finalisasi Terpilih
                 </button>
-                <span id="bulkCountDesa" class="bulk-count hidden text-xs text-honey-700 font-semibold ml-1"><span id="bulkNumDesa">0</span> terpilih</span>
+                <span id="bulkCountDesa" class="bulk-count hidden text-[11px] text-honey-700 font-semibold ml-1"><span id="bulkNumDesa">0</span> terpilih</span>
             </div>
         </div>`;
 
@@ -8541,19 +8559,19 @@
         // ═══════════════════════════════════════════
         return `
         <style>
-            /* ── FLUID TYPOGRAPHY ── */
-            #tableDesaWrap { font-size: clamp(0.7rem, 1.2vw, 0.875rem); }
-            #tableDesaWrap thead { font-size: clamp(0.65rem, 0.95vw, 0.75rem); }
-            #tableDesaWrap .td-judul { font-size: clamp(0.75rem, 1.3vw, 0.95rem); font-weight: 600; }
+            /* ── FLUID TYPOGRAPHY (DIPERKECIL) ── */
+            #tableDesaWrap { font-size: clamp(0.6rem, 1vw, 0.75rem); }
+            #tableDesaWrap thead { font-size: clamp(0.58rem, 0.8vw, 0.68rem); }
+            #tableDesaWrap .td-judul { font-size: clamp(0.68rem, 1.05vw, 0.82rem); font-weight: 600; }
 
-            /* ── FLUID SPACING ── */
+            /* ── FLUID SPACING (DIPERKECIL) ── */
             #tableDesaWrap th, 
             #tableDesaWrap td.td-cell { 
-                padding: clamp(0.5rem, 0.9vw, 0.75rem) clamp(0.6rem, 1.1vw, 0.85rem); 
+                padding: clamp(0.35rem, 0.65vw, 0.55rem) clamp(0.4rem, 0.8vw, 0.6rem); 
                 vertical-align: middle;
                 border-bottom: 1px solid #e5e7eb;
-                border-right: 1px solid #e5e7eb;
-                line-height: 1.5;
+                border-right: 1px solid #f3f4f6; /* Diperhalus border kanan */
+                line-height: 1.35;
             }
             #tableDesaWrap th:last-child,
             #tableDesaWrap td.td-cell:last-child { border-right: none; }
@@ -8563,15 +8581,15 @@
                 background-color: #f9fafb;
                 color: #374151; 
                 text-transform: uppercase; 
-                letter-spacing: 0.05em; 
+                letter-spacing: 0.04em; 
                 font-weight: 700;
                 position: sticky;
                 top: 0;
                 z-index: 10;
                 border-bottom: 2px solid #d1d5db;
-                border-right-color: #e5e7eb;
+                border-right-color: #f3f4f6;
                 white-space: nowrap; 
-                box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+                box-shadow: 0 1px 3px rgba(0,0,0,0.03);
             }
             #tableDesaWrap thead th:last-child { border-right: none; }
 
@@ -8582,18 +8600,18 @@
                 background-color: #f9fafb; 
             }
             #tableDesaWrap .sub-content { 
-                padding: clamp(0.65rem, 1.2vw, 1rem) clamp(0.75rem, 1.5vw, 1.25rem);
+                padding: clamp(0.5rem, 0.9vw, 0.75rem) clamp(0.5rem, 1.1vw, 0.85rem);
                 display: flex;
                 flex-direction: column;
-                gap: clamp(0.5rem, 0.8vw, 0.75rem);
-                font-size: clamp(0.7rem, 1.1vw, 0.85rem);
+                gap: clamp(0.4rem, 0.6vw, 0.5rem);
+                font-size: clamp(0.62rem, 0.95vw, 0.75rem);
             }
 
             /* ── INTERAKSI BARIS ── */
             #tableDesaWrap tbody tr { transition: background-color 0.15s ease; }
             #tableDesaWrap tbody tr:hover > td.td-cell { background-color: #f9fafb; }
 
-            /* ✅ TAMBAHAN: Highlight untuk ranking yang berubah */
+            /* HIGHLIGHT RANKING */
             #tableDesaWrap .rank-changed { 
                 background-color: #fef3c7 !important; 
                 border-color: #f59e0b !important;
@@ -8601,16 +8619,14 @@
             }
             @keyframes rankPulse {
                 0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-                50% { box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2); }
+                50% { box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2); }
             }
             
-            /* ✅ TAMBAHAN: Animasi baris saat sort */
+            /* ANIMASI SORT */
             #tableDesaWrap tbody[id^="row-desa-"] {
                 transition: transform 0.3s ease, opacity 0.3s ease;
             }
-            #tableDesaWrap tbody.sorting {
-                opacity: 0.7;
-            }
+            #tableDesaWrap tbody.sorting { opacity: 0.7; }
             
             /* ── SCROLLBAR KLASIK ── */
             .tbl-inner {
@@ -8620,13 +8636,13 @@
                 scrollbar-width: thin; 
                 scrollbar-color: #94a3b8 #e2e8f0;
             }
-            .tbl-inner::-webkit-scrollbar { width: 8px; height: 16px; }
+            .tbl-inner::-webkit-scrollbar { width: 6px; height: 12px; }
             .tbl-inner::-webkit-scrollbar-track { background: #e2e8f0; }
-            .tbl-inner::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 2px; border: 2px solid #e2e8f0; }
+            .tbl-inner::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 2px; border: 1px solid #e2e8f0; }
             .tbl-inner::-webkit-scrollbar-thumb:hover { background: #64748b; }
             .tbl-inner::-webkit-scrollbar-corner { background: #e2e8f0; }
 
-            /* ── CSS UNTUK MODAL KONFIRMASI ── */
+            /* ── CSS MODAL KONFIRMASI ── */
             .confirm-overlay {
                 position: fixed; inset: 0; z-index: 9999;
                 display: flex; align-items: center; justify-content: center;
@@ -8635,22 +8651,22 @@
             }
             .confirm-overlay.active { opacity: 1; }
             .confirm-card {
-                background: white; border-radius: 1rem; padding: 1.5rem;
-                max-width: 400px; width: calc(100% - 2rem);
+                background: white; border-radius: 0.75rem; padding: 1.25rem;
+                max-width: 360px; width: calc(100% - 2rem);
                 box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
                 text-align: center; transform: scale(0.95); transition: transform 0.2s ease;
             }
             .confirm-overlay.active .confirm-card { transform: scale(1); }
             .confirm-icon {
-                width: 3.5rem; height: 3.5rem; margin: 0 auto 1rem;
+                width: 3rem; height: 3rem; margin: 0 auto 0.75rem;
                 border-radius: 50%; display: flex; align-items: center; justify-content: center;
             }
-            .confirm-title { font-size: 1.1rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; }
-            .confirm-message { font-size: 0.85rem; color: #6b7280; line-height: 1.6; margin-bottom: 1.5rem; }
-            .confirm-actions { display: flex; gap: 0.75rem; justify-content: center; }
+            .confirm-title { font-size: 1rem; font-weight: 700; color: #1f2937; margin-bottom: 0.4rem; }
+            .confirm-message { font-size: 0.8rem; color: #6b7280; line-height: 1.5; margin-bottom: 1.25rem; }
+            .confirm-actions { display: flex; gap: 0.5rem; justify-content: center; }
             .confirm-btn {
-                padding: 0.625rem 1.25rem; border-radius: 0.5rem;
-                font-size: 0.875rem; font-weight: 600; cursor: pointer;
+                padding: 0.5rem 1rem; border-radius: 0.375rem;
+                font-size: 0.8rem; font-weight: 600; cursor: pointer;
                 transition: all 0.15s ease; border: none;
             }
             .confirm-btn-cancel { background: white; color: #374151; border: 1px solid #d1d5db; }
@@ -8659,45 +8675,44 @@
             .confirm-btn-delete:hover { background: #dc2626; }
         </style>
 
-        <div class="space-y-4">
+        <div class="space-y-3">
             ${statsHTML}
             
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <div>
-                    <h3 class="font-display font-bold text-xl">Musyawarah & Verifikasi Desa</h3>
-                    <!-- ✅ PERBAIKAN: Ubah hint agar user tahu harus klik Update -->
-                    <p class="text-xs text-gray-400 mt-0.5">Beri peringkat desa, tentukan kewenangan, lalu klik <b>Update</b> untuk menyortir otomatis.</p>
+                    <h3 class="font-display font-bold text-lg">Musyawarah & Verifikasi Desa</h3>
+                    <p class="text-[11px] text-gray-400 mt-0.5">Beri peringkat desa, tentukan kewenangan, lalu klik <b>Update</b> untuk menyortir otomatis.</p>
                 </div>
             </div>
 
             ${btns}
             
             <div class="relative">
-                <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[10px]"></i>
                 <input type="text" id="searchDesaTable" placeholder="Cari judul usulan, pengusul, dusun, RT..."
-                    class="w-full pl-10 pr-4 py-2.5 border rounded-lg text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-forest-200 focus:border-forest-400 transition-all"
+                    class="w-full pl-9 pr-3 py-2 border rounded-lg text-xs bg-gray-50 focus:bg-white focus:ring-2 focus:ring-forest-200 focus:border-forest-400 transition-all"
                     oninput="filterDesaTable(this.value)">
             </div>
             
-            <div class="container mx-auto px-2 sm:px-4 md:px-6 xl:max-w-[1600px]">
-                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="container mx-auto px-1 sm:px-3 md:px-4 xl:max-w-[1600px]">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                     <div class="tbl-inner h-[500px] scroll-smooth">
-                        <table class="w-full min-w-[1100px] border-collapse" id="tableDesaWrap">
+                        <table class="w-full min-w-[950px] border-collapse" id="tableDesaWrap">
                             <colgroup>
-                                <col style="width: 40px">   
-                                <col style="width: 40px">  
-                                <col style="width: 120px"> 
+                                <col style="width: 35px">   
+                                <col style="width: 35px">  
+                                <col style="width: 100px"> 
                                 <col>                     
-                                <col style="width: 120px">  
                                 <col style="width: 100px">  
-                                <col style="width: 70px">   
-                                <col style="width: 110px">  
-                                <col style="width: 140px">  
-                                <col style="width: 90px">   
+                                <col style="width: 85px">  
+                                <col style="width: 60px">   
+                                <col style="width: 90px">  
+                                <col style="width: 115px">  
+                                <col style="width: 75px">   
                             </colgroup>
                             <thead>
                                 <tr>
-                                    <th class="text-center"><input type="checkbox" onchange="document.querySelectorAll('.bulk-check-desa').forEach(c=>{c.checked=this.checked});updateBulkCountDesa()" aria-label="Pilih semua"></th>
+                                    <th class="text-center"><input type="checkbox" class="w-3.5 h-3.5" onchange="document.querySelectorAll('.bulk-check-desa').forEach(c=>{c.checked=this.checked});updateBulkCountDesa()" aria-label="Pilih semua"></th>
                                     <th class="text-center">No</th>
                                     <th class="text-center">Status</th>
                                     <th class="text-left">Judul Usulan</th>
@@ -8706,7 +8721,7 @@
                                     <th class="text-center">RT</th>
                                     <th class="text-center">Volume</th>
                                     <th class="text-right">Estimasi</th>
-                                    <th class="text-center">Rank Dusun</th>
+                                    <th class="text-center">Rank</th>
                                 </tr>
                             </thead>
                             ${rowsHTML}
@@ -8716,7 +8731,6 @@
             </div>
         </div>`;
     }
-
 
     /* ==========================================
     FUNGSI-FUNGSI HELPER DESA
@@ -9385,7 +9399,7 @@
                 : `<span class="text-xs text-gray-500">${escapeHtml(namaPengusul || username)}</span>`;
         }
 
-        // ═══════════════════════════════════════════
+            // ═══════════════════════════════════════════
         //  TABLE ROWS HTML
         // ═══════════════════════════════════════════
         let rowsHTML = '';
@@ -9401,40 +9415,38 @@
                 const sdgOptions = buildSdgOptions(sdgIds, itemId);
                 
                 let actionBtns = '';
-                // ✅ PERBAIKAN: Gunakan handleUpdateDusun yang akan sort setelah update
-                actionBtns += `<button onclick="event.stopPropagation(); handleUpdateDusun('${itemId}')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"><i class="fas fa-save text-xs"></i><span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[10px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Update</span></button>`;
-                actionBtns += `<button onclick="event.stopPropagation(); prosesDusun('${itemId}','ranked_dusun')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-green-100 text-green-600 hover:bg-green-200 transition-colors"><i class="fas fa-paper-plane text-xs"></i><span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[10px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Submit</span></button>`;
-                if (isDiajukan && !isOwnMusyawarah) actionBtns += `<button onclick="event.stopPropagation(); openModalKembalikan('${itemId}','dikembalikan_user')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors"><i class="fas fa-undo text-xs"></i><span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[10px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Kembalikan</span></button>`;
-                if (isDikembalikan && isOwnMusyawarah) actionBtns += `<button onclick="event.stopPropagation(); openFormUsulan('${itemId}')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 hover:bg-indigo-200 transition-colors"><i class="fas fa-pen text-xs"></i><span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[10px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Edit Usulan</span></button>`;
+                actionBtns += `<button onclick="event.stopPropagation(); handleUpdateDusun('${itemId}')" class="group relative w-7 h-7 flex items-center justify-center rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors" title="Update"><i class="fas fa-save text-[10px]"></i><span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[9px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Update</span></button>`;
+                actionBtns += `<button onclick="event.stopPropagation(); prosesDusun('${itemId}','ranked_dusun')" class="group relative w-7 h-7 flex items-center justify-center rounded-md bg-green-100 text-green-600 hover:bg-green-200 transition-colors" title="Submit"><i class="fas fa-paper-plane text-[10px]"></i><span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[9px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Submit</span></button>`;
+                if (isDiajukan && !isOwnMusyawarah) actionBtns += `<button onclick="event.stopPropagation(); openModalKembalikan('${itemId}','dikembalikan_user')" class="group relative w-7 h-7 flex items-center justify-center rounded-md bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors" title="Kembalikan"><i class="fas fa-undo text-[10px]"></i><span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[9px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Kembalikan</span></button>`;
+                if (isDikembalikan && isOwnMusyawarah) actionBtns += `<button onclick="event.stopPropagation(); openFormUsulan('${itemId}')" class="group relative w-7 h-7 flex items-center justify-center rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200 transition-colors" title="Edit Usulan"><i class="fas fa-pen text-[10px]"></i><span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[9px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Edit Usulan</span></button>`;
                 if (canEditMusyawarah) {
-                    actionBtns += `<button onclick="event.stopPropagation(); openFormUsulan('${itemId}')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 hover:bg-indigo-200 transition-colors"><i class="fas fa-pen text-xs"></i><span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[10px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Edit</span></button>`;
-                    actionBtns += `<button onclick="event.stopPropagation(); hapusUsulanMusyawarah('${itemId}','${escapeJs(i.judul)}')" class="group relative w-8 h-8 flex items-center justify-center rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors"><i class="fas fa-trash-alt text-xs"></i><span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[10px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Hapus</span></button>`;
+                    actionBtns += `<button onclick="event.stopPropagation(); openFormUsulan('${itemId}')" class="group relative w-7 h-7 flex items-center justify-center rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200 transition-colors" title="Edit"><i class="fas fa-pen text-[10px]"></i><span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[9px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Edit</span></button>`;
+                    actionBtns += `<button onclick="event.stopPropagation(); hapusUsulanMusyawarah('${itemId}','${escapeJs(i.judul)}')" class="group relative w-7 h-7 flex items-center justify-center rounded-md bg-red-100 text-red-600 hover:bg-red-200 transition-colors" title="Hapus"><i class="fas fa-trash-alt text-[10px]"></i><span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[9px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Hapus</span></button>`;
                 }
                 
-                const catatanHtml = isDikembalikan ? `<div class="flex items-start gap-2 text-xs text-amber-700 bg-amber-50 rounded-lg p-3"><i class="fas fa-comment-dots mt-0.5 flex-shrink-0"></i><div><b class="block mb-0.5">Catatan Pemerintah Desa:</b>${escapeHtml(i.catatanKembali)}</div></div>` : '';
+                const catatanHtml = isDikembalikan ? `<div class="flex items-start gap-1.5 text-[11px] text-amber-700 bg-amber-50 rounded-md p-2"><i class="fas fa-comment-dots mt-0.5 flex-shrink-0"></i><div><b class="block mb-0.5">Catatan Pemerintah Desa:</b>${escapeHtml(i.catatanKembali)}</div></div>` : '';
                 
                 const subContent = locked 
-                    ? '<div class="text-xs text-red-500 font-medium"><i class="fas fa-lock mr-1"></i>Pengimputan ditutup.</div>'
-                    : `<div class="flex flex-col gap-3">
-                            <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
-                                <div class="flex items-center gap-2">
-                                    <label class="text-xs font-semibold text-gray-600 whitespace-nowrap">Ranking:</label>
-                                    <!-- ✅ PERBAIKAN: Hapus oninput, tambahkan onblur untuk highlight perubahan -->
-                                    <input type="number" min="1" placeholder="#" value="${i.rankingDusun}" class="w-20 px-2 py-1.5 border rounded-lg text-sm text-center focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all" id="rank-${i.id}" data-original="${i.rankingDusun}" onblur="highlightChangedRank(this)">
+                    ? '<div class="text-[11px] text-red-500 font-medium"><i class="fas fa-lock mr-1"></i>Pengimputan ditutup.</div>'
+                    : `<div class="flex flex-col gap-2">
+                            <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                                <div class="flex items-center gap-1.5">
+                                    <label class="text-[11px] font-semibold text-gray-600 whitespace-nowrap">Ranking:</label>
+                                    <input type="number" min="1" placeholder="#" value="${i.rankingDusun}" class="w-16 px-1.5 py-1 border rounded-md text-xs text-center focus:ring-1 focus:ring-blue-200 focus:border-blue-400 transition-all" id="rank-${i.id}" data-original="${i.rankingDusun}" onblur="highlightChangedRank(this)">
                                 </div>
-                                <div class="flex items-center gap-1.5">${actionBtns}</div>
+                                <div class="flex items-center gap-1">${actionBtns}</div>
                             </div>
-                            <div class="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4">
-                                <label class="text-xs font-semibold text-gray-600 whitespace-nowrap pt-1.5">SDGs:</label>
-                                <div class="relative w-full sm:flex-1 sm:max-w-[400px]" id="sdg-wrapper-${i.id}">
-                                    <div onclick="event.stopPropagation(); toggleSdgDropdown('${itemId}')" class="flex items-center gap-1 px-3 py-2 border rounded-lg text-sm bg-white cursor-pointer min-h-[38px]">
-                                        <span class="text-gray-400 text-xs ${sdgIds.length ? 'hidden' : ''}" id="sdg-placeholder-${i.id}">Pilih SDGs...</span>
+                            <div class="flex flex-col sm:flex-row sm:items-start gap-1.5 sm:gap-3">
+                                <label class="text-[11px] font-semibold text-gray-600 whitespace-nowrap pt-1">SDGs:</label>
+                                <div class="relative w-full sm:flex-1 sm:max-w-[350px]" id="sdg-wrapper-${i.id}">
+                                    <div onclick="event.stopPropagation(); toggleSdgDropdown('${itemId}')" class="flex items-center gap-1 px-2.5 py-1.5 border rounded-md text-xs bg-white cursor-pointer min-h-[32px]">
+                                        <span class="text-gray-400 text-[11px] ${sdgIds.length ? 'hidden' : ''}" id="sdg-placeholder-${i.id}">Pilih SDGs...</span>
                                         <div class="flex flex-wrap gap-1" id="sdg-chips-${i.id}">${sdgChips}</div>
-                                        <i class="fas fa-chevron-down text-[10px] text-gray-400 ml-auto flex-shrink-0 transition-transform" id="sdg-arrow-${i.id}"></i>
+                                        <i class="fas fa-chevron-down text-[9px] text-gray-400 ml-auto flex-shrink-0 transition-transform" id="sdg-arrow-${i.id}"></i>
                                     </div>
-                                    <div class="hidden absolute z-50 mt-1 bg-white border rounded-lg shadow-xl p-1.5 w-full sm:w-auto sm:min-w-[280px] max-h-[220px] overflow-y-auto" id="sdg-dropdown-${i.id}">
+                                    <div class="hidden absolute z-50 mt-1 bg-white border rounded-md shadow-xl p-1 w-full sm:w-auto sm:min-w-[250px] max-h-[200px] overflow-y-auto" id="sdg-dropdown-${i.id}">
                                         <div class="sticky top-0 bg-white pb-1 mb-1 border-b">
-                                            <input type="text" placeholder="Cari SDGs..." class="w-full px-2 py-1 text-xs border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400" oninput="filterSdgOptions('${itemId}', this.value)">
+                                            <input type="text" placeholder="Cari SDGs..." class="w-full px-2 py-1 text-[11px] border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400" oninput="filterSdgOptions('${itemId}', this.value)">
                                         </div>
                                         ${sdgOptions}
                                     </div>
@@ -9444,14 +9456,14 @@
                 
                 return `<tbody id="row-${i.id}">
                             <tr class="main-row cursor-pointer hover:bg-gray-50/80" onclick="showDetail('${itemId}')">
-                                <td class="td-cell text-center">${locked ? '' : `<input type="checkbox" class="bulk-check accent-honey-500" data-id="${i.id}" onclick="event.stopPropagation()" onchange="updateBulkCount()">`}</td>
-                                <td class="td-cell text-center text-gray-400 row-dusun-num tabular-nums">${n + 1}</td>
-                                <td class="td-cell text-center">${statusLabel(i.status)}</td>
+                                <td class="td-cell text-center">${locked ? '' : `<input type="checkbox" class="bulk-check accent-honey-500 w-3.5 h-3.5" data-id="${i.id}" onclick="event.stopPropagation()" onchange="updateBulkCount()">`}</td>
+                                <td class="td-cell text-center text-gray-400 row-dusun-num tabular-nums text-xs">${n + 1}</td>
+                                <td class="td-cell text-center text-xs">${statusLabel(i.status)}</td>
                                 <td class="td-cell font-semibold text-gray-800 td-judul">${escapeHtml(i.judul)}</td>
-                                <td class="td-cell text-gray-500 whitespace-nowrap">${Array.isArray(i.rt) ? i.rt.join(', ') : i.rt}</td>
-                                <td class="td-cell text-gray-600 whitespace-nowrap">${i.volume} ${escapeHtml(i.satuan)}</td>
-                                <td class="td-cell text-right font-semibold text-gray-700 whitespace-nowrap tabular-nums">${formatRupiah(i.estimasiBiaya)}</td>
-                                <td class="td-cell text-center">${sumberBadge(isOwnMusyawarah, i.namaPengusul, i.username)}</td>
+                                <td class="td-cell text-gray-500 whitespace-nowrap text-xs">${Array.isArray(i.rt) ? i.rt.join(', ') : i.rt}</td>
+                                <td class="td-cell text-gray-600 whitespace-nowrap text-xs">${i.volume} ${escapeHtml(i.satuan)}</td>
+                                <td class="td-cell text-right font-semibold text-gray-700 whitespace-nowrap tabular-nums text-xs">${formatRupiah(i.estimasiBiaya)}</td>
+                                <td class="td-cell text-center text-xs">${sumberBadge(isOwnMusyawarah, i.namaPengusul, i.username)}</td>
                             </tr>
                             <tr class="sub-row">
                                 <td colspan="8" class="sub-cell">
@@ -9461,7 +9473,7 @@
                         </tbody>`;
             }).join('');
         } else {
-            rowsHTML = `<tbody><tr><td colspan="8" class="text-center py-12 text-gray-400 text-sm">${emptyText}</td></tr></tbody>`;
+            rowsHTML = `<tbody><tr><td colspan="8" class="text-center py-8 text-gray-400 text-xs">${emptyText}</td></tr></tbody>`;
         }
 
         // ═══════════════════════════════════════════
@@ -9469,25 +9481,25 @@
         // ═══════════════════════════════════════════
         let headerBtnsHTML = '';
         if (locked) {
-            headerBtnsHTML = `<span class="px-3 py-1.5 bg-red-100 text-red-700 text-xs font-bold rounded-lg"><i class="fas fa-lock mr-1"></i>Pengimputan Ditutup</span>`;
+            headerBtnsHTML = `<span class="px-2.5 py-1 bg-red-100 text-red-700 text-[10px] font-bold rounded-md"><i class="fas fa-lock mr-1"></i>Pengimputan Ditutup</span>`;
         } else {
             headerBtnsHTML = `
-            <div class="sm:hidden space-y-2">
-                <button onclick="bulkProsesDusun()" class="w-full h-10 px-4 flex items-center justify-center gap-1.5 btn-success text-xs font-semibold rounded-lg shadow-sm"><i class="fas fa-check-double"></i> Submit Terpilih ke Desa</button>
-                <div id="bulkCountMobile" class="bulk-count hidden text-xs text-honey-700 font-semibold pl-1 -mt-1"><span id="bulkNumMobile">0</span> terpilih</div>
-                <div class="flex items-center gap-2">
-                    <button onclick="openFormUsulan('musyawarah')" class="flex-1 h-10 px-3 flex items-center justify-center gap-2 rounded-lg bg-blue-600 text-white shadow-sm hover:bg-blue-700 active:bg-blue-800 transition-colors text-xs font-semibold"><i class="fas fa-file-circle-plus text-sm"></i> Input Musyawarah</button>
-                    <button onclick="openAjukanKembaliDusunModal()" class="flex-1 h-10 px-3 flex items-center justify-center gap-2 rounded-lg bg-forest-600 text-white shadow-sm hover:bg-forest-700 active:bg-forest-800 transition-colors text-xs font-semibold"><i class="fas fa-rotate-left text-sm"></i> Ajukan Kembali</button>
+            <div class="sm:hidden space-y-1.5">
+                <button onclick="bulkProsesDusun()" class="w-full h-8 px-3 flex items-center justify-center gap-1.5 btn-success text-[10px] font-semibold rounded-md shadow-sm"><i class="fas fa-check-double text-[9px]"></i> Submit Terpilih ke Desa</button>
+                <div id="bulkCountMobile" class="bulk-count hidden text-[10px] text-honey-700 font-semibold pl-1 -mt-1"><span id="bulkNumMobile">0</span> terpilih</div>
+                <div class="flex items-center gap-1.5">
+                    <button onclick="openFormUsulan('musyawarah')" class="flex-1 h-8 px-2.5 flex items-center justify-center gap-1.5 rounded-md bg-blue-600 text-white shadow-sm hover:bg-blue-700 active:bg-blue-800 transition-colors text-[10px] font-semibold"><i class="fas fa-file-circle-plus text-xs"></i> Input Musyawarah</button>
+                    <button onclick="openAjukanKembaliDusunModal()" class="flex-1 h-8 px-2.5 flex items-center justify-center gap-1.5 rounded-md bg-forest-600 text-white shadow-sm hover:bg-forest-700 active:bg-forest-800 transition-colors text-[10px] font-semibold"><i class="fas fa-rotate-left text-xs"></i> Ajukan Kembali</button>
                 </div>
             </div>
-            <div class="hidden sm:flex sm:flex-wrap sm:items-center sm:justify-between gap-3 mb-3">
-                <div class="flex items-center gap-2">
-                    <button onclick="bulkProsesDusun()" class="h-10 px-4 flex items-center gap-1.5 btn-success text-xs font-semibold rounded-lg shadow-sm"><i class="fas fa-check-double"></i>Submit Terpilih ke Desa</button>
-                    <span id="bulkCount" class="bulk-count hidden text-xs text-honey-700 font-semibold ml-1"><span id="bulkNum">0</span> terpilih</span>
+            <div class="hidden sm:flex sm:flex-wrap sm:items-center sm:justify-between gap-2 mb-2">
+                <div class="flex items-center gap-1.5">
+                    <button onclick="bulkProsesDusun()" class="h-8 px-3 flex items-center gap-1 btn-success text-[10px] font-semibold rounded-md shadow-sm"><i class="fas fa-check-double text-[9px]"></i>Submit Terpilih ke Desa</button>
+                    <span id="bulkCount" class="bulk-count hidden text-[10px] text-honey-700 font-semibold ml-1"><span id="bulkNum">0</span> terpilih</span>
                 </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="openFormUsulan('musyawarah')" class="group relative w-10 h-10 flex items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm hover:bg-blue-700 transition-colors"><i class="fas fa-file-circle-plus text-sm"></i><span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[10px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Input Musyawarah</span></button>
-                    <button onclick="openAjukanKembaliDusunModal()" class="group relative w-10 h-10 flex items-center justify-center rounded-lg bg-forest-600 text-white shadow-sm hover:bg-forest-700 transition-colors"><i class="fas fa-rotate-left text-sm"></i><span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[10px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Ajukan Kembali</span></button>
+                <div class="flex items-center gap-1.5">
+                    <button onclick="openFormUsulan('musyawarah')" class="group relative w-8 h-8 flex items-center justify-center rounded-md bg-blue-600 text-white shadow-sm hover:bg-blue-700 transition-colors"><i class="fas fa-file-circle-plus text-xs"></i><span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[9px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Input Musyawarah</span></button>
+                    <button onclick="openAjukanKembaliDusunModal()" class="group relative w-8 h-8 flex items-center justify-center rounded-md bg-forest-600 text-white shadow-sm hover:bg-forest-700 transition-colors"><i class="fas fa-rotate-left text-xs"></i><span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-0.5 bg-gray-800 text-white text-[9px] font-medium rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">Ajukan Kembali</span></button>
                 </div>
             </div>`;
         }
@@ -9497,19 +9509,19 @@
         // ═══════════════════════════════════════════
         return `
         <style>
-            /* ── FLUID TYPOGRAPHY ── */
-            #tableDusunWrap { font-size: clamp(0.7rem, 1.2vw, 0.875rem); }
-            #tableDusunWrap thead { font-size: clamp(0.65rem, 0.95vw, 0.75rem); }
-            #tableDusunWrap .td-judul { font-size: clamp(0.75rem, 1.3vw, 0.95rem); font-weight: 600; }
+            /* ── FLUID TYPOGRAPHY (DIPERKECIL) ── */
+            #tableDusunWrap { font-size: clamp(0.6rem, 1vw, 0.75rem); }
+            #tableDusunWrap thead { font-size: clamp(0.58rem, 0.8vw, 0.68rem); }
+            #tableDusunWrap .td-judul { font-size: clamp(0.68rem, 1.05vw, 0.82rem); font-weight: 600; }
 
-            /* ── FLUID SPACING ── */
+            /* ── FLUID SPACING (DIPERKECIL) ── */
             #tableDusunWrap th, 
             #tableDusunWrap td.td-cell { 
-                padding: clamp(0.4rem, 0.8vw, 0.65rem) clamp(0.5rem, 1vw, 0.75rem); 
+                padding: clamp(0.35rem, 0.65vw, 0.55rem) clamp(0.4rem, 0.8vw, 0.6rem); 
                 vertical-align: middle;
                 border-bottom: 1px solid #e5e7eb;
-                border-right: 1px solid #e5e7eb;
-                line-height: 1.5;
+                border-right: 1px solid #f3f4f6;
+                line-height: 1.35;
             }
             #tableDusunWrap th:last-child,
             #tableDusunWrap td.td-cell:last-child { border-right: none; }
@@ -9521,11 +9533,11 @@
                 background-color: #f9fafb; 
             }
             #tableDusunWrap .sub-content { 
-                padding: clamp(0.65rem, 1.2vw, 1rem) clamp(0.75rem, 1.5vw, 1.25rem);
+                padding: clamp(0.5rem, 0.9vw, 0.75rem) clamp(0.5rem, 1.1vw, 0.85rem);
                 display: flex;
                 flex-direction: column;
-                gap: clamp(0.5rem, 0.8vw, 0.75rem);
-                font-size: clamp(0.7rem, 1.1vw, 0.85rem);
+                gap: clamp(0.4rem, 0.6vw, 0.5rem);
+                font-size: clamp(0.62rem, 0.95vw, 0.75rem);
             }
 
             /* ── HEADER STYLING ── */
@@ -9533,19 +9545,23 @@
                 background-color: #f9fafb; 
                 color: #4b5563; 
                 text-transform: uppercase; 
-                letter-spacing: 0.05em; 
+                letter-spacing: 0.04em; 
                 font-weight: 600;
                 position: sticky;
                 top: 0;
                 z-index: 10;
                 border-bottom: 2px solid #e5e7eb;
+                border-right-color: #f3f4f6;
+                white-space: nowrap;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.03);
             }
+            #tableDusunWrap thead th:last-child { border-right: none; }
 
             /* ── INTERAKSI BARIS ── */
             #tableDusunWrap tbody tr { transition: background-color 0.15s ease; }
             #tableDusunWrap tbody tr:hover > td.td-cell { background-color: #f9fafb; }
             
-            /* ✅ TAMBAHAN: Highlight untuk ranking yang berubah */
+            /* HIGHLIGHT RANKING */
             #tableDusunWrap .rank-changed { 
                 background-color: #fef3c7 !important; 
                 border-color: #f59e0b !important;
@@ -9553,10 +9569,10 @@
             }
             @keyframes rankPulse {
                 0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-                50% { box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2); }
+                50% { box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2); }
             }
             
-            /* ✅ TAMBAHAN: Animasi baris saat sort */
+            /* ANIMASI SORT */
             #tableDusunWrap tbody[id^="row-"] {
                 transition: transform 0.3s ease, opacity 0.3s ease;
             }
@@ -9564,7 +9580,7 @@
                 opacity: 0.7;
             }
 
-            /* ── SCROLLBAR ── */
+            /* ── SCROLLBAR (DIPERKECIL) ── */
             .tbl-inner {
                 scrollbar-gutter: stable; 
                 overflow-x: auto; 
@@ -9572,46 +9588,46 @@
                 scrollbar-width: thin; 
                 scrollbar-color: #94a3b8 #e2e8f0;
             }
-            .tbl-inner::-webkit-scrollbar { width: 8px; height: 16px; }
+            .tbl-inner::-webkit-scrollbar { width: 6px; height: 12px; }
             .tbl-inner::-webkit-scrollbar-track { background: #e2e8f0; }
-            .tbl-inner::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 2px; border: 2px solid #e2e8f0; }
+            .tbl-inner::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 2px; border: 1px solid #e2e8f0; }
             .tbl-inner::-webkit-scrollbar-thumb:hover { background: #64748b; }
             .tbl-inner::-webkit-scrollbar-corner { background: #e2e8f0; }
         </style>
 
-        <div class="space-y-4">
+        <div class="space-y-3">
             ${statsHTML}
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <div>
-                    <h3 class="font-display font-bold text-xl">Verifikasi & Input Dusun</h3>
-                    <p class="text-xs text-gray-400 mt-0.5">Beri peringkat lalu klik <b>Update</b> untuk menyortir otomatis.</p>
+                    <h3 class="font-display font-bold text-lg">Verifikasi & Input Dusun</h3>
+                    <p class="text-[11px] text-gray-400 mt-0.5">Beri peringkat lalu klik <b>Update</b> untuk menyortir otomatis.</p>
                 </div>
                 ${locked ? `<div class="flex items-center gap-2">${headerBtnsHTML}</div>` : ''}
             </div>
             ${!locked ? headerBtnsHTML : ''}
             
             <div class="relative">
-                <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                <input type="text" id="searchDusunTable" placeholder="Cari judul usulan, RT, atau Pengusul..." class="w-full pl-10 pr-4 py-2.5 border rounded-lg text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-forest-200 focus:border-forest-400 transition-all" oninput="filterDusunTable(this.value)">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[10px]"></i>
+                <input type="text" id="searchDusunTable" placeholder="Cari judul usulan, RT, atau Pengusul..." class="w-full pl-9 pr-3 py-2 border rounded-lg text-xs bg-gray-50 focus:bg-white focus:ring-2 focus:ring-forest-200 focus:border-forest-400 transition-all" oninput="filterDusunTable(this.value)">
             </div>
             
-            <div class="container mx-auto px-2 sm:px-4 md:px-6 xl:max-w-[1600px]">
-                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="container mx-auto px-1 sm:px-3 md:px-4 xl:max-w-[1600px]">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                     <div class="tbl-inner h-[500px] scroll-smooth">
-                        <table class="w-full min-w-[800px] border-collapse" id="tableDusunWrap">
+                        <table class="w-full min-w-[750px] border-collapse" id="tableDusunWrap">
                             <colgroup>
-                                <col style="width: 40px">   
-                                <col style="width: 40px">  
-                                <col style="width: 120px"> 
+                                <col style="width: 35px">   
+                                <col style="width: 35px">  
+                                <col style="width: 100px"> 
                                 <col>                     
-                                <col style="width: 80px">   
+                                <col style="width: 65px">   
+                                <col style="width: 90px">  
                                 <col style="width: 120px">  
-                                <col style="width: 150px">  
-                                <col style="width: 140px">  
+                                <col style="width: 110px">  
                             </colgroup>
                             <thead>
                                 <tr>
-                                    <th class="text-center">${locked ? '' : `<input type="checkbox" onchange="document.querySelectorAll('.bulk-check').forEach(c=>{c.checked=this.checked});updateBulkCount()" aria-label="Pilih semua">`}</th>
+                                    <th class="text-center">${locked ? '' : `<input type="checkbox" class="w-3.5 h-3.5" onchange="document.querySelectorAll('.bulk-check').forEach(c=>{c.checked=this.checked});updateBulkCount()" aria-label="Pilih semua">`}</th>
                                     <th class="text-center">No</th>
                                     <th class="text-center">Status</th>
                                     <th class="text-left">Judul Usulan</th>
