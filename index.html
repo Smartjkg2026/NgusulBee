@@ -276,7 +276,7 @@
        1. KONFIGURASI APLIKASI
        ========================================== */
     const CONFIG = {
-        API_URL: 'https://script.google.com/macros/s/AKfycbxcbzb9-PCUAEenHXYsxX0iSXLTBfWiVH3owLh2Pyk87afHUNkJuE8b-ZC34ltlN-sMKg/exec',
+        API_URL: 'https://script.google.com/macros/s/AKfycbwsk32VrORd7GHJR3eDAIXiyUKtgM4pqqdZEmTTANzSAxxERUZk1nIM1cpSUVUpUNxRGQ/exec',
         APP_NAME: 'NgusulBee',
         DESA: 'Desa Jangkang',
         KATEGORI: ['Infrastruktur', 'Pendidikan', 'Kesehatan', 'Ekonomi', 'Sosial', 'Lingkungan'],
@@ -1479,28 +1479,43 @@
     }
 
     function rLanding() {
+        // Tambahkan setTimeout agar fetchLandingStats jalan setelah HTML di-render
+        setTimeout(function() { 
+            if (typeof fetchLandingStats === 'function') fetchLandingStats(); 
+        }, 100);
+
         return `<div class="view-enter min-h-screen flex flex-col">
             <nav class="relative z-10 flex items-center justify-between px-5 md:px-8 py-4 max-w-6xl mx-auto w-full">
                 <div class="flex items-center gap-3">
                     <img src="Logo.png" alt="NgusulBee" class="w-10 h-10 object-contain">
                     <span class="font-display font-800 text-lg text-honey-700 tracking-tight">NgusulBee</span>
                 </div>
-                <div class="flex gap-2 sm:gap-3"><button onclick="navigate('register')" class="px-4 sm:px-5 py-2 text-sm font-semibold text-honey-700 hover:bg-honey-50 rounded-lg transition-colors">Daftar</button><button onclick="navigate('login')" class="px-4 sm:px-5 py-2 text-sm font-semibold text-white bg-honey-500 hover:bg-honey-600 rounded-lg shadow transition-colors">Masuk</button></div>
+                <div class="flex gap-2 sm:gap-3">
+                    <button onclick="navigate('register')" class="px-4 sm:px-5 py-2 text-sm font-semibold text-honey-700 hover:bg-honey-50 rounded-lg transition-colors">Daftar</button>
+                    <button onclick="navigate('login')" class="px-4 sm:px-5 py-2 text-sm font-semibold text-white bg-honey-500 hover:bg-honey-600 rounded-lg shadow transition-colors">Masuk</button>
+                </div>
             </nav>
+            
             <main class="flex-1 flex items-center px-5 md:px-8 py-12 md:py-16 relative">
                 <div class="hero-gradient"></div>
                 <svg class="hero-hex hero-hex-1" viewBox="0 0 100 100"><polygon points="50,3 95,27 95,72 50,97 5,72 5,27" fill="none" stroke="#E8A317" stroke-width="2"/></svg>
                 <svg class="hero-hex hero-hex-2" viewBox="0 0 100 100"><polygon points="50,3 95,27 95,72 50,97 5,72 5,27" fill="none" stroke="#E8A317" stroke-width="2"/></svg>
                 <svg class="hero-hex hero-hex-3" viewBox="0 0 100 100"><polygon points="50,3 95,27 95,72 50,97 5,72 5,27" fill="none" stroke="#E8A317" stroke-width="2"/></svg>
+                
                 <div class="max-w-6xl mx-auto w-full grid md:grid-cols-2 gap-10 md:gap-12 items-center relative z-10">
                     <div class="space-y-7">
-                        <div><span class="inline-block px-3 py-1 bg-honey-100 text-honey-700 text-xs font-bold rounded-full mb-4">${CONFIG.DESA}</span><h1 class="font-display font-900 text-4xl md:text-5xl leading-[1.1] tracking-tight">Suara Warga,<br><span class="text-honey-500">Pembangunan Nyata</span></h1></div>
+                        <div>
+                            <span class="inline-block px-3 py-1 bg-honey-100 text-honey-700 text-xs font-bold rounded-full mb-4">${CONFIG.DESA}</span>
+                            <h1 class="font-display font-900 text-4xl md:text-5xl leading-[1.1] tracking-tight">Suara Warga,<br><span class="text-honey-500">Pembangunan Nyata</span></h1>
+                        </div>
                         <p class="text-base md:text-lg text-gray-600 leading-relaxed max-w-md">Platform musyawarah perencanaan pembangunan desa yang transparan dan akuntabel.</p>
-                        <div class="flex flex-wrap gap-3"><button onclick="navigate('login')" class="px-7 py-3.5 bg-honey-500 text-white font-display font-700 rounded-xl shadow-lg hover:bg-honey-600 hover:shadow-xl transition-all">Mulai Sekarang <i class="fas fa-arrow-right ml-2"></i></button></div>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="navigate('login')" class="px-7 py-3.5 bg-honey-500 text-white font-display font-700 rounded-xl shadow-lg hover:bg-honey-600 hover:shadow-xl transition-all">Mulai Sekarang <i class="fas fa-arrow-right ml-2"></i></button>
+                        </div>
                         <a href="SlideNgusulbee.html" class="px-7 py-3.5 bg-transparent border-2 border-cyan-600 text-cyan-600 font-display font-700 rounded-xl shadow-lg hover:bg-cyan-50 hover:shadow-xl transition-all inline-flex items-center gap-2"><i class="fas fa-desktop text-red-500 text-xl"></i> Presentasi</a>
-                        <a href="tutorial.html" class="px-7 py-3.5 bg-transparent border-2 border-cyan-600 text-cyan-600 font-display font-700 rounded-xl shadow-lg hover:bg-cyan-50 hover:shadow-xl transition-all inline-flex items-center gap-2"><i class="fas fa-play text-red-500 text-xl"></i></i> Totorial</a>
+                        <a href="tutorial.html" class="px-7 py-3.5 bg-transparent border-2 border-cyan-600 text-cyan-600 font-display font-700 rounded-xl shadow-lg hover:bg-cyan-50 hover:shadow-xl transition-all inline-flex items-center gap-2"><i class="fas fa-play text-red-500 text-xl"></i> Tutorial</a>
                         
-                        <!-- ✅ STATISTIK (DENGAN ANIMASI HOVER) -->
+                        <!-- STATISTIK DINAMIS -->
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
                             <div class="stat-hover stat-honey bg-white/80 backdrop-blur-sm border border-gray-200/60 rounded-xl px-4 py-3 text-center text-gray-500 shadow-sm">
                                 <span class="stat-num block font-display font-800 text-2xl text-honey-600 transition-colors">27</span>
@@ -1526,69 +1541,19 @@
                                 <span class="text-[11px] font-semibold text-purple-500 mt-1 block">Total Login</span>
                             </div>
                         </div>
+                        
                         <style>
-                            /* ==========================================
-                            ANIMASI HOVER STATISTIK LANDING
-                            ========================================== */
-                            .stat-hover {
-                                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                                transform: translateY(0);
-                            }
-
-                            .stat-hover:hover {
-                                transform: translateY(-4px);
-                                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-                            }
-
-                            .stat-hover:hover .stat-num {
-                                transform: scale(1.1);
-                                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                            }
-
-                            /* Warna spesifik per kartu */
-                            .stat-hover.stat-honey:hover {
-                                background-color: #fffbeb;
-                                border-color: #fde68a;
-                                box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.15), 0 4px 6px -2px rgba(245, 158, 11, 0.05);
-                            }
-                            .stat-hover.stat-honey:hover .stat-num { color: #b45309; }
-
-                            .stat-hover.stat-forest:hover {
-                                background-color: #ecfdf5;
-                                border-color: #86efac;
-                                box-shadow: 0 10px 25px -5px rgba(22, 163, 74, 0.15), 0 4px 6px -2px rgba(22, 163, 74, 0.05);
-                            }
-                            .stat-hover.stat-forest:hover .stat-num { color: #15803d; }
-
-                            .stat-hover.stat-gray:hover {
-                                background-color: #f9fafb;
-                                border-color: #d1d5db;
-                            }
-
-                            .stat-hover.stat-blue:hover {
-                                background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-                                border-color: #93c5fd;
-                                box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.2), 0 4px 6px -2px rgba(59, 130, 246, 0.05);
-                            }
-                            .stat-hover.stat-blue:hover .stat-num { color: #2563eb; }
-
-                            .stat-hover.stat-purple:hover {
-                                background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
-                                border-color: #c4b5fd;
-                                box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.2), 0 4px 6px -2px rgba(139, 92, 246, 0.05);
-                            }
-                            .stat-hover.stat-purple:hover .stat-num { color: #7c3aed; }
-
-                            /* Dot indikator online */
-                            .stat-hover .online-dot {
-                                transition: all 0.3s ease;
-                            }
-                            .stat-hover:hover .online-dot {
-                                transform: scale(1.5);
-                                box-shadow: 0 0 8px 2px rgba(59, 130, 246, 0.6);
-                            }
+                            .stat-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translateY(0); }
+                            .stat-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+                            .stat-hover:hover .stat-num { transform: scale(1.1); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+                            .stat-hover.stat-honey:hover { background-color: #fffbeb; border-color: #fde68a; }
+                            .stat-hover.stat-forest:hover { background-color: #ecfdf5; border-color: #86efac; }
+                            .stat-hover.stat-blue:hover { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-color: #93c5fd; }
+                            .stat-hover.stat-purple:hover { background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); border-color: #c4b5fd; }
+                            .stat-hover:hover .online-dot { transform: scale(1.5); box-shadow: 0 0 8px 2px rgba(59, 130, 246, 0.6); transition: all 0.3s ease; }
                         </style>
                     </div>
+                    
                     <div class="hidden md:grid grid-cols-2 gap-4">
                         <div class="space-y-4">
                             <div class="bg-white rounded-2xl p-5 shadow-lg border border-honey-100 stat-card"><div class="w-10 h-10 bg-honey-100 rounded-lg flex items-center justify-center mb-3"><i class="fas fa-file-pen text-honey-600"></i></div><h4 class="font-display font-700 text-sm">Ajukan Usulan</h4><p class="text-xs text-gray-500 mt-1">Sampaikan kebutuhan pembangunan</p></div>
@@ -1606,55 +1571,35 @@
     }
 
     // ==========================================
-    // FETCH & RENDER LANDING STATS (DEBUG VERSION)
+    // FETCH LANDING STATS (FINAL VERSION)
     // ==========================================
     async function fetchLandingStats() {
         const onlineEl = document.getElementById('landingOnline');
         const loginsEl = document.getElementById('landingLogins');
         
-        // Tampilkan loading sementara
         if (onlineEl) onlineEl.textContent = '...';
         if (loginsEl) loginsEl.textContent = '...';
 
         try {
-            // Cek apakah API tersedia
             if (typeof API === 'undefined' || !API.post) {
-                console.error('[Landing Stats] API tidak ditemukan');
-                if (onlineEl) onlineEl.textContent = '0';
-                if (loginsEl) loginsEl.textContent = '0';
+                if (onlineEl) onlineEl.textContent = '-';
+                if (loginsEl) loginsEl.textContent = '-';
                 return;
             }
 
             const res = await API.post('getLandingStats', {});
-            
-            console.log('[Landing Stats] Response:', res); // ✅ DEBUG: Lihat di Console
 
             if (res.success && res.data) {
-                if (onlineEl) onlineEl.textContent = res.data.online;
-                if (loginsEl) loginsEl.textContent = res.data.totalLogins;
+                if (onlineEl) onlineEl.textContent = res.data.online || 0;
+                if (loginsEl) loginsEl.textContent = res.data.totalLogins || 0;
             } else {
-                console.error('[Landing Stats] Response gagal:', res.message);
-                if (onlineEl) onlineEl.textContent = '0';
-                if (loginsEl) loginsEl.textContent = '0';
+                if (onlineEl) onlineEl.textContent = '-';
+                if (loginsEl) loginsEl.textContent = '-';
             }
         } catch (e) {
             console.error('[Landing Stats] Error:', e);
-            if (onlineEl) onlineEl.textContent = '0';
-            if (loginsEl) loginsEl.textContent = '0';
-        }
-    }
-
-    async function fetchLandingStats() {
-        try {
-            const res = await API.post('getLandingStats', {});
-            if (res.success) {
-                const onlineEl = document.getElementById('landingOnline');
-                const loginsEl = document.getElementById('landingLogins');
-                if (onlineEl) onlineEl.textContent = res.data.online;
-                if (loginsEl) loginsEl.textContent = res.data.totalLogins;
-            }
-        } catch (e) {
-            console.error('Gagal ambil stats landing:', e);
+            if (onlineEl) onlineEl.textContent = '-';
+            if (loginsEl) loginsEl.textContent = '-';
         }
     }
 
@@ -4494,7 +4439,7 @@
     }
 
 /* ==========================================
-    PREVIEW: BA RESMI — READ-ONLY BERSIH
+    PREVIEW: BA RESMI — READ-ONLY BERSIH & RESPONSIF
     ========================================== */
     function buildPreviewResmi(f, tahun, usulanFinal, byDusun, totalBiaya) {
         const sub = f.resmiSubTab || 'utama';
@@ -4529,46 +4474,105 @@
             </button>
         </div>`;
 
-        /* Kertas A4 — read only, tanpa pengaturan apapun */
+        /* Kertas A4 — read only, dengan wrapper responsif */
         const paper = `
-    <div style="background:repeating-conic-gradient(#d5d5d5 0% 25%, #e3e3e3 0% 50%) 50% / 20px 20px;
-                padding:40px 0 60px; position:relative;">
-
-        <!-- Label atas -->
-        <div class="no-print" style="position:absolute; top:12px; left:50%; transform:translateX(-50%);
-             font-family:'Segoe UI',Tahoma,sans-serif; font-size:10px; color:#888;
-             background:rgba(230,230,230,.85); padding:3px 14px; border-radius:20px;
-             letter-spacing:.5px; backdrop-filter:blur(4px); z-index:10; white-space:nowrap;">
-            <i class="fas fa-eye" style="margin-right:4px; opacity:.6;"></i>Preview A4 — 210 × 297 mm
-        </div>
-
-        <!-- Kertas putih -->
-        <div style="width:210mm; margin:0 auto; position:relative; background:#fff;
-                    border:1px solid #c0c0c0; border-radius:1px;
-                    box-shadow:0 1px 3px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.06), 0 12px 36px rgba(0,0,0,.1);">
-
-            <!-- CSS: salinan 1:1 dari printBAPDF() -->
-            <style>
-                #wePaper, #wePaper * { all: revert; }
-                #wePaper * { margin:0; padding:0; box-sizing:content-box; }
-                #wePaper { font-family:Arial,Helvetica,sans-serif; font-size:12pt; color:#000; -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; }
-                #wePaper table { border-collapse:collapse; width:100%; table-layout:auto; }
-                #wePaper th { white-space:nowrap!important; }
-                #wePaper tr { page-break-inside:avoid; page-break-after:auto; }
-                #wePaper thead { display:table-header-group; }
-                #wePaper tfoot { display:table-footer-group; }
-                #wePaper p, #wePaper div { orphans:3; widows:3; }
-                #wePaper img { max-width:88px; height:auto; }
-            </style>
-
-            <!-- Konten read-only -->
-            <div id="wePaper" style="position:relative; z-index:2; background:transparent;
-                        padding:25mm 25mm 25mm 25mm; line-height:1.5;
-                        overflow-wrap:break-word; word-break:break-word;">
-                ${content}
+        <div class="ba-mobile-wrapper no-print" style="
+            background:repeating-conic-gradient(#d5d5d5 0% 25%, #e3e3e3 0% 50%) 50% / 20px 20px;
+            padding:40px 0 60px; position:relative;
+        ">
+            <!-- Label atas -->
+            <div class="no-print" style="position:sticky; top:0px; left:50%; transform:translateX(-50%);
+                 font-family:'Segoe UI',Tahoma,sans-serif; font-size:10px; color:#888;
+                 background:rgba(230,230,230,.92); padding:4px 14px; border-radius:20px;
+                 letter-spacing:.5px; backdrop-filter:blur(4px); z-index:10; white-space:nowrap;
+                 margin: 0 auto 10px; width: fit-content; border: 1px solid #ddd;">
+                <i class="fas fa-eye" style="margin-right:4px; opacity:.6;"></i>Preview A4 — Geser untuk melihat detail
             </div>
-        </div>
-    </div>`;
+
+            <!-- Kontainer Geser untuk HP -->
+            <div style="overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 10px;">
+
+                <!-- Kertas putih (Tetap 210mm agar layout tidak rusak) -->
+                <div id="baPaperWrapper" style="width:210mm; min-width:210mm; margin:0 auto; position:relative; background:#fff;
+                            border:1px solid #c0c0c0; border-radius:1px;
+                            box-shadow:0 1px 3px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.06), 0 12px 36px rgba(0,0,0,.1);">
+
+                    <!-- CSS: salinan 1:1 dari printBAPDF() -->
+                    <style>
+                        /* --- RESET DASAR KERTAS --- */
+                        #wePaper, #wePaper * { all: revert; }
+                        #wePaper * { margin:0; padding:0; box-sizing:content-box; }
+                        #wePaper { font-family:Arial,Helvetica,sans-serif; font-size:12pt; color:#000; -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; }
+                        #wePaper table { border-collapse:collapse; width:100%; table-layout:auto; }
+                        #wePaper th { white-space:nowrap!important; }
+                        #wePaper tr { page-break-inside:avoid; page-break-after:auto; }
+                        #wePaper thead { display:table-header-group; }
+                        #wePaper tfoot { display:table-footer-group; }
+                        #wePaper p, #wePaper div { orphans:3; widows:3; }
+                        #wePaper img { max-width:88px; height:auto; }
+
+                        /* --- RESPONSIF: UNTUK TAMPILAN DI HP --- */
+                        @media screen and (max-width: 850px) {
+                            /* Hilangkan padding luar di HP agar maksimalkan ruang */
+                            .ba-mobile-wrapper {
+                                padding: 10px 0 30px !important;
+                                background: #f3f4f6 !important;
+                            }
+                            
+                            /* Hilangkan shadow kertas agar lebih bersih */
+                            #baPaperWrapper {
+                                box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+                                border: none !important;
+                                border-radius: 4px !important;
+                            }
+                            
+                            /* Perkecil margin dalam kertas di HP */
+                            #wePaper {
+                                padding: 10mm 8mm !important;
+                                font-size: 10pt !important;
+                            }
+                            
+                            #wePaper table {
+                                font-size: 8pt !important;
+                            }
+                            
+                            #wePaper td, #wePaper th {
+                                padding: 2pt 3pt !important;
+                            }
+                        }
+                        
+                        /* --- SAAT DICETAK / PDF --- */
+                        @media print {
+                            .ba-mobile-wrapper, .ba-mobile-wrapper * {
+                                background: white !important;
+                                padding: 0 !important;
+                                box-shadow: none !important;
+                                overflow: visible !important;
+                                border: none !important;
+                            }
+                            #baPaperWrapper {
+                                width: 210mm !important;
+                                margin: 0 !important;
+                                box-shadow: none !important;
+                                border: none !important;
+                            }
+                            #wePaper {
+                                padding: 25mm 25mm 25mm 25mm !important;
+                                font-size: 12pt !important;
+                            }
+                            #wePaper table { font-size: 11pt !important; }
+                        }
+                    </style>
+
+                    <!-- Konten read-only -->
+                    <div id="wePaper" style="position:relative; z-index:2; background:transparent;
+                                padding:25mm 25mm 25mm 25mm; line-height:1.5;
+                                overflow-wrap:break-word; word-break:break-word;">
+                        ${content}
+                    </div>
+                </div>
+            </div>
+        </div>`;
 
         return subNav + paper;
     }
@@ -4929,7 +4933,7 @@
         </div>`;
     }
 
-/* ==========================================
+    /* ==========================================
     LAMPIRAN II — RINCIAN DETAIL
     ========================================== */
     function buildLampiranDetailContent(f, tahun, usulanFinal, byDusun, totalBiaya, tglInfo) {
@@ -4948,16 +4952,16 @@
         usulanFinal.forEach((item, idx) => {
             detailRows += `
             <tr>
-                <td style="border:1pt solid #999; padding:3pt 5pt; text-align:center; font-size:9pt; vertical-align:top;">${idx + 1}</td>
-                <td style="border:1pt solid #999; padding:3pt 5pt; font-size:9pt; vertical-align:top;">
+                <td style="border:1pt solid #999; padding:4pt 4pt; text-align:center; font-size:9pt; vertical-align:top; width:4%;">${idx + 1}</td>
+                <td style="border:1pt solid #999; padding:4pt 5pt; font-size:9pt; vertical-align:top; width:36%;">
                     <b>${escapeHtml(item.judul)}</b><br>
                     <span style="color:#555; font-size:8pt;">${escapeHtml(item.deskripsi || 'Tidak ada deskripsi')}</span>
                 </td>
-                <td style="border:1pt solid #999; padding:3pt 5pt; text-align:center; font-size:9pt; vertical-align:top;white-space:nowrap;">${escapeHtml(item.dusun || '-')}</td>
-                <td style="border:1pt solid #999; padding:3pt 5pt; text-align:center; font-size:9pt; vertical-align:top;">${Array.isArray(item.rt) ? item.rt.join(', ') : (item.rt || '-')}</td>
-                <td style="border:1pt solid #999; padding:3pt 5pt; text-align:center; font-size:9pt; vertical-align:top;white-space:nowrap;">${escapeHtml(item.kategori || '-')}</td>
-                <td style="border:1pt solid #999; padding:3pt 5pt; text-align:center; font-size:9pt; vertical-align:top;">${item.rankingDesa || '-'}</td>
-                <td style="border:1pt solid #999; padding:3pt 5pt; text-align:right; font-size:9pt; vertical-align:top;">${formatRupiah(item.estimasiBiaya)}</td>
+                <td style="border:1pt solid #999; padding:4pt 4pt; text-align:center; font-size:9pt; vertical-align:top; width:12%;">${escapeHtml(item.dusun || '-')}</td>
+                <td style="border:1pt solid #999; padding:4pt 4pt; text-align:center; font-size:9pt; vertical-align:top; width:9%;">${Array.isArray(item.rt) ? item.rt.join(', ') : (item.rt || '-')}</td>
+                <td style="border:1pt solid #999; padding:4pt 4pt; text-align:center; font-size:9pt; vertical-align:top; width:14%;">${escapeHtml(item.kategori || '-')}</td>
+                <td style="border:1pt solid #999; padding:4pt 4pt; text-align:center; font-size:9pt; vertical-align:top; width:5%;">${item.rankingDesa || '-'}</td>
+                <td style="border:1pt solid #999; padding:4pt 6pt; text-align:right; font-size:9pt; vertical-align:top; width:20%;">${formatRupiah(item.estimasiBiaya)}</td>
             </tr>`;
         });
 
@@ -4969,23 +4973,23 @@
             <div style="font-size:12pt; font-weight:bold; margin-top:8pt; text-transform:uppercase;">Rincian Detail Seluruh Usulan Pembangunan Desa</div>
             <div style="font-size:9pt; margin-top:3pt;">RKP Desa Tahun ${escapeHtml(rkpT)} &amp; Du-RKP Desa Tahun ${escapeHtml(durkpT)}</div>
         </div>
-        <table style="width:100%; border-collapse:collapse; margin-bottom:14pt;">
+        <table style="width:100%; border-collapse:collapse; margin-bottom:14pt; table-layout:fixed;">
             <thead>
                 <tr style="background:#1565c0; color:#fff;">
-                    <td style="border:1pt solid #1565c0; padding:4pt 5pt; width:7pt; text-align:center; font-weight:bold; font-size:9pt;white-space:nowrap;">No</td>
-                    <td style="border:1pt solid #1565c0; padding:4pt 5pt; font-weight:bold; font-size:9pt;">Uraian Usulan</td>
-                    <td style="border:1pt solid #1565c0; padding:4pt 5pt; width:22pt; text-align:center; font-weight:bold; font-size:9pt;white-space:nowrap;">Dusun</td>
-                    <td style="border:1pt solid #1565c0; padding:4pt 5pt; width:18pt; text-align:center; font-weight:bold; font-size:9pt;white-space:nowrap;">RT</td>
-                    <td style="border:1pt solid #1565c0; padding:4pt 5pt; width:28pt; text-align:center; font-weight:bold; font-size:9pt;white-space:nowrap;">Kategori</td>
-                    <td style="border:1pt solid #1565c0; padding:4pt 5pt; width:15pt; text-align:center; font-weight:bold; font-size:9pt;white-space:nowrap;">Rank</td>
-                    <td style="border:1pt solid #1565c0; padding:4pt 5pt; width:60pt; text-align:center; font-weight:bold; font-size:9pt;white-space:nowrap;">Estimasi Biaya</td>
+                    <td style="border:1pt solid #1565c0; padding:5pt 4pt; text-align:center; font-weight:bold; font-size:9pt; width:4%;">No</td>
+                    <td style="border:1pt solid #1565c0; padding:5pt 5pt; font-weight:bold; font-size:9pt; width:36%;">Uraian Usulan</td>
+                    <td style="border:1pt solid #1565c0; padding:5pt 4pt; text-align:center; font-weight:bold; font-size:9pt; width:12%;">Dusun</td>
+                    <td style="border:1pt solid #1565c0; padding:5pt 4pt; text-align:center; font-weight:bold; font-size:9pt; width:9%;">RT</td>
+                    <td style="border:1pt solid #1565c0; padding:5pt 4pt; text-align:center; font-weight:bold; font-size:9pt; width:14%;">Kategori</td>
+                    <td style="border:1pt solid #1565c0; padding:5pt 4pt; text-align:center; font-weight:bold; font-size:9pt; width:5%;">Rank</td>
+                    <td style="border:1pt solid #1565c0; padding:5pt 6pt; text-align:center; font-weight:bold; font-size:9pt; width:20%;">Estimasi Biaya</td>
                 </tr>
             </thead>
             <tbody>
                 ${detailRows}
                 <tr style="background:#0d47a1; color:#fff; font-weight:bold;">
                     <td colspan="6" style="border:1pt solid #0d47a1; padding:5pt 6pt; text-align:right; font-size:10pt;">TOTAL</td>
-                    <td style="border:1pt solid #0d47a1; padding:5pt 6pt; text-align:right; font-size:10pt;white-space:nowrap;">${formatRupiah(totalBiaya)}</td>
+                    <td style="border:1pt solid #0d47a1; padding:5pt 6pt; text-align:right; font-size:10pt;">${formatRupiah(totalBiaya)}</td>
                 </tr>
             </tbody>
         </table>
@@ -5012,7 +5016,7 @@
         </div>`;
     }
 
-/* ==========================================
+    /* ==========================================
     LAMPIRAN III — USULAN BERDASARKAN TUJUAN SDGs
     ========================================== */
     function buildLampiranSDGsContent(f, tahun, usulanFinal, byDusun, totalBiaya, tglInfo) {
