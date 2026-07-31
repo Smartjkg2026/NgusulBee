@@ -276,7 +276,7 @@
        1. KONFIGURASI APLIKASI
        ========================================== */
     const CONFIG = {
-        API_URL: 'https://script.google.com/macros/s/AKfycbwsk32VrORd7GHJR3eDAIXiyUKtgM4pqqdZEmTTANzSAxxERUZk1nIM1cpSUVUpUNxRGQ/exec',
+        API_URL: 'https://script.google.com/macros/s/AKfycbwD-1mSwidELkbX6LNeTW7GLygIu9ke2CulInDuhr1Iw9yHO8BcLoPrHdKSxQ8GS_1InA/exec',
         APP_NAME: 'NgusulBee',
         DESA: 'Desa Jangkang',
         KATEGORI: ['Infrastruktur', 'Pendidikan', 'Kesehatan', 'Ekonomi', 'Sosial', 'Lingkungan'],
@@ -5542,7 +5542,7 @@
         showToast('Dokumen berhasil disimpan sebagai Word (.doc)', 'success');
     }
 
-/**
+    /**
      * Laporan Prioritas Pembangunan Desa
      * ✅ DIPERBAIKI: Menggunakan rankingDesa, Sort, dan Menambahkan Kolom Rujukan
      */
@@ -5641,17 +5641,26 @@
                             <h4 class="font-semibold text-sm text-gray-700">Daftar Prioritas Pembangunan Desa</h4>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-xs">
+                            <!-- ✅ PERBAIKAN: table-fixed agar kolom tidak bertumpuk -->
+                            <table class="w-full text-xs" style="table-layout: fixed;">
+                                <colgroup>
+                                    <col style="width: 52px;">   <!-- 1. Rank Desa -->
+                                    <col>                       <!-- 2. Judul (fleksibel) -->
+                                    <col style="width: 90px;">   <!-- 3. Dusun -->
+                                    <col style="width: 88px;">   <!-- 4. Kategori -->
+                                    <col style="width: 125px;">  <!-- 5. Estimasi Biaya (ditambah) -->
+                                    <col style="width: 195px;">  <!-- 6. Rencana Aksi -->
+                                    <col style="width: 50px;">   <!-- 7. % -->
+                                </colgroup>
                                 <thead class="bg-gray-50 border-b">
                                     <tr>
-                                        <th class="px-3 py-2.5 text-center font-semibold text-gray-600 w-16">Rank Desa</th>
-                                        <th class="px-3 py-2.5 text-left font-semibold text-gray-600">Usulan Pembangunan</th>
-                                        <th class="px-3 py-2.5 text-left font-semibold text-gray-600 w-20">Dusun</th>
-                                        <th class="px-3 py-2.5 text-center font-semibold text-gray-600 w-24">Kategori</th>
-                                        <th class="px-3 py-2.5 text-right font-semibold text-gray-600 w-32">Estimasi Biaya</th>
-                                        <!-- ✅ PENAMBAHAN: Kolom Rencana Aksi & Rujukan -->
-                                        <th class="px-3 py-2.5 text-left font-semibold text-gray-600 w-48">Rencana Aksi & Rujukan</th>
-                                        <th class="px-3 py-2.5 text-right font-semibold text-gray-600 w-16">%</th>
+                                        <th class="px-2 py-2.5 text-center font-semibold text-gray-600">Rank</th>
+                                        <th class="px-2 py-2.5 text-left font-semibold text-gray-600">Usulan Pembangunan</th>
+                                        <th class="px-2 py-2.5 text-left font-semibold text-gray-600">Dusun</th>
+                                        <th class="px-2 py-2.5 text-center font-semibold text-gray-600">Kategori</th>
+                                        <th class="px-2 py-2.5 text-right font-semibold text-gray-600">Est. Biaya</th>
+                                        <th class="px-2 py-2.5 text-left font-semibold text-gray-600">Rencana Aksi & Rujukan</th>
+                                        <th class="px-2 py-2.5 text-right font-semibold text-gray-600">%</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-100">
@@ -5659,30 +5668,29 @@
                                         const pct = totalBiaya > 0 ? (parseInt(item.estimasiBiaya) || 0) / totalBiaya * 100 : 0;
                                         const colorClass = kategoriColors[item.kategori] || 'bg-gray-100 text-gray-700 border-gray-200';
                                         
-                                        // ✅ LOGIKA RUJUKAN BERDASARKAN RANK DESA
                                         let rujukanHTML = '<span class="text-gray-300">-</span>';
                                         if (item.rencanaAksi) {
                                             const aksiColor = item.rencanaAksi === 'Kewenangan Desa' ? 'bg-forest-100 text-forest-700' : 'bg-amber-100 text-amber-700';
-                                            rujukanHTML = `<span class="inline-block px-2 py-0.5 rounded-full font-bold whitespace-normal break-words ${aksiColor}">${escapeHtml(item.rencanaAksi)}</span>`;
+                                            rujukanHTML = `<span class="inline-block px-1.5 py-0.5 rounded-full text-[9px] font-semibold leading-tight ${aksiColor}">${escapeHtml(item.rencanaAksi)}</span>`;
                                             
                                             if (item.rujukanUsulan) {
-                                                rujukanHTML += `<br><span class="text-[10px] text-gray-500 italic">→ Rujukan: ${escapeHtml(item.rujukanUsulan)}</span>`;
+                                                rujukanHTML += `<br><span class="text-[9px] text-gray-500 italic leading-tight">→ ${escapeHtml(item.rujukanUsulan)}</span>`;
                                             }
                                         }
 
                                         return `
                                         <tr class="hover:bg-gray-50 cursor-pointer" onclick="showDetail('${escapeJs(item.id)}')">
-                                            <td class="px-3 py-2.5 text-center">
-                                                <span class="inline-flex items-center justify-center w-7 h-7 rounded-full ${idx < 3 ? 'bg-honey-500 text-white' : 'bg-gray-200 text-gray-600'} text-[10px] font-bold">${item.rankingDesa || '-'}</span>
+                                            <td class="px-2 py-2 text-center">
+                                                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full ${idx < 3 ? 'bg-honey-500 text-white' : 'bg-gray-200 text-gray-600'} text-[9px] font-bold">${item.rankingDesa || '-'}</span>
                                             </td>
-                                            <td class="px-3 py-2.5 font-medium text-gray-800 whitespace-normal break-words leading-snug">${escapeHtml(item.judul)}</td>
-                                            <td class="px-3 py-2.5 text-gray-500 whitespace-nowrap">${escapeHtml(item.dusun)}</td>
-                                            <td class="px-3 py-2.5 text-center">
-                                                <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-medium border ${colorClass}">${item.kategori}</span>
+                                            <td class="px-2 py-2 font-medium text-gray-800" style="word-break: break-word; overflow-wrap: break-word; line-height: 1.3;">${escapeHtml(item.judul)}</td>
+                                            <td class="px-2 py-2 text-gray-500" style="word-break: break-word; overflow-wrap: break-word; line-height: 1.3;">${escapeHtml(item.dusun)}</td>
+                                            <td class="px-2 py-2 text-center">
+                                                <span class="inline-block px-1.5 py-0.5 rounded-full text-[9px] font-medium border ${colorClass}">${item.kategori}</span>
                                             </td>
-                                            <td class="px-3 py-2.5 text-right font-semibold whitespace-nowrap tabular-nums">${formatRupiah(item.estimasiBiaya)}</td>
-                                            <td class="px-3 py-2.5 whitespace-normal break-words">${rujukanHTML}</td>
-                                            <td class="px-3 py-2.5 text-right text-gray-500 tabular-nums">${pct.toFixed(1)}%</td>
+                                            <td class="px-2 py-2 text-right font-semibold tabular-nums" style="white-space: nowrap; word-break: normal;">${formatRupiah(item.estimasiBiaya)}</td>
+                                            <td class="px-2 py-2" style="word-break: break-word; overflow-wrap: break-word; line-height: 1.35;">${rujukanHTML}</td>
+                                            <td class="px-2 py-2 text-right text-gray-500 tabular-nums" style="white-space: nowrap;">${pct.toFixed(1)}%</td>
                                         </tr>`;
                                     }).join('')}
                                     ${usulanFinal.length === 0 ? `
@@ -5696,10 +5704,13 @@
                                 </tbody>
                                 ${usulanFinal.length > 0 ? `
                                 <tfoot class="bg-honey-50 border-t-2 border-honey-200">
-                                    <tr class="font-bold text-sm">
-                                        <td colspan="5" class="px-3 py-3 text-right text-honey-800">TOTAL PRIORITAS PEMBANGUNAN DESA</td>
-                                        <td class="px-3 py-3 text-center text-honey-600">100%</td>
-                                        <td class="px-3 py-3 text-right text-honey-600">100%</td>
+                                    <tr class="font-bold text-xs">
+                                        <!-- Span 4 kolom pertama untuk teks -->
+                                        <td colspan="4" class="px-2 py-3 text-right text-honey-800">TOTAL PRIORITAS PEMBANGUNAN DESA</td>
+                                        <!-- Kolom ke-5 diisi Total Anggaran -->
+                                        <td class="px-2 py-3 text-right text-honey-800 tabular-nums">${formatRupiah(totalBiaya)}</td>
+                                        <!-- Span 2 kolom terakhir untuk persentase -->
+                                        <td colspan="2" class="px-2 py-3 text-right text-honey-600">100%</td>
                                     </tr>
                                 </tfoot>
                                 ` : ''}
@@ -5712,7 +5723,8 @@
     }
 
     /* ==========================================
-        PRINT LAPORAN PRIORITAS (WINDOW POPUP)
+        PRINT LAPORAN PRIORITAS (LANDSCAPE A4)
+        ✅ DIPERBAIKI: Kolom tidak bertumpuk
         ========================================== */
     function printLaporanPrioritas() {
         const contentEl = document.getElementById('laporanPrioritasContent');
@@ -5721,96 +5733,131 @@
             return;
         }
 
-        // Ganti warna Tailwind menjadi warna inline agar tampil saat dicetak
-        let content = contentEl.innerHTML;
-        content = content.replace(/bg-honey-500/g, 'background-color:#d97706; color:#fff;');
-        content = content.replace(/bg-honey-50/g, 'background-color:#fffbeb;');
-        content = content.replace(/bg-honey-600/g, 'background-color:#b45309; color:#fff;');
-        content = content.replace(/bg-forest-100 text-forest-700/g, 'background-color:#d1fae5; color:#065f46;');
-        content = content.replace(/bg-amber-100 text-amber-700/g, 'background-color:#fef3c7; color:#92400e;');
-        content = content.replace(/bg-gray-50/g, 'background-color:#f9fafb;');
-        content = content.replace(/bg-gray-100/g, 'background-color:#f3f4f6;');
-        content = content.replace(/bg-gray-200 text-gray-600/g, 'background-color:#e5e7eb; color:#4b5563;');
-        content = content.replace(/bg-blue-100 text-blue-700/g, 'background-color:#dbeafe; color:#1d4ed8;');
-        content = content.replace(/bg-green-100 text-green-700/g, 'background-color:#d1fae5; color:#047857;');
-        content = content.replace(/bg-purple-100 text-purple-700/g, 'background-color:#ede9fe; color:#6d28d9;');
-        content = content.replace(/bg-red-100 text-red-700/g, 'background-color:#fee2e2; color:#b91c1c;');
-        content = content.replace(/bg-orange-100 text-orange-700/g, 'background-color:#ffedd5; color:#c2410c;');
-        content = content.replace(/bg-teal-100 text-teal-700/g, 'background-color:#ccfbf1; color:#0f766e;');
-        content = content.replace(/text-honey-800/g, 'color:#92400e;');
-        content = content.replace(/text-honey-600/g, 'color:#d97706;');
-        content = content.replace(/border-honey-200/g, 'border-color:#fde68a;');
-        content = content.replace(/border-blue-200/g, 'border-color:#bfdbfe;');
-        content = content.replace(/border-green-200/g, 'border-color:#a7f3d0;');
-        content = content.replace(/border-purple-200/g, 'border-color:#ddd6fe;');
-        content = content.replace(/border-red-200/g, 'border-color:#fecaca;');
-        content = content.replace(/border-orange-200/g, 'border-color:#fed7aa;');
-        content = content.replace(/border-teal-200/g, 'border-color:#99f6e4;');
-        content = content.replace(/border-gray-200/g, 'border-color:#e5e7eb;');
+        const content = contentEl.innerHTML;
 
         const printHTML = `<!DOCTYPE html>
     <html lang="id">
     <head>
-    <meta charset="UTF-8">
-    <title>Laporan Prioritas - Desa Jangkang</title>
-    <style>
-        @page { size: A4; margin: 15mm; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color: #000; line-height: 1.4; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1pt solid #e5e7eb; padding: 5pt 8pt; }
-        tr { page-break-inside: avoid; }
-        .inline-block { display: inline-block; }
-        .inline-flex { display: inline-flex; align-items: center; justify-content: center; }
-        .whitespace-normal { white-space: normal; }
-        .whitespace-nowrap { white-space: nowrap; }
-        .break-words { word-break: break-word; overflow-wrap: break-word; }
-        .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .text-left { text-align: left; }
-        .font-bold, .font-semibold { font-weight: bold; }
-        .rounded-full { border-radius: 50%; }
-        .rounded-lg { border-radius: 8px; }
-        .rounded-xl { border-radius: 12px; }
-        .italic { font-style: italic; }
-        .grid { display: grid; gap: 16px; }
-        .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
-        .w-3, .w-7 { display: inline-block; }
-        .w-3 { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
-        .w-7 { width: 28px; height: 28px; line-height: 28px; text-align:center; font-size: 10px; font-weight: bold; }
-        .h-2 { height: 8px; }
-        .p-2, .p-4 { padding: 8px; }
-        .p-4 { padding: 16px; }
-        .mb-1, .mb-3, .mb-4, .mb-5, .mb-6 { margin-bottom: 4px; }
-        .mb-3 { margin-bottom: 12px; }
-        .mb-4 { margin-bottom: 16px; }
-        .mb-5 { margin-bottom: 20px; }
-        .mb-6 { margin-bottom: 24px; }
-        .gap-2, .gap-3 { display: flex; align-items: center; gap: 8px; }
-        .gap-3 { gap: 12px; }
-        .flex { display: flex; }
-        .justify-between { justify-content: space-between; }
-        .items-center { align-items: center; }
-        .text-\[10px\] { font-size: 9pt; }
-        .text-xs { font-size: 10pt; }
-        .text-sm { font-size: 11pt; }
-        .min-w-0 { min-width: 0; }
-        .leading-snug { line-height: 1.3; }
-        .tabular-nums { font-variant-numeric: tabular-nums; }
-        .opacity-40 { opacity: 0.4; }
-    </style>
+        <meta charset="UTF-8">
+        <title>Laporan Prioritas - Desa Jangkang</title>
+
+        <script src="https://cdn.tailwindcss.com"><\/script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            honey: {
+                                50:  '#fffbeb', 100: '#fef3c7', 200: '#fde68a',
+                                300: '#fcd34d', 400: '#fbbf24', 500: '#d97706',
+                                600: '#b45309', 700: '#92400e', 800: '#78350f',
+                                900: '#451a03',
+                            },
+                            forest: {
+                                50:  '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0',
+                                300: '#6ee7b7', 400: '#34d399', 500: '#10b981',
+                                600: '#059669', 700: '#047857', 800: '#065f46',
+                                900: '#064e3b',
+                            }
+                        },
+                        fontFamily: {
+                            display: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+                        }
+                    }
+                }
+            }
+        <\/script>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+        <style>
+            @page {
+                size: A4 landscape;
+                margin: 10mm 12mm;
+            }
+
+            body {
+                background: #fff;
+                font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+                font-size: 9pt;
+                line-height: 1.3;
+            }
+
+            @media print {
+                *, *::before, *::after {
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                }
+
+                tr:hover { background: transparent !important; }
+                .overflow-x-auto { overflow: visible !important; width: 100% !important; }
+                .grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+
+                /* ✅ PENTING: Paksa table-fixed & override semua lebar kolom */
+                table {
+                    width: 100% !important;
+                    table-layout: fixed !important;
+                }
+
+                colgroup col:nth-child(1) { width: 48px !important; }
+                colgroup col:nth-child(2) { width: auto !important; }
+                colgroup col:nth-child(3) { width: 85px !important; }
+                colgroup col:nth-child(4) { width: 80px !important; }
+                colgroup col:nth-child(5) { width: 118px !important; }
+                colgroup col:nth-child(6) { width: 185px !important; }
+                colgroup col:nth-child(7) { width: 44px !important; }
+
+                th, td {
+                    padding: 3pt 4pt !important;
+                    font-size: 7.5pt !important;
+                    word-break: break-word !important;
+                    overflow-wrap: break-word !important;
+                    vertical-align: top !important;
+                }
+
+                thead th {
+                    font-size: 7pt !important;
+                    vertical-align: bottom !important;
+                }
+
+                /* Badge di dalam tabel */
+                table .inline-block { font-size: 6.5pt !important; padding: 0px 4px !important; }
+                table .inline-flex { width: 18px !important; height: 18px !important; line-height: 18px !important; font-size: 7pt !important; }
+
+                /* Ringkasan grid */
+                .grid .text-xs { font-size: 7.5pt !important; }
+                .grid .text-\[10px\] { font-size: 6.5pt !important; }
+                .grid .p-2 { padding: 4px !important; }
+                .grid .p-4 { padding: 10px !important; }
+
+                tr { page-break-inside: avoid; }
+                thead { display: table-header-group; }
+                tfoot { display: table-footer-group; }
+            }
+        </style>
     </head>
     <body>
-        <div style="margin-bottom:16px; border-bottom:2px solid #000; padding-bottom:8px;">
-            <h2 style="font-size:16pt; font-weight:bold; margin-bottom:4px;">Laporan Prioritas Pembangunan Desa Jangkang</h2>
-            <p style="font-size:11pt; color:#555;">Tahun Anggaran ${STATE.tahunAktif} · Diurutkan berdasarkan Ranking Desa</p>
+        <div style="margin-bottom: 14px; border-bottom: 2.5px solid #000; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+                <h2 style="font-size: 15pt; font-weight: 800; margin-bottom: 2px; color: #1f2937;">
+                    Laporan Prioritas Pembangunan Desa Jangkang
+                </h2>
+                <p style="font-size: 10pt; color: #6b7280;">
+                    Tahun Anggaran ${STATE.tahunAktif} &middot; Diurutkan berdasarkan Ranking Desa
+                </p>
+            </div>
+            <div style="text-align: right; font-size: 7pt; color: #9ca3af;">
+                Landscape A4
+            </div>
         </div>
+
         ${content}
     </body>
     </html>`;
 
-        const printWin = window.open('', '_blank', 'width=900,height=700');
+        const printWin = window.open('', '_blank', 'width=1100,height=700');
         if (!printWin) {
             showToast('Pop-up diblokir browser. Izinkan pop-up untuk mencetak.', 'error');
             return;
@@ -5819,11 +5866,13 @@
         printWin.document.write(printHTML);
         printWin.document.close();
 
-        printWin.onload = function() {
-            setTimeout(() => { printWin.print(); }, 300);
+        printWin.onload = function () {
+            setTimeout(() => {
+                printWin.print();
+            }, 600);
         };
-        
-        showToast('Menyiapkan laporan untuk dicetak...', 'info');
+
+        showToast('Menyiapkan laporan untuk dicetak (Landscape)...', 'info');
     }
 
     /**
@@ -5919,7 +5968,7 @@
                 </div>
 
                 <!-- Konten yang akan dicetak -->
-                <div id="laporanSDGSContent">
+                <div id="laporanSDGSContent" data-sdgs-count="${sdgsData.length}">
                     <!-- SDGs Grid -->
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6">
                         ${sdgsList.map(sdgs => {
@@ -6014,116 +6063,162 @@
         </div>`;
     }
 
-    /* ==========================================
-        PRINT LAPORAN SDGs (WINDOW POPUP)
-        ========================================== */
-    function printLaporanSDGS() {
-        const contentEl = document.getElementById('laporanSDGSContent');
-        if (!contentEl) {
-            showToast('Konten laporan SDGs tidak ditemukan.', 'error');
-            return;
-        }
+        /* ==========================================
+            PRINT LAPORAN SDGs (LANDSCAPE A4)
+            ✅ DIPERBAIKI: Format landscape, 100% sama seperti layar
+            ========================================== */
+        function printLaporanSDGS() {
+            const contentEl = document.getElementById('laporanSDGSContent');
+            if (!contentEl) {
+                showToast('Konten laporan SDGs tidak ditemukan.', 'error');
+                return;
+            }
 
-        let content = contentEl.innerHTML;
-        content = content.replace(/hover:shadow-md hover:-translate-y-0.5/g, '');
-        content = content.replace(/cursor-pointer/g, '');
-        content = content.replace(/transition-all duration-200/g, '');
+            const sdgsCount = contentEl.getAttribute('data-sdgs-count') || '0';
 
-        const printHTML = `<!DOCTYPE html>
+            // Bersihkan class interaktif yang tidak berguna saat dicetak
+            let content = contentEl.innerHTML;
+            content = content.replace(/cursor-pointer/g, '');
+            content = content.replace(/hover:shadow-md/g, '');
+            content = content.replace(/hover:-translate-y-0\.5/g, '');
+            content = content.replace(/hover:bg-gray-50/g, '');
+            content = content.replace(/transition-all duration-200/g, '');
+
+            const printHTML = `<!DOCTYPE html>
     <html lang="id">
     <head>
-    <meta charset="UTF-8">
-    <title>Laporan SDGs - Desa Jangkang</title>
-    <style>
-        @page { size: A4; margin: 15mm; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color: #000; line-height: 1.4; }
-        .grid { display: grid; gap: 10px; }
-        .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
-        .sm_grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
-        .md_grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
-        @media (max-width: 640px) { .sm_grid-cols-3 { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 768px) { .md_grid-cols-4 { grid-template-columns: repeat(2, 1fr); } }
-        .flex { display: flex; }
-        .inline-flex { display: inline-flex; align-items: center; justify-content: center; }
-        .items-center, .items-start { align-items: center; }
-        .items-start { align-items: flex-start; }
-        .justify-center { justify-content: center; }
-        .justify-end { justify-content: flex-end; }
-        .gap-2, .gap-3 { gap: 8px; }
-        .gap-3 { gap: 12px; }
-        .min-w-0 { min-width: 0; }
-        .flex-shrink-0 { flex-shrink: 0; }
-        .border { border: 1px solid #e5e7eb; }
-        .rounded-xl { border-radius: 12px; }
-        .rounded-lg { border-radius: 8px; }
-        .rounded-full { border-radius: 50%; }
-        .p-3 { padding: 12px; }
-        .mb-6 { margin-bottom: 24px; }
-        .mt-0\.5 { margin-top: 2px; }
-        .mt-1 { margin-top: 4px; }
-        .px-3 { padding-left: 12px; padding-right: 12px; }
-        .px-4 { padding-left: 16px; padding-right: 16px; }
-        .py-2\.5 { padding-top: 10px; padding-bottom: 10px; }
-        .py-3 { padding-top: 12px; padding-bottom: 12px; }
-        .text-xs { font-size: 10pt; }
-        .text-sm { font-size: 11pt; }
-        .text-\[10px\] { font-size: 9pt; }
-        .text-\[9px\] { font-size: 8pt; }
-        .font-bold, .font-semibold, .font-medium { font-weight: bold; }
-        .text-center { text-align: center; }
-        .text-left { text-align: left; }
-        .text-right { text-align: right; }
-        .text-gray-400 { color: #9ca3af; }
-        .text-gray-500 { color: #6b7280; }
-        .text-gray-600 { color: #4b5563; }
-        .text-gray-800 { color: #1f2937; }
-        .text-white { color: #ffffff; }
-        .leading-tight { line-height: 1.25; }
-        .opacity-30 { opacity: 0.3; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #e5e7eb; padding: 5pt 8pt; }
-        .bg-gray-50 { background-color: #f9fafb; }
-        .bg-gray-100 { background-color: #f3f4f6; }
-        .divide-y > * + * { border-top: 1px solid #f3f4f6; }
-        .overflow-x-auto { overflow-x: auto; }
-        tr { page-break-inside: avoid; }
-        .w-5, .w-7, .w-8, .w-16 { display: inline-block; text-align: center; }
-        .w-5 { width: 20px; height: 20px; line-height: 20px; font-size: 8pt; border-radius: 50%; }
-        .w-7 { width: 28px; height: 28px; line-height: 28px; font-size: 10pt; border-radius: 8px; }
-        .w-8 { width: 32px; height: 32px; line-height: 32px; border-radius: 8px; }
-        .w-16 { width: 64px; }
-        .h-1\.5 { height: 6px; width: 100%; border-radius: 999px; }
-        .relative { position: relative; }
-        .absolute { position: absolute; }
-        .-top-1\.5 { top: -6px; }
-        .-right-1\.5 { right: -6px; }
-    </style>
+        <meta charset="UTF-8">
+        <title>Laporan SDGs - Desa Jangkang</title>
+
+        <!-- Include Tailwind CSS CDN -->
+        <script src="https://cdn.tailwindcss.com"><\/script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            honey: {
+                                50:  '#fffbeb', 100: '#fef3c7', 200: '#fde68a',
+                                300: '#fcd34d', 400: '#fbbf24', 500: '#d97706',
+                                600: '#b45309', 700: '#92400e', 800: '#78350f',
+                                900: '#451a03',
+                            },
+                            forest: {
+                                50:  '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0',
+                                300: '#6ee7b7', 400: '#34d399', 500: '#10b981',
+                                600: '#059669', 700: '#047857', 800: '#065f46',
+                                900: '#064e3b',
+                            }
+                        },
+                        fontFamily: {
+                            display: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+                        }
+                    }
+                }
+            }
+        <\/script>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+        <style>
+            /* ✅ LANDSCAPE A4 */
+            @page {
+                size: A4 landscape;
+                margin: 10mm 12mm;
+            }
+
+            body {
+                background: #fff;
+                font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+                font-size: 9pt;
+                line-height: 1.3;
+            }
+
+            @media print {
+                *, *::before, *::after {
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                }
+
+                tr:hover { background: transparent !important; }
+                .overflow-x-auto { overflow: visible !important; width: 100% !important; }
+
+                /* ✅ Grid SDGs dibuat 6 kolom untuk memanfaatkan lebar Landscape */
+                .grid { 
+                    grid-template-columns: repeat(6, 1fr) !important; 
+                    gap: 8px !important; 
+                }
+
+                /* Optimasi ukuran elemen di dalam grid kartu SDGs */
+                .grid .text-\[10px\] { font-size: 7.5pt !important; }
+                .grid .text-\[9px\] { font-size: 6.5pt !important; }
+                .grid .p-3 { padding: 6px !important; }
+                .grid .gap-2 { gap: 5px !important; }
+                
+                /* Perkecil ikon dan badge angka di kartu */
+                .grid .w-8 { width: 22px !important; height: 22px !important; line-height: 22px !important; font-size: 8pt !important; }
+                .grid .w-5 { width: 15px !important; height: 15px !important; line-height: 15px !important; font-size: 6pt !important; }
+                .grid .-top-1\.5 { top: -4px !important; }
+                .grid .-right-1\.5 { right: -4px !important; }
+
+                /* Sesuaikan Tabel Ringkasan di bawah */
+                table { width: 100% !important; }
+                th, td { 
+                    padding: 3pt 5pt !important; 
+                    font-size: 8pt !important;
+                }
+                thead th { font-size: 7.5pt !important; }
+                
+                /* Perkecil badge angka SDGs di tabel */
+                table .w-7 { width: 22px !important; height: 22px !important; line-height: 22px !important; font-size: 8pt !important; }
+                table .w-16 { width: 50px !important; }
+
+                tr { page-break-inside: avoid; }
+                thead { display: table-header-group; }
+                tfoot { display: table-footer-group; }
+            }
+        </style>
     </head>
     <body>
-        <div style="margin-bottom:16px; border-bottom:2px solid #000; padding-bottom:8px;">
-            <h2 style="font-size:16pt; font-weight:bold; margin-bottom:4px;">Laporan Usulan Berdasarkan SDGs Desa Jangkang</h2>
-            <p style="font-size:11pt; color:#555;">Tahun Anggaran ${STATE.tahunAktif}</p>
+        <!-- Header Laporan -->
+        <div style="margin-bottom: 14px; border-bottom: 2.5px solid #000; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+                <h2 style="font-size: 15pt; font-weight: 800; margin-bottom: 2px; color: #1f2937; font-family: 'Plus Jakarta Sans', sans-serif;">
+                    Laporan Usulan Berdasarkan SDGs Desa Jangkang
+                </h2>
+                <p style="font-size: 10pt; color: #6b7280; font-family: 'Plus Jakarta Sans', sans-serif;">
+                    Tahun Anggaran ${STATE.tahunAktif} &middot; ${sdgsCount} dari 17 Tujuan SDGs
+                </p>
+            </div>
+            <div style="text-align: right; font-size: 7pt; color: #9ca3af;">
+                Format: Landscape A4
+            </div>
         </div>
+
+        <!-- Konten laporan -->
         ${content}
     </body>
     </html>`;
 
-        const printWin = window.open('', '_blank', 'width=900,height=700');
-        if (!printWin) {
-            showToast('Pop-up diblokir browser. Izinkan pop-up untuk mencetak.', 'error');
-            return;
+            const printWin = window.open('', '_blank', 'width=1100,height=700');
+            if (!printWin) {
+                showToast('Pop-up diblokir browser. Izinkan pop-up untuk mencetak.', 'error');
+                return;
+            }
+
+            printWin.document.write(printHTML);
+            printWin.document.close();
+
+            printWin.onload = function () {
+                setTimeout(() => {
+                    printWin.print();
+                }, 600);
+            };
+
+            showToast('Menyiapkan laporan SDGs untuk dicetak (Landscape)...', 'info');
         }
-
-        printWin.document.write(printHTML);
-        printWin.document.close();
-
-        printWin.onload = function() {
-            setTimeout(() => { printWin.print(); }, 300);
-        };
-        
-        showToast('Menyiapkan laporan SDGs untuk dicetak...', 'info');
-    }
 
     /**
      * Modal detail SDGs Desa
